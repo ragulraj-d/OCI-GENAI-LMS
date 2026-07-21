@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Day 31 — Oracle APEX Fundamentals</title>
+<style>
+:root{--bg:#F7F8FA;--surface:#FFF;--border:#E4E7ED;--accent:#1A5276;--accent-light:#EAF0F8;--accent-mid:#C5D9EF;--gold:#B7860B;--gold-light:#FDF8EC;--green:#1D6A3E;--green-light:#EAF5EE;--red:#8B1A1A;--red-light:#FDF0F0;--teal:#0E6655;--teal-light:#E8F8F5;--purple:#4A235A;--purple-light:#F5EEF8;--text:#1C1C2E;--muted:#5D6D7E;--radius:10px;--shadow:0 2px 10px rgba(0,0,0,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
+.header{background:linear-gradient(135deg,#1A3A5C,#1A5276);color:#fff;padding:40px 44px 32px;position:relative;overflow:hidden}
+.header::after{content:'';position:absolute;right:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04)}
+.day-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px}
+.header-sub{font-size:15px;opacity:.75;margin-bottom:24px}
+.header-pills{display:flex;flex-wrap:wrap;gap:10px}
+.header-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600}
+.container{max-width:960px;margin:0 auto;padding:36px 20px 80px}
+.section-label{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:40px 0 14px;padding-left:2px}
+.obj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.obj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:10px}
+.obj-num{background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.obj-text{font-size:13px;font-weight:600;line-height:1.4}
+.concept{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:18px;overflow:hidden;box-shadow:var(--shadow)}
+.concept-header{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--accent-light)}
+.concept-icon{width:36px;height:36px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.concept-title{font-size:16px;font-weight:700;color:var(--accent);flex:1}
+.concept-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#fff;padding:3px 10px;border-radius:20px}
+.concept-body{padding:20px}
+.card{border-radius:8px;padding:14px 16px;margin-bottom:14px;border-left:4px solid}
+.card:last-child{margin-bottom:0}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.card-content{font-size:14px;line-height:1.75}
+.card.what{background:var(--accent-light);border-color:var(--accent)}.card.what .card-label{color:var(--accent)}
+.card.why{background:var(--teal-light);border-color:var(--teal)}.card.why .card-label{color:var(--teal)}
+.card.how{background:var(--green-light);border-color:var(--green)}.card.how .card-label{color:var(--green)}
+.card.example{background:var(--gold-light);border-color:var(--gold)}.card.example .card-label{color:var(--gold)}
+.card.note{background:#FFF8E1;border-color:#F9A825}.card.note .card-label{color:#7A5800}
+.card.lab{background:var(--purple-light);border-color:var(--purple)}.card.lab .card-label{color:var(--purple)}
+.card.mistake{background:var(--red-light);border-color:var(--red)}.card.mistake .card-label{color:var(--red)}
+.steps{list-style:none;margin-top:10px}
+.steps li{position:relative;padding:7px 0 7px 32px;font-size:14px;border-left:2px solid var(--border);margin-left:12px;line-height:1.6}
+.steps li::before{content:attr(data-n);position:absolute;left:-12px;top:7px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps li+li{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px}
+th{background:var(--accent-light);color:var(--accent);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--accent-mid)}
+td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--accent-light)}
+pre{background:#1C1C2E;color:#E0E0F0;border-radius:8px;padding:16px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code','Courier New',monospace;font-size:13px;line-height:1.65;margin-top:10px}
+.kw{color:#79B8FF}.str{color:#9ECBFF}.cm{color:#6A9955;font-style:italic}.num{color:#F97583}.fn{color:#DCDCAA}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-top:12px}
+.flow-box{background:var(--accent-light);border:1.5px solid var(--accent-mid);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;color:var(--accent);text-align:center;white-space:nowrap}
+.flow-arrow{font-size:18px;color:var(--muted);padding:0 8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.grid2-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.grid2-item h4{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.grid2-item ul{padding-left:18px;font-size:13px;line-height:1.7}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.grid3-item{background:var(--accent-light);border:1px solid var(--accent-mid);border-radius:8px;padding:12px 14px}
+.g3-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.g3-body{font-size:12.5px;color:var(--text);line-height:1.55}
+.checklist{list-style:none;margin-top:10px}
+.checklist li{padding:6px 0 6px 26px;position:relative;font-size:14px;border-bottom:1px dashed var(--border)}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:'☐';position:absolute;left:0;color:var(--accent);font-size:15px}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.badge{background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-mid);border-radius:6px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.badge.green{background:var(--green-light);color:var(--green);border-color:#A9DFBF}
+.badge.gold{background:var(--gold-light);color:var(--gold);border-color:#F9E4B0}
+hr{border:none;border-top:1px dashed var(--border);margin:18px 0}
+.summary{background:linear-gradient(135deg,#1A3A5C,#1A5276);color:#fff;border-radius:var(--radius);padding:24px 28px;margin-top:10px}
+.summary h3{font-size:16px;font-weight:700;margin-bottom:14px;opacity:.9}
+.summary ul{padding-left:20px;font-size:14px;line-height:1.85;opacity:.9}
+.footer{text-align:center;padding:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:48px}
+@media(max-width:720px){.obj-grid{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.flow{flex-direction:column;align-items:flex-start}.header{padding:28px 20px 24px}.header h1{font-size:22px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="day-pill">&#128216; Day 31 &middot; OCI GenAI Programme</div>
+  <h1>Oracle APEX Fundamentals</h1>
+  <p class="header-sub">Oracle Stack &middot; Workspace &middot; Sessions &middot; Lifecycle &middot; LOVs &middot; Branches &middot; Debug &middot; Export</p>
+  <div class="header-pills">
+    <span class="header-pill">&#128197; July 13, 2026</span>
+    <span class="header-pill">&#127919; Hands-On Session</span>
+    <span class="header-pill">&#128738; ADB: genaishared</span>
+    <span class="header-pill">&#127760; WS_TRAINEE01 &ndash; WS_TRAINEE20</span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="section-label">What You Will Learn Today</div>
+<div class="obj-grid">
+  <div class="obj-card"><div class="obj-num">1</div><div class="obj-text">OCI Cloud Basics &mdash; Tenancy, Compartments, IAM</div></div>
+  <div class="obj-card"><div class="obj-num">2</div><div class="obj-text">Oracle Stack &mdash; DB, ORDS, APEX Engine</div></div>
+  <div class="obj-card"><div class="obj-num">3</div><div class="obj-text">Database vs Schema vs Workspace vs App</div></div>
+  <div class="obj-card"><div class="obj-num">4</div><div class="obj-text">Full Application Lifecycle &mdash; Request to Response</div></div>
+  <div class="obj-card"><div class="obj-num">5</div><div class="obj-text">Session Management &mdash; State, Timeout, Logout</div></div>
+  <div class="obj-card"><div class="obj-num">6</div><div class="obj-text">Page Designer &middot; Region Types &middot; Item Types</div></div>
+  <div class="obj-card"><div class="obj-num">7</div><div class="obj-text">Rendering &middot; Processing &middot; Computations &middot; Branches &middot; Processes</div></div>
+  <div class="obj-card"><div class="obj-num">8</div><div class="obj-text">LOVs &middot; Page Types &middot; Page Modes &middot; Shared Components</div></div>
+  <div class="obj-card"><div class="obj-num">9</div><div class="obj-text">SQL vs PL/SQL &middot; Debug Mode &middot; Error Handling &middot; Export/Import</div></div>
+</div>
+
+<!-- PART A -->
+<div class="section-label">Part A &middot; OCI Cloud Basics</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#9729;</div><div class="concept-title">What is OCI and How It Connects to APEX</div><div class="concept-tag">Foundation</div></div>
+  <div class="concept-body">
+    <div class="card what">
+      <div class="card-label">What is OCI</div>
+      <div class="card-content">OCI stands for <strong>Oracle Cloud Infrastructure</strong> &mdash; Oracle's cloud platform, similar to AWS, Azure, and GCP, but purpose-built for Oracle workloads like databases and APEX applications. Your entire APEX setup today runs on OCI.</div>
+    </div>
+    <table>
+      <tr><th>OCI Concept</th><th>What It Is</th><th>Your Training Context</th></tr>
+      <tr><td><strong>Tenancy</strong></td><td>Root OCI account &mdash; top-level container</td><td>ocigenai58</td></tr>
+      <tr><td><strong>Region</strong></td><td>Physical data centre location</td><td>India South &mdash; Hyderabad (ap-hyderabad-1)</td></tr>
+      <tr><td><strong>Availability Domain</strong></td><td>Isolated DC inside a region</td><td>One AD fails, others keep running</td></tr>
+      <tr><td><strong>Compartment</strong></td><td>Logical folder to organise resources</td><td>genai-shared &rarr; holds your ADB + APEX</td></tr>
+      <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td><td>Users, Groups, Policies for access control</td></tr>
+      <tr><td><strong>ADB</strong></td><td>Autonomous Database &mdash; self-managing Oracle DB</td><td>genaishared &mdash; APEX runs here</td></tr>
+    </table>
+    <div class="card how" style="margin-top:14px;">
+      <div class="card-label">Resource Hierarchy</div>
+      <div class="card-content">
+        <div class="flow" style="flex-wrap:wrap;">
+          <div class="flow-box">Tenancy</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Compartment</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">ADB (genaishared)</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">APEX Engine</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Your Workspace</div>
+        </div>
+      </div>
+    </div>
+    <div class="card note" style="margin-top:14px;">
+      <div class="card-label">Basic Networking &mdash; One Concept</div>
+      <div class="card-content"><strong>VCN &rarr; Subnet &rarr; Internet Gateway &rarr; Internet.</strong> Your ADB sits inside a VCN subnet. ORDS listens on port 443 (HTTPS). Requests pass through the Internet Gateway into the subnet and reach ORDS &mdash; which talks to the DB internally. No configuration needed today; just know the path exists.</div>
+    </div>
+    <div class="card note">
+      <div class="card-label">Always Free Tier &mdash; Cost Today</div>
+      <div class="card-content">1 ADB (1 OCPU, 20 GB) &middot; Object Storage 20 GB &middot; OCI Functions 2M calls/month. Days 31&ndash;38 cost <strong>&#8377;0</strong>. Compute charges begin from Day 39.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART B -->
+<div class="section-label">Part B &middot; REST, JSON &amp; HTTP &mdash; Foundation for Gen AI</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128279;</div><div class="concept-title">REST APIs, HTTP Methods, Headers &amp; JSON</div><div class="concept-tag">Bridge</div></div>
+  <div class="concept-body">
+    <div class="card why">
+      <div class="card-label">Why This Matters Right Now</div>
+      <div class="card-content">From Day 33 onwards, your APEX app calls <strong>OCI Gen AI</strong> via a REST API. The request is JSON. The response is JSON. APEX parses that JSON and shows the AI answer on screen. Understanding REST and JSON now means you will not be confused when the code uses <code>apex_web_service.make_rest_request</code> or <code>apex_json.get_varchar2</code>.</div>
+    </div>
+    <table>
+      <tr><th>HTTP Method</th><th>Purpose</th><th>Real Example</th></tr>
+      <tr><td><strong>GET</strong></td><td>Fetch / Read data</td><td>Fetch employee list from HR system</td></tr>
+      <tr><td><strong>POST</strong></td><td>Send / Create data</td><td>Submit leave request, call Gen AI API</td></tr>
+      <tr><td><strong>PUT</strong></td><td>Update existing data</td><td>Update employee salary</td></tr>
+      <tr><td><strong>DELETE</strong></td><td>Remove data</td><td>Delete a cancelled leave request</td></tr>
+    </table>
+    <table style="margin-top:12px;">
+      <tr><th>Status Code</th><th>Meaning</th></tr>
+      <tr><td>200</td><td>Success &mdash; data returned correctly</td></tr>
+      <tr><td>201</td><td>Created &mdash; new record made</td></tr>
+      <tr><td>400</td><td>Bad Request &mdash; wrong JSON format</td></tr>
+      <tr><td>401</td><td>Unauthorized &mdash; missing or invalid API key</td></tr>
+      <tr><td>404</td><td>Not Found &mdash; wrong endpoint URL</td></tr>
+      <tr><td>500</td><td>Server Error &mdash; something failed server-side</td></tr>
+    </table>
+    <div class="card what" style="margin-top:14px;">
+      <div class="card-label">Request Headers</div>
+      <div class="card-content">Every HTTP request carries headers &mdash; metadata about the request itself.
+<pre><span class="cm">-- Common headers used with OCI Gen AI:</span>
+Content-Type: application/json   <span class="cm">-- "I am sending JSON"</span>
+Accept: application/json         <span class="cm">-- "I want JSON back"</span>
+Authorization: Bearer &lt;token&gt;   <span class="cm">-- "Here is my identity proof"</span></pre>
+In APEX, when you use a Web Credential with OCI Signing, headers are handled automatically. Your private key signs every request so OCI can verify it came from you.</div>
+    </div>
+    <div class="card example">
+      <div class="card-label">JSON &mdash; Parse vs Serialize</div>
+      <div class="card-content"><strong>Serialize</strong> = Convert your data INTO JSON to send. &nbsp;<strong>Parse</strong> = Convert JSON response BACK into usable values.
+<pre><span class="cm">-- Serialize: build request body</span>
+l_body := <span class="str">'{"message":"How many leaves do I have?","maxTokens":500}'</span>;
+
+<span class="cm">-- Parse: extract value from response</span>
+apex_json.parse(l_response);
+l_answer := apex_json.get_varchar2(p_path =&gt; <span class="str">'chatResponse.text'</span>);</pre>
+<strong>JSON Types:</strong> String <code>"text"</code> &middot; Number <code>25</code> &middot; Boolean <code>true/false</code> &middot; Array <code>[1,2,3]</code> &middot; Object <code>{key:value}</code> &middot; Null <code>null</code></div>
+    </div>
+    <div class="card note">
+      <div class="card-label">Authentication Types</div>
+      <div class="card-content"><strong>API Key</strong> &mdash; Simple key in header &nbsp;|&nbsp; <strong>Bearer Token</strong> &mdash; JWT, expires after a time window &nbsp;|&nbsp; <strong>OCI Signing</strong> &mdash; Private-key signing (used for all OCI APIs) &nbsp;|&nbsp; <strong>Basic Auth</strong> &mdash; Username:Password encoded in header</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART C: ORACLE STACK -->
+<div class="section-label">Part C &middot; Oracle APEX &mdash; The Stack</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#127959;</div><div class="concept-title">Oracle Stack &mdash; DB &rarr; ORDS &rarr; APEX</div><div class="concept-tag">Core Concept</div></div>
+  <div class="concept-body">
+    <div class="card why">
+      <div class="card-label">The Business Problem APEX Solves</div>
+      <div class="card-content">A company with 5,000 employees gets 200 leave requests every Monday. HR manages them on Excel and WhatsApp. The HR manager spends 3 hours sorting. Approvals go on email &mdash; no tracking. Employees have no visibility.<br><br><strong>This is a real problem in every large organisation.</strong> APEX solves it in 2 days: one developer, one database, one application &mdash; leave request &rarr; manager approval &rarr; employee notification &mdash; all in a browser, no installation, no separate web server.</div>
+    </div>
+    <div class="card what">
+      <div class="card-label">What is Oracle APEX</div>
+      <div class="card-content">APEX (Application Express) is a <strong>low-code web application platform</strong> that runs inside Oracle Database. Build complete enterprise web apps using only SQL &mdash; no separate HTML, CSS, or JavaScript required. Used by 50,000+ organisations worldwide.</div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Complete Request Flow</div>
+      <div class="card-content">
+        <div class="flow" style="flex-wrap:wrap;">
+          <div class="flow-box">Browser</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">HTTPS</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">ORDS (Port 443)</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Connection Pool</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">APEX Engine</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">SQL &rarr; Oracle DB</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">HTML &rarr; Browser</div>
+        </div>
+        <br><strong>ORDS</strong> &mdash; Middleware. Converts HTTP to DB calls. Manages a connection pool &mdash; pre-opened DB connections shared across all requests (much faster than opening a new connection each time).<br><br>
+        <strong>APEX Engine</strong> &mdash; Reads your page definition from the DB and dynamically builds HTML. You never write HTML &mdash; APEX generates it.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DATABASE vs SCHEMA -->
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128194;</div><div class="concept-title">Database vs Schema vs Workspace vs Application</div><div class="concept-tag">Key Distinction</div></div>
+  <div class="concept-body">
+    <div class="flow" style="flex-wrap:wrap;margin-bottom:14px;">
+      <div class="flow-box">Oracle Database</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Schema (Data Owner)</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Workspace (Dev Env)</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Application (Web App)</div>
+    </div>
+    <table>
+      <tr><th>Level</th><th>What It Is</th><th>Analogy</th><th>Example</th></tr>
+      <tr><td><strong>Database</strong></td><td>The Oracle DB engine &mdash; stores everything</td><td>The whole building</td><td>genaishared ADB</td></tr>
+      <tr><td><strong>Schema</strong></td><td>A named owner of tables inside the DB</td><td>Your flat/apartment</td><td>TRAINEE01 schema owns EMPLOYEES table</td></tr>
+      <tr><td><strong>Workspace</strong></td><td>Your APEX dev environment linked to a schema</td><td>Your work desk in the flat</td><td>WS_TRAINEE01 uses TRAINEE01 schema</td></tr>
+      <tr><td><strong>Application</strong></td><td>The web app you build inside the workspace</td><td>Work product on your desk</td><td>Employee Portal (App ID: 100)</td></tr>
+    </table>
+    <div class="card note" style="margin-top:14px;">
+      <div class="card-label">Key Isolation Rule</div>
+      <div class="card-content">Your workspace sees only its linked schema's tables. TRAINEE01's workspace cannot see TRAINEE02's tables. Complete isolation between all 20 workspaces.</div>
+    </div>
+  </div>
+</div>
+
+<!-- THREE LOGIN LEVELS -->
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128272;</div><div class="concept-title">Three Login Levels</div><div class="concept-tag">Access</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Level</th><th>URL</th><th>Who</th><th>Purpose</th></tr>
+      <tr><td><strong>Level 1 &mdash; APEX Admin</strong></td><td>/ords/apex_admin</td><td>Administrator</td><td>Manage workspaces, system settings</td></tr>
+      <tr><td><strong>Level 2 &mdash; Workspace Login</strong></td><td>/ords/apex</td><td>Developers (you)</td><td>Build applications</td></tr>
+      <tr><td><strong>Level 3 &mdash; App User Login</strong></td><td>App login page</td><td>End users (business)</td><td>Use the finished app</td></tr>
+    </table>
+    <div class="card note" style="margin-top:14px;">
+      <div class="card-label">Your Credentials Today</div>
+      <div class="card-content">Workspace: <strong>WS_TRAINEE[your number]</strong> &middot; Username: <strong>TRAINEE[your number]</strong> &middot; Password: as shared in class</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART D: SESSIONS -->
+<div class="section-label">Part D &middot; Session Management</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128283;</div><div class="concept-title">Sessions &mdash; What Happens After Login</div><div class="concept-tag">Core Concept</div></div>
+  <div class="concept-body">
+    <div class="card why">
+      <div class="card-label">Why Sessions Exist</div>
+      <div class="card-content">HTTP is <strong>stateless</strong> &mdash; every request is independent. The server has no memory of who you are between requests. Sessions solve this: after login, APEX creates a session that identifies you for your entire visit. Without sessions, you would need to log in on every single click.</div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Session Lifecycle</div>
+      <div class="card-content">
+        <div class="flow" style="flex-wrap:wrap;">
+          <div class="flow-box">User Logs In</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Session Created</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Session ID Generated</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">ID in URL / Cookie</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">User Works</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Timeout / Logout</div>
+        </div>
+      </div>
+    </div>
+    <table style="margin-top:14px;">
+      <tr><th>Concept</th><th>What It Is</th><th>Where You See It</th></tr>
+      <tr><td><strong>Session ID</strong></td><td>Unique number identifying your login</td><td>Third segment in URL: f?p=100:1:<strong>12345678</strong></td></tr>
+      <tr><td><strong>Session State</strong></td><td>All item values stored server-side for your session</td><td>Values persist as you navigate between pages</td></tr>
+      <tr><td><strong>Session Timeout</strong></td><td>Auto-logout after inactivity</td><td>App Properties &rarr; Security &rarr; Session Timeout</td></tr>
+      <tr><td><strong>Logout</strong></td><td>Clears session state and session ID</td><td>Navigation bar logout link</td></tr>
+    </table>
+    <div class="card example" style="margin-top:14px;">
+      <div class="card-label">Real Example</div>
+      <div class="card-content">You open Employee Edit form (Page 3). You select Department = Sales. You navigate to Page 4. You return to Page 3. The Department field still shows Sales &mdash; APEX stored it in <strong>Session State</strong>. Session State is APEX's short-term memory for your active session.</div>
+    </div>
+    <div class="card note">
+      <div class="card-label">Security Note</div>
+      <div class="card-content">Always set session timeout for apps handling sensitive data. Recommended: 30 minutes for internal HR and finance apps. This prevents others accessing an unattended open session.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART E: APPLICATION LIFECYCLE -->
+<div class="section-label">Part E &middot; Application Lifecycle &mdash; Complete Request Flow</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128260;</div><div class="concept-title">What Happens From Click to Response &mdash; 10 Stages</div><div class="concept-tag">Architecture</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Stage</th><th>What Happens</th><th>Example</th></tr>
+      <tr><td><strong>1. Request</strong></td><td>User opens a URL or clicks a link</td><td>Click "View Employees"</td></tr>
+      <tr><td><strong>2. Authentication</strong></td><td>Is this user logged in?</td><td>Yes &rarr; continue. No &rarr; redirect to login</td></tr>
+      <tr><td><strong>3. Authorization</strong></td><td>Does this user have permission for this page?</td><td>HR Manager &rarr; allowed. Staff &rarr; Access Denied</td></tr>
+      <tr><td><strong>4. Rendering</strong></td><td>Computations run, data fetched, page HTML built</td><td>Employee list loads with 20 rows</td></tr>
+      <tr><td><strong>5. User Interaction</strong></td><td>User fills form, applies filters, clicks buttons</td><td>Types name, selects department</td></tr>
+      <tr><td><strong>6. Submit</strong></td><td>User clicks Save &mdash; page posts back to APEX</td><td>Click "Save Employee"</td></tr>
+      <tr><td><strong>7. Validation</strong></td><td>All validations run in order</td><td>Name cannot be empty. Salary must be numeric.</td></tr>
+      <tr><td><strong>8. Processing</strong></td><td>Validation passes &rarr; PL/SQL processes run</td><td>INSERT INTO employees... COMMIT;</td></tr>
+      <tr><td><strong>9. Branch</strong></td><td>Navigate to next page after processing</td><td>Redirect to employee list</td></tr>
+      <tr><td><strong>10. Response</strong></td><td>New page renders and is sent to browser</td><td>List refreshes with new record</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PART F: STRUCTURE + PAGE TYPES -->
+<div class="section-label">Part F &middot; Application Structure &middot; Page Types &middot; Page Modes</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128208;</div><div class="concept-title">App &rarr; Page &rarr; Region &rarr; Item</div><div class="concept-tag">Architecture</div></div>
+  <div class="concept-body">
+    <div class="flow" style="flex-wrap:wrap;margin-bottom:14px;">
+      <div class="flow-box">Application</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Pages</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Regions</div><div class="flow-arrow">&rarr;</div>
+      <div class="flow-box">Items</div>
+    </div>
+    <table>
+      <tr><th>Level</th><th>Description</th><th>Example</th></tr>
+      <tr><td><strong>Application</strong></td><td>The complete web app</td><td>Employee Portal (App ID: 100)</td></tr>
+      <tr><td><strong>Page 0 &mdash; Global</strong></td><td>Header, footer, nav shown on ALL pages</td><td>Company logo, navigation menu</td></tr>
+      <tr><td><strong>Page</strong></td><td>One screen/view</td><td>Page 1: Home, Page 2: Report, Page 3: Form</td></tr>
+      <tr><td><strong>Region</strong></td><td>Container inside a page</td><td>A report region, a form region, a chart</td></tr>
+      <tr><td><strong>Item</strong></td><td>Individual UI element</td><td>Text field, dropdown, date picker</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128196;</div><div class="concept-title">Page Types &amp; Page Modes</div><div class="concept-tag">Components</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Page Type</th><th>What It Creates</th><th>Business Use</th></tr>
+      <tr><td><strong>Blank Page</strong></td><td>Empty canvas &mdash; you add regions manually</td><td>Custom dashboard, landing page</td></tr>
+      <tr><td><strong>Report</strong></td><td>Classic or Interactive Report pre-built</td><td>Employee list, leave requests</td></tr>
+      <tr><td><strong>Form</strong></td><td>Data entry form from a table</td><td>Add / Edit employee</td></tr>
+      <tr><td><strong>Master Detail</strong></td><td>Parent + child records on one page</td><td>Department + all employees in it</td></tr>
+      <tr><td><strong>Dashboard</strong></td><td>Multiple charts and KPIs</td><td>HR analytics &mdash; headcount, salary stats</td></tr>
+      <tr><td><strong>Calendar</strong></td><td>Date-based event display</td><td>Leave calendar, project milestones</td></tr>
+      <tr><td><strong>Wizard</strong></td><td>Multi-step form with Next/Back</td><td>Employee onboarding in 5 steps</td></tr>
+    </table>
+    <hr/>
+    <div class="grid3">
+      <div class="grid3-item"><div class="g3-title">Normal Page</div><div class="g3-body">Full browser page. Replaces current view. Used for dashboards and main reports.</div></div>
+      <div class="grid3-item"><div class="g3-title">Modal Dialog</div><div class="g3-body">Popup overlay on current page. Background stays loaded. Used for quick edits and confirmations.</div></div>
+      <div class="grid3-item"><div class="g3-title">Popup Page</div><div class="g3-body">Separate browser window. Used for LOV search popups and print previews.</div></div>
+    </div>
+    <div class="card example" style="margin-top:14px;">
+      <div class="card-label">When to Use Modal</div>
+      <div class="card-content">Employee list (Normal) &rarr; Click Edit &rarr; Form opens as Modal Dialog &rarr; Save &rarr; Modal closes &rarr; List refreshes. The user never leaves the list page &mdash; smooth, modern UX without a full page reload.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART G: PAGE DESIGNER + COMPONENTS -->
+<div class="section-label">Part G &middot; Page Designer &middot; Regions &middot; Items</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128187;</div><div class="concept-title">Page Designer Navigation</div><div class="concept-tag">Tool</div></div>
+  <div class="concept-body">
+    <div class="card what">
+      <div class="card-label">Three Panels</div>
+      <div class="card-content"><strong>Left Panel</strong> &mdash; Component tree. All regions, items, buttons in a hierarchy. Tabs: Rendering (page load) and Processing (page submit).<br><br>
+      <strong>Centre Panel</strong> &mdash; Canvas. Visual preview. Click any element to select it.<br><br>
+      <strong>Right Panel</strong> &mdash; Properties. All settings for the selected component &mdash; name, label, type, source SQL, validation rules, etc.</div>
+    </div>
+    <div class="card note">
+      <div class="card-label">Item Naming Convention</div>
+      <div class="card-content">Pattern: <strong>P[PageNo]_[ITEM_NAME]</strong><br>
+      P<strong>2</strong>_EMP_ID &rarr; Item on Page 2 &middot; P<strong>3</strong>_SALARY &rarr; Item on Page 3<br>
+      Reference in PL/SQL with a colon: <code>:P3_SALARY</code> gives the current value of that item.</div>
+    </div>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128230;</div><div class="concept-title">Region Types</div><div class="concept-tag">Components</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Region Type</th><th>Purpose</th><th>Business Use</th></tr>
+      <tr><td><strong>Form</strong></td><td>Data entry with input fields</td><td>Add / Edit employee record</td></tr>
+      <tr><td><strong>Classic Report</strong></td><td>Simple read-only table</td><td>Fixed employee list display</td></tr>
+      <tr><td><strong>Interactive Report</strong></td><td>Advanced table &mdash; filter, sort, download</td><td>HR analytics with self-service filters</td></tr>
+      <tr><td><strong>Interactive Grid</strong></td><td>Editable table &mdash; inline data modification</td><td>Bulk appraisal salary updates</td></tr>
+      <tr><td><strong>Chart</strong></td><td>Bar, Pie, Line, Donut, Scatter</td><td>Dept headcount, salary distribution</td></tr>
+      <tr><td><strong>Calendar</strong></td><td>Date-based event view</td><td>Leave calendar, project timelines</td></tr>
+      <tr><td><strong>HTML</strong></td><td>Custom HTML content</td><td>Banners, announcements</td></tr>
+      <tr><td><strong>PL/SQL Dynamic</strong></td><td>Custom output from PL/SQL</td><td>Complex conditional content</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#129513;</div><div class="concept-title">Item Types</div><div class="concept-tag">Components</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Item Type</th><th>Renders As</th><th>Use Case</th></tr>
+      <tr><td><strong>Text Field</strong></td><td>Single-line input</td><td>Employee name, email</td></tr>
+      <tr><td><strong>Text Area</strong></td><td>Multi-line input</td><td>Leave reason, feedback</td></tr>
+      <tr><td><strong>Select List</strong></td><td>Dropdown</td><td>Department, status, leave type</td></tr>
+      <tr><td><strong>Radio Group</strong></td><td>Choose one option</td><td>Gender, employment type</td></tr>
+      <tr><td><strong>Checkbox</strong></td><td>Yes / No toggle</td><td>Active flag, agree to terms</td></tr>
+      <tr><td><strong>Date Picker</strong></td><td>Calendar popup</td><td>Leave start/end date, hire date</td></tr>
+      <tr><td><strong>Hidden</strong></td><td>Invisible value holder</td><td>Pass employee ID between pages</td></tr>
+      <tr><td><strong>Display Only</strong></td><td>Read-only label</td><td>Show calculated value, status</td></tr>
+      <tr><td><strong>Password</strong></td><td>Masked input</td><td>Login forms</td></tr>
+      <tr><td><strong>File Browse</strong></td><td>File upload button</td><td>Upload documents, profile photo</td></tr>
+      <tr><td><strong>Popup LOV</strong></td><td>Magnifier search popup</td><td>Search and select from large lists</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PART H: LOV -->
+<div class="section-label">Part H &middot; List of Values (LOV)</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128203;</div><div class="concept-title">LOV &mdash; Used in Almost Every APEX Form</div><div class="concept-tag">Core Component</div></div>
+  <div class="concept-body">
+    <div class="card why">
+      <div class="card-label">What is an LOV and Why It Matters</div>
+      <div class="card-content">An LOV powers dropdowns, radio groups, checkboxes, and popup searches. Defined once in Shared Components &mdash; reused on any page. If a new department is added, update the LOV in one place and every dropdown across all pages updates automatically.</div>
+    </div>
+    <table>
+      <tr><th>LOV Type</th><th>Values Come From</th><th>Example</th></tr>
+      <tr><td><strong>Static LOV</strong></td><td>You type the options manually</td><td>Status: ACTIVE, INACTIVE, PENDING</td></tr>
+      <tr><td><strong>Dynamic LOV</strong></td><td>SQL query &mdash; values from a DB table</td><td><code>SELECT dept_name, dept_id FROM departments</code></td></tr>
+      <tr><td><strong>Popup LOV</strong></td><td>Search popup for large datasets</td><td>Search employee by name from 10,000 records</td></tr>
+    </table>
+    <div class="card how" style="margin-top:14px;">
+      <div class="card-label">Create a Dynamic LOV</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Shared Components &rarr; List of Values &rarr; Create.</li>
+          <li data-n="2">Name: DEPARTMENTS_LOV. Type: Dynamic.</li>
+          <li data-n="3">SQL: <code>SELECT department_name d, department_id r FROM departments ORDER BY 1</code></li>
+          <li data-n="4">Save. On any Select List item, set LOV to DEPARTMENTS_LOV.</li>
+          <li data-n="5">Dropdown auto-populates from DB every time the page loads.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PART I: RENDERING vs PROCESSING -->
+<div class="section-label">Part I &middot; Rendering &middot; Processing &middot; Computations &middot; Branches &middot; Processes</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#9881;</div><div class="concept-title">Page Rendering and Processing &mdash; Full Detail</div><div class="concept-tag">Core Concept</div></div>
+  <div class="concept-body">
+    <div class="grid2">
+      <div class="grid2-item">
+        <h4>&#128229; Rendering &mdash; Page LOADS</h4>
+        <ul>
+          <li>Before Header computations run</li>
+          <li>Data fetched from DB</li>
+          <li>Items populated with values</li>
+          <li>Page HTML built and sent to browser</li>
+        </ul>
+        <div class="card example" style="margin-top:10px;padding:10px 12px;">
+          <div class="card-label">Example</div>
+          <div class="card-content" style="font-size:13px;">Employee opens Edit form &rarr; APEX fetches their record &rarr; fields fill in automatically</div>
+        </div>
+      </div>
+      <div class="grid2-item">
+        <h4>&#128228; Processing &mdash; Page SUBMITS</h4>
+        <ul>
+          <li>Validations run first</li>
+          <li>Fail &rarr; error shown, processing stops</li>
+          <li>Pass &rarr; Processes (PL/SQL) execute</li>
+          <li>Branch &rarr; navigate to next page</li>
+        </ul>
+        <div class="card example" style="margin-top:10px;padding:10px 12px;">
+          <div class="card-label">Example</div>
+          <div class="card-content" style="font-size:13px;">Click Save &rarr; validate name not null &rarr; INSERT to DB &rarr; redirect to list page</div>
+        </div>
+      </div>
+    </div>
+    <hr/>
+    <div class="card what">
+      <div class="card-label">Computations</div>
+      <div class="card-content">Computations automatically set an item's value.
+        <table style="margin-top:8px;">
+          <tr><th>Type</th><th>When It Runs</th><th>Example</th></tr>
+          <tr><td><strong>Before Header</strong></td><td>During page load &mdash; before items render</td><td>Set P3_TODAY = SYSDATE</td></tr>
+          <tr><td><strong>After Submit</strong></td><td>After submit &mdash; before processes run</td><td>Set P3_FULL_NAME = :P3_FIRST || ' ' || :P3_LAST</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Process Types</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>Process Type</th><th>What It Does</th><th>When Used</th></tr>
+          <tr><td><strong>Automatic Row Fetch</strong></td><td>Loads one DB row into form items automatically</td><td>Edit form rendering &mdash; fill fields from DB</td></tr>
+          <tr><td><strong>Automatic Row Process</strong></td><td>Auto INSERT, UPDATE, or DELETE from form items</td><td>Save button &mdash; APEX writes to DB for you</td></tr>
+          <tr><td><strong>Execute PL/SQL</strong></td><td>Run any custom PL/SQL you write</td><td>Complex business logic, calling REST APIs</td></tr>
+          <tr><td><strong>Execute Code</strong></td><td>Run JavaScript code after submit</td><td>Client-side actions</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card example">
+      <div class="card-label">Branches &mdash; Where to Go After Processing</div>
+      <div class="card-content">A Branch decides where the user goes after processing completes.
+<pre><span class="cm">-- Branch flow example:</span>
+User clicks Save
+    &darr;
+Validation passes
+    &darr;
+Process: INSERT employee (Execute PL/SQL)
+    &darr;
+Branch: Go to Page 2 (Employee List)
+    &darr;
+List refreshes with new record</pre>
+Branch conditions: Always &middot; When button pressed &middot; When item not null &middot; When no errors occurred</div>
+    </div>
+  </div>
+</div>
+
+<!-- PART J: SQL vs PLSQL -->
+<div class="section-label">Part J &middot; SQL vs PL/SQL Inside APEX</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128218;</div><div class="concept-title">When to Use SQL and When to Use PL/SQL</div><div class="concept-tag">Core Concept</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>SQL</th><th>PL/SQL</th></tr>
+      <tr><td>Read, write, update, delete data</td><td>Business logic &mdash; decisions, loops, error handling</td></tr>
+      <tr><td>SELECT &middot; INSERT &middot; UPDATE &middot; DELETE</td><td>IF &middot; ELSIF &middot; LOOP &middot; WHILE &middot; PROCEDURE &middot; EXCEPTION</td></tr>
+      <tr><td>Used in: Report source, LOV source, item default</td><td>Used in: Processes, Computations, Dynamic Actions, Validations</td></tr>
+      <tr><td>Returns rows and columns</td><td>Returns a value, raises exception, or performs an action</td></tr>
+    </table>
+    <div class="card what" style="margin-top:14px;">
+      <div class="card-label">Where Each Is Used in APEX</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>APEX Component</th><th>Language</th><th>Example</th></tr>
+          <tr><td>Report Region Source</td><td>SQL</td><td><code>SELECT * FROM employees</code></td></tr>
+          <tr><td>LOV Source</td><td>SQL</td><td><code>SELECT dept_name, dept_id FROM departments</code></td></tr>
+          <tr><td>Item Default Value</td><td>SQL Expression</td><td><code>SYSDATE</code></td></tr>
+          <tr><td>Process (save data)</td><td>PL/SQL</td><td><code>INSERT INTO employees VALUES (:P3_NAME, :P3_DEPT...)</code></td></tr>
+          <tr><td>Validation</td><td>PL/SQL Expression</td><td><code>:P3_SALARY &gt; 0</code></td></tr>
+          <tr><td>Dynamic Action (calculate)</td><td>PL/SQL</td><td>Calculate HRA from basic salary</td></tr>
+          <tr><td>REST API Call</td><td>PL/SQL</td><td><code>apex_web_service.make_rest_request(...)</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PART K: SHARED COMPONENTS + SQL WORKSHOP -->
+<div class="section-label">Part K &middot; Shared Components &amp; SQL Workshop</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128295;</div><div class="concept-title">Shared Components &mdash; Define Once, Use Everywhere</div><div class="concept-tag">Tool</div></div>
+  <div class="concept-body">
+    <div class="grid3">
+      <div class="grid3-item"><div class="g3-title">Authentication Schemes</div><div class="g3-body">Who can log in &mdash; APEX Accounts, LDAP, OCI IAM, Custom PL/SQL</div></div>
+      <div class="grid3-item"><div class="g3-title">Authorization Schemes</div><div class="g3-body">Who can do what &mdash; Is in Group, Has Role, PL/SQL expression</div></div>
+      <div class="grid3-item"><div class="g3-title">Navigation Menus</div><div class="g3-body">Sidebar and top nav links shared across all pages</div></div>
+      <div class="grid3-item"><div class="g3-title">Lists of Values</div><div class="g3-body">Dropdown options defined once, reused in all forms</div></div>
+      <div class="grid3-item"><div class="g3-title">Web Credentials</div><div class="g3-body">API keys, OCI credentials &mdash; stored securely, referenced by name</div></div>
+      <div class="grid3-item"><div class="g3-title">Templates &amp; Themes</div><div class="g3-body">Page and region UI templates &mdash; controls look and feel globally</div></div>
+    </div>
+    <div class="card example" style="margin-top:14px;">
+      <div class="card-label">Why This Matters for Gen AI</div>
+      <div class="card-content">Your OCI Gen AI API key will be stored as a <strong>Web Credential</strong> in Shared Components. Every page that calls Gen AI references it by name (<code>OCI_CRED</code>). If the key changes, update it once &mdash; no code changes needed anywhere else.</div>
+    </div>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128450;</div><div class="concept-title">SQL Workshop</div><div class="concept-tag">Tool</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Tool</th><th>What It Does</th></tr>
+      <tr><td><strong>SQL Commands</strong></td><td>Run SQL and PL/SQL &mdash; CREATE, SELECT, INSERT, UPDATE, DELETE</td></tr>
+      <tr><td><strong>SQL Scripts</strong></td><td>Save and run multi-statement scripts</td></tr>
+      <tr><td><strong>Object Browser</strong></td><td>View tables, columns, constraints, and data visually</td></tr>
+      <tr><td><strong>Query Builder</strong></td><td>Build SQL by dragging and joining tables</td></tr>
+      <tr><td><strong>Data Workshop</strong></td><td>Import from CSV/Excel, export table data</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PART L: URL + SUBSTITUTION -->
+<div class="section-label">Part L &middot; APEX URL Structure &amp; Substitution Strings</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128279;</div><div class="concept-title">APEX URL Structure &amp; Session State Protection</div><div class="concept-tag">Navigation</div></div>
+  <div class="concept-body">
+    <div class="card what">
+      <div class="card-label">URL Format</div>
+      <div class="card-content">
+<pre>f?p=AppID:PageNo:Session:::ItemName:Value
+
+<span class="cm">-- Example: Open Page 2, pass EMP_ID = 5</span>
+f?p=100:2::::P2_EMP_ID:5
+
+100        &rarr; Application ID
+2          &rarr; Page Number to open
+           &rarr; Session (APEX fills automatically)
+P2_EMP_ID  &rarr; Item to receive the value
+5          &rarr; The value being passed</pre>
+      </div>
+    </div>
+    <div class="card note">
+      <div class="card-label">&#9888; Session State Protection</div>
+      <div class="card-content"><strong>Problem:</strong> User changes <code>P2_EMP_ID:5</code> to <code>P2_EMP_ID:1</code> in the URL and sees another employee's record.<br><br>
+      <strong>Solution:</strong> Enable Session State Protection on the item. APEX adds a <strong>checksum</strong>. Any URL modification invalidates the checksum &mdash; APEX blocks the request and shows an error page.</div>
+    </div>
+    <table>
+      <tr><th>Substitution String</th><th>Returns</th><th>Use Case</th></tr>
+      <tr><td><code>&amp;APP_USER.</code></td><td>Logged-in username</td><td>"Welcome, Arjun" in header</td></tr>
+      <tr><td><code>&amp;APP_ID.</code></td><td>Current application ID</td><td>Dynamic links</td></tr>
+      <tr><td><code>&amp;APP_PAGE_ID.</code></td><td>Current page number</td><td>Conditional logic</td></tr>
+      <tr><td><code>&amp;APP_SESSION.</code></td><td>Session ID</td><td>Auto in URL</td></tr>
+      <tr><td><code>&amp;SYSDATE.</code></td><td>Today's date</td><td>Default for date fields</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- PART M: DEBUG + ERROR + EXPORT -->
+<div class="section-label">Part M &middot; Debug Mode &middot; Error Handling &middot; Export/Import</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128027;</div><div class="concept-title">Debug Mode &mdash; Find What Went Wrong</div><div class="concept-tag">Developer Tool</div></div>
+  <div class="concept-body">
+    <div class="card what">
+      <div class="card-label">What is Debug Mode</div>
+      <div class="card-content">Debug mode shows every step APEX took when processing a page &mdash; every SQL statement, every process, every branch decision &mdash; with execution time in milliseconds. It is your primary diagnostic tool when something does not work as expected.</div>
+    </div>
+    <div class="card how">
+      <div class="card-label">How to Use</div>
+      <div class="card-content">
+        <div class="flow" style="flex-wrap:wrap;">
+          <div class="flow-box">Run App</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Click Debug (top-right)</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Page Reloads in Debug</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">View Execution Steps</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Find Error / Slow SQL</div>
+        </div>
+        <br>Or add <code>&amp;p_debug=YES</code> to the URL directly. Debug shows: Authentication &rarr; Authorization &rarr; Computations &rarr; SQL &rarr; Processes &rarr; Branches &mdash; each with time taken.
+      </div>
+    </div>
+    <div class="card example">
+      <div class="card-label">Real Use Case</div>
+      <div class="card-content">Your report shows no data. Debug reveals the SQL ran as <code>WHERE dept = NULL</code>. The item P2_DEPT was not submitted before the report ran. Fix: add P2_DEPT to Items to Submit list. Debug found the issue in 30 seconds &mdash; without debug it could take hours.</div>
+    </div>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128680;</div><div class="concept-title">Error Handling in APEX</div><div class="concept-tag">Reliability</div></div>
+  <div class="concept-body">
+    <table>
+      <tr><th>Error Type</th><th>Cause</th><th>How APEX Handles It</th></tr>
+      <tr><td><strong>Validation Error</strong></td><td>Required field empty, wrong format, rule violated</td><td>Inline error next to item. Processing stops. No data saved.</td></tr>
+      <tr><td><strong>PL/SQL Exception</strong></td><td>Unhandled DB error (duplicate key, null constraint)</td><td>Page-level error. Add EXCEPTION block to handle gracefully.</td></tr>
+      <tr><td><strong>Friendly Error Messages</strong></td><td>Default APEX errors show ORA-XXXXX codes</td><td>Use Error Handling Function in Shared Components to show user-friendly messages.</td></tr>
+    </table>
+    <div class="card how" style="margin-top:14px;">
+      <div class="card-label">PL/SQL Exception Example</div>
+      <div class="card-content">
+<pre><span class="kw">BEGIN</span>
+  <span class="kw">INSERT INTO</span> employees (emp_id, emp_name)
+  <span class="kw">VALUES</span> (:P3_EMP_ID, :P3_EMP_NAME);
+  <span class="kw">COMMIT</span>;
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN</span> DUP_VAL_ON_INDEX <span class="kw">THEN</span>
+    apex_error.add_error(
+      p_message          =&gt; <span class="str">'This Employee ID already exists. Use a different ID.'</span>,
+      p_display_location =&gt; apex_error.c_inline_in_notification
+    );
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#128230;</div><div class="concept-title">Application Export &amp; Import &mdash; Dev to Production</div><div class="concept-tag">Industry Practice</div></div>
+  <div class="concept-body">
+    <div class="card why">
+      <div class="card-label">Why This Is Important</div>
+      <div class="card-content">In every real company, developers build in a <strong>Development</strong> environment. After testing, the app is exported as a SQL file and imported into <strong>Production</strong>. This is how every enterprise APEX deployment works.</div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Export / Import Flow</div>
+      <div class="card-content">
+        <div class="flow" style="flex-wrap:wrap;">
+          <div class="flow-box">Development Workspace</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">App Builder &rarr; Export</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">.sql File Downloaded</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Production Workspace &rarr; Import</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">App Live in Production</div>
+        </div>
+        <ol class="steps" style="margin-top:14px;">
+          <li data-n="1">App Builder &rarr; select your app &rarr; click <strong>Export</strong>.</li>
+          <li data-n="2">Choose: Export Application Definition &rarr; click Export.</li>
+          <li data-n="3">A <code>.sql</code> file downloads &mdash; your entire application in one file.</li>
+          <li data-n="4">In Production workspace &rarr; App Builder &rarr; <strong>Import</strong> &rarr; upload the .sql file.</li>
+          <li data-n="5">Follow the install wizard. App is now live in Production.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card note">
+      <div class="card-label">What the Export Contains</div>
+      <div class="card-content">All pages, regions, items, processes, validations, shared components, and settings. Does <strong>not</strong> contain table data &mdash; that lives in the schema separately and must be migrated independently.</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAB -->
+<div class="section-label">Hands-On Lab &middot; Build Your Employee Portal</div>
+<div class="concept">
+  <div class="concept-header"><div class="concept-icon">&#129514;</div><div class="concept-title">Lab &mdash; Employee Portal Application</div><div class="concept-tag">Hands-On</div></div>
+  <div class="concept-body">
+    <div class="card lab">
+      <div class="card-label">&#127970; Business Scenario</div>
+      <div class="card-content">Your company manages employee records on Excel. The operations team wants a browser-based portal where HR staff can view, add, and manage employees. Build the first version of this Employee Portal using Oracle APEX.</div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Step 1 &mdash; Login to Your Workspace</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Open the APEX URL shared in class.</li>
+          <li data-n="2">Workspace: <strong>WS_TRAINEE[your number]</strong> &middot; Username: <strong>TRAINEE[your number]</strong> &middot; Password: as given.</li>
+          <li data-n="3">Click Sign In &mdash; you should see the APEX App Builder home screen.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Step 2 &mdash; Create the Employees Table</div>
+      <div class="card-content">SQL Workshop &rarr; SQL Commands:
+<pre><span class="kw">CREATE TABLE</span> employees (
+  emp_id     NUMBER <span class="kw">PRIMARY KEY</span>,
+  emp_name   VARCHAR2(<span class="num">100</span>),
+  department VARCHAR2(<span class="num">50</span>),
+  salary     NUMBER,
+  join_date  DATE
+);
+<span class="cm">-- If you see "table already exists" error:</span>
+<span class="kw">DROP TABLE</span> employees PURGE;
+<span class="cm">-- Then run CREATE TABLE again</span></pre>
+      </div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Step 3 &mdash; Insert Sample Data</div>
+      <div class="card-content">
+<pre><span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="str">'Arjun Kumar'</span>,<span class="str">'IT'</span>,<span class="num">55000</span>,SYSDATE);
+<span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span> (<span class="num">2</span>,<span class="str">'Priya Shah'</span>,<span class="str">'HR'</span>,<span class="num">48000</span>,SYSDATE);
+<span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span> (<span class="num">3</span>,<span class="str">'Rahul Verma'</span>,<span class="str">'Finance'</span>,<span class="num">62000</span>,SYSDATE);
+<span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span> (<span class="num">4</span>,<span class="str">'Sneha Nair'</span>,<span class="str">'IT'</span>,<span class="num">58000</span>,SYSDATE);
+<span class="kw">INSERT INTO</span> employees <span class="kw">VALUES</span> (<span class="num">5</span>,<span class="str">'Vikram Das'</span>,<span class="str">'Operations'</span>,<span class="num">45000</span>,SYSDATE);
+<span class="kw">COMMIT</span>;
+<span class="cm">-- Verify: Should show 5 rows</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> employees;</pre>
+      </div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Step 4 &mdash; Create the Application</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">App Builder &rarr; <strong>Create</strong> &rarr; New Application.</li>
+          <li data-n="2">Name: <strong>Employee Portal</strong>. Leave all other settings as default.</li>
+          <li data-n="3">Click <strong>Add Page</strong> &rarr; Report &rarr; Interactive Report &rarr; Table: EMPLOYEES.</li>
+          <li data-n="4">Click <strong>Create Application</strong>. APEX auto-generates the full app.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card how">
+      <div class="card-label">Step 5 &mdash; Run, Explore, and Debug</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Click <strong>Run Application</strong>. Login when prompted. Verify all 5 rows appear.</li>
+          <li data-n="2">Return to App Builder &rarr; click the page number &rarr; Page Designer opens.</li>
+          <li data-n="3">Explore Left Panel (tree), Centre Panel (canvas), Right Panel (properties).</li>
+          <li data-n="4">Click Report region &rarr; find SQL Source in Right Panel &rarr; add <code>WHERE salary &gt; 50000</code>. Save (Ctrl+S) and Run &mdash; verify only 3 rows appear.</li>
+          <li data-n="5">Run the app &rarr; click <strong>Debug</strong> (top-right) &rarr; review the execution steps panel.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card mistake">
+      <div class="card-label">&#9888; Common Mistakes &amp; Fixes</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>Mistake</th><th>Fix</th></tr>
+          <tr><td>"Table already exists" error</td><td><code>DROP TABLE employees PURGE;</code> then CREATE again</td></tr>
+          <tr><td>No data in report</td><td>Check you ran COMMIT after INSERT statements</td></tr>
+          <tr><td>Login fails after app creation</td><td>Use workspace username, not APEX admin credentials</td></tr>
+          <tr><td>SQL filter shows no effect</td><td>Save (Ctrl+S) in Page Designer first, then Run</td></tr>
+          <tr><td>Page Designer won't open</td><td>Click the page number in App Builder, not the Run button</td></tr>
+          <tr><td>Form fields empty on Edit page</td><td>Check Automatic Row Fetch process exists under Rendering tab</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="section-label">Day 31 Summary</div>
+<div class="summary">
+  <h3>What You Learned Today</h3>
+  <ul>
+    <li>Oracle APEX is a low-code web platform running inside Oracle Database via ORDS &mdash; build enterprise apps using only SQL, no separate web server needed.</li>
+    <li>Database holds everything &middot; Schema owns the tables &middot; Workspace is your APEX dev environment &middot; Application is what you build inside it.</li>
+    <li>Every APEX request goes through 10 stages: Authentication &rarr; Authorization &rarr; Rendering &rarr; User Interaction &rarr; Submit &rarr; Validation &rarr; Processing &rarr; Branch &rarr; Response.</li>
+    <li>Sessions give APEX memory between requests. Session State holds all item values as you navigate. Always set session timeout for sensitive apps.</li>
+    <li>Processing order: Computations &rarr; Validations &rarr; Processes &rarr; Branches. LOVs, Shared Components, Debug Mode, and Export/Import are daily tools in every real APEX project.</li>
+    <li>REST, JSON, and HTTP are the bridge to OCI Gen AI &mdash; every concept from today is used in API calls starting Day 33.</li>
+  </ul>
+</div>
+
+<!-- NEXT -->
+<div class="section-label">Coming Up &mdash; Day 32</div>
+<div class="concept" style="border:1px solid var(--border);box-shadow:none;">
+  <div class="concept-body" style="padding:16px 20px;">
+    <div class="badge-row">
+      <span class="badge">Interactive Reports &mdash; filters, charts, downloads</span>
+      <span class="badge green">Dynamic Actions &mdash; zero-code interactivity</span>
+      <span class="badge gold">Authorization Schemes &mdash; role-based access</span>
+      <span class="badge">Row-Level Security &mdash; data filtered per user</span>
+      <span class="badge green">Session State Protection</span>
+      <span class="badge gold">RESTful Web Services in APEX</span>
+    </div>
+    <p style="margin-top:14px;font-size:14px;color:var(--muted);">Make sure your <strong>employees table has data</strong> and your <strong>Employee Portal app is running</strong> before Day 32.</p>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="section-label">Self-Assessment Checklist</div>
+<div class="concept" style="border:1px solid var(--border);box-shadow:none;">
+  <div class="concept-body" style="padding:16px 20px;">
+    <ul class="checklist">
+      <li>I can log into my APEX workspace (Level 2 login)</li>
+      <li>I understand: Database &rarr; Schema &rarr; Workspace &rarr; Application hierarchy</li>
+      <li>I can explain the ORDS &rarr; APEX Engine &rarr; Oracle DB request flow</li>
+      <li>I have created the EMPLOYEES table in SQL Workshop</li>
+      <li>I have inserted 5 rows and verified with SELECT *</li>
+      <li>I have created and run the Employee Portal application</li>
+      <li>I have opened Page Designer and explored all three panels</li>
+      <li>I understand Session and Session State &mdash; what they store and why</li>
+      <li>I understand the full Application Lifecycle (10 stages)</li>
+      <li>I understand Rendering vs Processing lifecycle</li>
+      <li>I know the difference between a Process, a Computation, and a Branch</li>
+      <li>I know when to use SQL and when to use PL/SQL in APEX</li>
+      <li>I understand what an LOV is and the difference between Static and Dynamic LOV</li>
+      <li>I know the difference between Normal Page, Modal Dialog, and Popup</li>
+      <li>I know what P[N]_ITEM_NAME naming means and how to reference items in PL/SQL</li>
+      <li>I have used Debug Mode and viewed the execution steps</li>
+      <li>I know what Application Export produces and when it is used</li>
+      <li>I can handle a PL/SQL exception using apex_error.add_error</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<div class="footer">Day 31 &middot; Oracle APEX Fundamentals &middot; OCI GenAI Foundation Programme &middot; July 13, 2026</div>
+</body>
+</html>

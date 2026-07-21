@@ -1,0 +1,3153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Manipulation with Pandas — Learning Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aptos+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Catppuccin Mocha Palette ── */
+  :root {
+    --base:    #FAFAF9;
+    --mantle:  #FFFFFF;
+    --crust:   #F3F4F6;
+    --surface0:#E5E7EB;
+    --surface1:#D1D5DB;
+    --surface2:#9CA3AF;
+    --overlay0:#6B7280;
+    --overlay1:#374151;
+    --overlay2:#111827;
+    --text:    #111827;
+    --subtext0:#374151;
+    --subtext1:#6B7280;
+    --lavender:#E8650A;
+    --blue:    #2563EB;
+    --sapphire:#0284C7;
+    --sky:     #0EA5E9;
+    --teal:    #0D9488;
+    --green:   #16A34A;
+    --yellow:  #D97706;
+    --peach:   #E8650A;
+    --maroon:  #DC2626;
+    --red:     #DC2626;
+    --mauve:   #7C3AED;
+    --pink:    #DB2777;
+    --flamingo:#F43F5E;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--base);
+    color: var(--text);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── Layout ── */
+  .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Header ── */
+  .hero {
+    background: linear-gradient(135deg, #FFF3EB 0%, #FFFFFF 60%, #FFF8F3 100%);
+    border-bottom: 2px solid #E8650A;
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,101,10,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--surface0);
+    border: 1px solid #E8650A;
+    color: #E8650A;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Aptos Display', 'Segoe UI', sans-serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .hero h1 span { color: #2563EB; }
+  .hero-sub {
+    color: var(--subtext0);
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .hero-meta span {
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #374151;
+  }
+  .hero-meta span b { color: #7C3AED; }
+
+  /* ── Session Tabs ── */
+  .toc {
+    display: flex;
+    gap: 10px;
+    padding: 24px 0 0;
+    border-bottom: 2px solid var(--surface0);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .toc a {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+    color: var(--subtext0);
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--text); background: var(--surface0); }
+  .toc a.s1 { color: #2563EB; border-color: #2563EB; background: rgba(37,99,235,0.06); }
+  .toc a.s2 { color: #7C3AED; border-color: #7C3AED; background: rgba(124,58,237,0.06); }
+
+  /* ── Session Header ── */
+  .session-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 28px 0 20px;
+    border-bottom: 1px solid var(--surface0);
+    margin-bottom: 36px;
+  }
+  .session-badge {
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .s1 .session-badge { color: #2563EB; border-color: #2563EB; }
+  .s2 .session-badge { color: #7C3AED; border-color: #7C3AED; }
+  .session-header h2 { font-size: 22px; font-weight: 700; color: var(--text); }
+
+  /* ── Section ── */
+  .section { margin-bottom: 52px; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Aptos Display', sans-serif;
+    color: #E8650A;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--surface0);
+  }
+  .section-title .icon { font-size: 18px; }
+
+  /* ── Topic Card ── */
+  .topic {
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .topic-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface0);
+    border-bottom: 1px solid var(--surface1);
+  }
+  .topic-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+  .tag-numpy  { color: #2563EB;  border-color: #2563EB;  background: rgba(37,99,235,0.08); }
+  .tag-pandas { color: #16A34A;  border-color: #16A34A;  background: rgba(22,163,74,0.08); }
+  .tag-clean  { color: #E8650A;  border-color: #E8650A;  background: rgba(232,101,10,0.08); }
+  .tag-eda    { color: #D97706;  border-color: #D97706;  background: rgba(217,119,6,0.08); }
+  .tag-load   { color: #0284C7;  border-color: #0284C7;  background: rgba(2,132,199,0.08); }
+  .topic-header h3 { font-size: 15px; font-weight: 700; font-family: 'Aptos Display', sans-serif; color: var(--text); }
+  .topic-body { padding: 18px; }
+
+  /* ── WWWWH Grid ── */
+  .wwwwh {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .wcard {
+    background: var(--surface0);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border-left: 3px solid;
+  }
+  .wcard.what  { border-color: #2563EB; }
+  .wcard.why   { border-color: #16A34A; }
+  .wcard.when  { border-color: #D97706; }
+  .wcard.whennot{ border-color: #DC2626; }
+  .wcard.how   { border-color: #7C3AED; }
+  .wcard-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .wcard.what .wcard-label   { color: #2563EB; }
+  .wcard.why .wcard-label    { color: #16A34A; }
+  .wcard.when .wcard-label   { color: #D97706; }
+  .wcard.whennot .wcard-label{ color: #DC2626; }
+  .wcard.how .wcard-label    { color: #7C3AED; }
+  .wcard p { font-size: 12px; color: #374151; line-height: 1.5; }
+
+  /* ── Code Blocks — always dark regardless of page theme ── */
+  .code-wrap {
+    background: #1E1E2E;
+    border: 1px solid #313244;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 14px 0;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  }
+  .code-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #2A2A3C;
+    border-bottom: 1px solid #313244;
+    font-size: 11px;
+  }
+  .code-bar .dots { display: flex; gap: 6px; }
+  .code-bar .dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .d-red  { background: #FF5F56; }
+  .d-yel  { background: #FFBD2E; }
+  .d-grn  { background: #27C93F; }
+  .code-bar .lang { color: #7C8399; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em; }
+  pre {
+    background: #1E1E2E;
+    color: #CDD6F4;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.8;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: pre;
+  }
+  pre::-webkit-scrollbar { height: 5px; }
+  pre::-webkit-scrollbar-track { background: #181825; }
+  pre::-webkit-scrollbar-thumb { background: #45475A; border-radius: 3px; }
+  .kw  { color: #CBA6F7; }   /* keywords */
+  .fn  { color: #89B4FA; }   /* functions */
+  .st  { color: #A6E3A1; }   /* strings */
+  .cm  { color: #6C7086; font-style: italic; } /* comments */
+  .nm  { color: #FAB387; }   /* numbers */
+  .cl  { color: #F38BA8; }   /* class/type */
+  .op  { color: #89DCEB; }   /* operators */
+  .out { color: #94E2D5; }   /* output */
+  .at  { color: #B4BEFE; }   /* attribute */
+  .em  { color: #F9E2AF; }   /* self / special */
+
+  /* ── Output Block ── */
+  .output-block {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-left: 4px solid #16A34A;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #14532D;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .output-label {
+    font-size: 10px;
+    color: #16A34A;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  /* ── Insight Pills ── */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .pill {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .pill-blue   { color: #2563EB;   border-color: #2563EB;   background: rgba(37,99,235,0.08); }
+  .pill-green  { color: #16A34A;   border-color: #16A34A;   background: rgba(22,163,74,0.08); }
+  .pill-peach  { color: #E8650A;   border-color: #E8650A;   background: rgba(232,101,10,0.08); }
+  .pill-mauve  { color: #7C3AED;   border-color: #7C3AED;   background: rgba(124,58,237,0.08); }
+  .pill-yellow { color: #D97706;   border-color: #D97706;   background: rgba(217,119,6,0.08); }
+  .pill-red    { color: #DC2626;   border-color: #DC2626;   background: rgba(220,38,38,0.08); }
+  .pill-teal   { color: #0D9488;   border-color: #0D9488;   background: rgba(13,148,136,0.08); }
+
+  /* ── Table ── */
+  .ref-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+  .ref-table th {
+    background: var(--surface0);
+    color: #E8650A;
+    text-align: left;
+    padding: 9px 14px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .ref-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--surface0);
+    color: var(--subtext1);
+    vertical-align: top;
+  }
+  .ref-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .ref-table td:first-child { color: #2563EB; font-weight: 600; }
+
+  /* ── Alert / Tip boxes ── */
+  .box {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    border-left: 3px solid;
+  }
+  .box-tip   { background: rgba(166,227,161,0.07); border-color: #16A34A;  color: #16A34A; }
+  .box-warn  { background: rgba(249,226,175,0.07); border-color: #D97706; color: #D97706; }
+  .box-info  { background: rgba(37,99,235,0.06); border-color: #2563EB;   color: #2563EB; }
+  .box-error { background: rgba(243,139,168,0.07); border-color: #DC2626;    color: #DC2626; }
+  .box strong { font-weight: 700; }
+
+  /* ── Inline code ── */
+  code {
+    background: #1E1E2E;
+    color: #CDD6F4;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  /* ── Step list ── */
+  .steps { list-style: none; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--surface0);
+    font-size: 13px;
+    color: #374151;
+  }
+  .steps li::before {
+    content: counter(step);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--surface1);
+    color: #E8650A;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Summary card at bottom ── */
+  .cheatsheet {
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 48px;
+  }
+  .cheatsheet h2 {
+    font-size: 15px;
+    font-family: 'Aptos Display', sans-serif;
+    color: #E8650A;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--surface0);
+  }
+  .cs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .cs-col h4 {
+    font-size: 12px;
+    color: #2563EB;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .cs-col ul { list-style: none; }
+  .cs-col li {
+    font-size: 12px;
+    color: var(--subtext0);
+    padding: 3px 0;
+    border-bottom: 1px dotted var(--surface0);
+  }
+  .cs-col li code { font-size: 11px; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 30px 0 10px;
+    border-top: 1px solid var(--surface0);
+    color: var(--overlay0);
+    font-size: 11px;
+    margin-top: 48px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--surface1), transparent);
+    margin: 48px 0;
+  }
+
+  /* ── Analogy block ── */
+  .analogy {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #FFF3EB;
+    border: 1px solid #FDDCBC;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .analogy .emoji { font-size: 24px; line-height: 1; }
+  .analogy p { font-size: 12px; color: var(--subtext1); }
+  .analogy p strong { color: #E8650A; }
+
+  /* ── Interview / Exercise / Project boxes ── */
+  .interview-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-left: 4px solid #2563EB;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .interview-box h4 {
+    font-family: 'Aptos Display', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2563EB;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .interview-box ul { list-style: none; padding: 0; }
+  .interview-box li {
+    font-size: 12.5px;
+    color: #1E40AF;
+    padding: 4px 0;
+    border-bottom: 1px dotted #BFDBFE;
+  }
+  .interview-box li::before { content: "Q  "; color: #60A5FA; font-weight: 700; }
+
+  .exercise-box {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-left: 4px solid #16A34A;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .exercise-box h4 {
+    font-family: 'Aptos Display', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #16A34A;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .exercise-box ol { padding-left: 18px; }
+  .exercise-box li { font-size: 12.5px; color: #14532D; padding: 3px 0; }
+
+  .project-box {
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    border-left: 4px solid #E8650A;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 18px;
+    margin: 14px 0;
+  }
+  .project-box h4 {
+    font-family: 'Aptos Display', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #E8650A;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .project-box ol { padding-left: 18px; }
+  .project-box li { font-size: 12.5px; color: #7C2D12; padding: 3px 0; }
+
+  .fn-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+  .fn-table th { background: #E5E7EB; color: #374151; text-align: left; padding: 7px 12px; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+  .fn-table td { padding: 7px 12px; border-bottom: 1px solid #F3F4F6; color: #374151; vertical-align: top; }
+  .fn-table td:first-child { color: #7C3AED; font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; width: 130px; }
+
+  .tag-string { color: #7C3AED; border-color: #7C3AED; background: rgba(124,58,237,0.08); }
+  .tag-datetime { color: #0D9488; border-color: #0D9488; background: rgba(13,148,136,0.08); }
+  .tag-viz { color: #DB2777; border-color: #DB2777; background: rgba(219,39,119,0.08); }
+  .tag-db { color: #0284C7; border-color: #0284C7; background: rgba(2,132,199,0.08); }
+  .tag-project { color: #E8650A; border-color: #E8650A; background: rgba(232,101,10,0.08); }
+  .tag-groupby { color: #16A34A; border-color: #16A34A; background: rgba(22,163,74,0.08); }
+  .tag-merge { color: #D97706; border-color: #D97706; background: rgba(217,119,6,0.08); }
+
+  /* ── Left Index Sidebar ── */
+  .idx-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 270px;
+    height: 100vh;
+    background: #FFFFFF;
+    border-right: 1px solid #E5E7EB;
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .idx-sidebar.collapsed { transform: translateX(-270px); }
+
+  .idx-toggle {
+    position: fixed;
+    top: 50%;
+    left: 270px;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 56px;
+    background: #E8650A;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 201;
+    transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 2px 0 8px rgba(232,101,10,0.3);
+  }
+  .idx-toggle.collapsed { left: 0; }
+  .idx-toggle svg { width: 12px; height: 12px; fill: #fff; transition: transform 0.3s; }
+  .idx-toggle.collapsed svg { transform: rotate(180deg); }
+
+  .idx-header {
+    padding: 18px 18px 12px;
+    border-bottom: 2px solid #E8650A;
+    flex-shrink: 0;
+  }
+  .idx-header h2 {
+    font-family: 'Aptos Display', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #E8650A;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .idx-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 10px 0 24px;
+  }
+  .idx-body::-webkit-scrollbar { width: 3px; }
+  .idx-body::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+
+  .idx-group {
+    margin-bottom: 4px;
+  }
+  .idx-group-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9CA3AF;
+    padding: 10px 18px 4px;
+    display: block;
+  }
+  .idx-link {
+    display: block;
+    padding: 5px 18px 5px 26px;
+    font-size: 12px;
+    color: #374151;
+    text-decoration: none;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .idx-link:hover {
+    color: #E8650A;
+    background: #FFF3EB;
+    border-left-color: #E8650A;
+  }
+  .idx-link.active {
+    color: #E8650A;
+    font-weight: 600;
+    background: #FFF3EB;
+    border-left-color: #E8650A;
+  }
+  .idx-section-link {
+    display: block;
+    padding: 7px 18px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    font-family: 'Aptos Display', sans-serif;
+  }
+  .idx-section-link:hover {
+    color: #E8650A;
+    background: #FFF3EB;
+    border-left-color: #E8650A;
+  }
+
+  /* Push page content right when sidebar is open */
+  .idx-open .page-wrapper { margin-left: 270px; }
+  .idx-open .hero { padding-left: 294px; padding-right: 24px; }
+
+  @media (max-width: 900px) {
+    .idx-sidebar { width: 240px; }
+    .idx-toggle { left: 240px; }
+    .idx-toggle.collapsed { left: 0; }
+    .idx-open .page-wrapper { margin-left: 0; }
+    .idx-open .hero { padding-left: 24px; }
+  }
+
+  @media (max-width: 640px) {
+    .wwwwh { grid-template-columns: 1fr; }
+    .hero { padding: 32px 16px; }
+    .idx-sidebar { width: 220px; }
+    .idx-toggle { left: 220px; }
+    .idx-toggle.collapsed { left: 0; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ── LEFT INDEX SIDEBAR ── -->
+<aside class="idx-sidebar" id="idxSidebar">
+  <div class="idx-header">
+    <h2>📑 Index</h2>
+  </div>
+  <div class="idx-body" id="idxBody">
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#session1">⚡ Session 1 — NumPy</a>
+      <span class="idx-group-label">NumPy Arrays</span>
+      <a class="idx-link" href="#np-array-creation">Array Creation</a>
+      <a class="idx-link" href="#np-attributes">Array Attributes</a>
+      <a class="idx-link" href="#np-indexing">Indexing &amp; Slicing</a>
+      <a class="idx-link" href="#np-reshaping">Reshaping</a>
+      <a class="idx-link" href="#np-vectorization">Vectorization &amp; Broadcasting</a>
+      <a class="idx-link" href="#np-aggregates">Aggregate Functions</a>
+      <a class="idx-link" href="#np-more-creation">empty, full, eye, random</a>
+      <a class="idx-link" href="#np-operations">copy, view, where, sort, unique</a>
+    </div>
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#session1">🐼 Session 1 — Pandas</a>
+      <span class="idx-group-label">Pandas Foundations</span>
+      <a class="idx-link" href="#pd-series-df">Series vs DataFrame</a>
+      <a class="idx-link" href="#pd-selection">Column &amp; Row Selection</a>
+      <a class="idx-link" href="#pd-inspection">Inspection Methods</a>
+      <a class="idx-link" href="#pd-properties">columns, index, values</a>
+      <a class="idx-link" href="#pd-manipulation">rename, drop, assign, query</a>
+    </div>
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#session2">🧹 Session 2 — Loading &amp; Cleaning</a>
+      <span class="idx-group-label">Data Loading</span>
+      <a class="idx-link" href="#pd-read">read_csv / excel / json</a>
+      <a class="idx-link" href="#pd-save">to_csv / excel / json</a>
+      <span class="idx-group-label">Data Cleaning</span>
+      <a class="idx-link" href="#pd-missing">Missing Values</a>
+      <a class="idx-link" href="#pd-duplicates">Duplicate Records</a>
+      <a class="idx-link" href="#pd-types">Type Conversion</a>
+      <span class="idx-group-label">String &amp; DateTime</span>
+      <a class="idx-link" href="#pd-strings">String Operations</a>
+      <a class="idx-link" href="#pd-datetime">DateTime Operations</a>
+      <span class="idx-group-label">Filter &amp; Sort</span>
+      <a class="idx-link" href="#pd-filtering">Filtering &amp; Boolean Masking</a>
+      <a class="idx-link" href="#pd-sorting">Sorting</a>
+      <span class="idx-group-label">Groupby &amp; Combine</span>
+      <a class="idx-link" href="#pd-groupby">groupby &amp; agg</a>
+      <a class="idx-link" href="#pd-merge">merge, join, concat</a>
+    </div>
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#session2">⭐ EDA</a>
+      <span class="idx-group-label">Exploratory Data Analysis</span>
+      <a class="idx-link" href="#eda-intro">What is EDA?</a>
+      <a class="idx-link" href="#eda-describe">describe()</a>
+      <a class="idx-link" href="#eda-correlation">Correlation</a>
+      <a class="idx-link" href="#eda-distribution">Distribution</a>
+      <a class="idx-link" href="#eda-outliers">Outlier Detection</a>
+      <a class="idx-link" href="#eda-pipeline">Full EDA Pipeline</a>
+    </div>
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#visualization">📊 Visualization &amp; DB</a>
+      <span class="idx-group-label">Matplotlib</span>
+      <a class="idx-link" href="#viz-charts">plot, bar, hist, scatter, box</a>
+      <span class="idx-group-label">Database</span>
+      <a class="idx-link" href="#db-readsql">read_sql()</a>
+      <span class="idx-group-label">Project</span>
+      <a class="idx-link" href="#project-pipeline">Employee Data Pipeline</a>
+    </div>
+
+    <div class="idx-group">
+      <a class="idx-section-link" href="#cheatsheet">📋 Quick Reference</a>
+    </div>
+
+  </div>
+</aside>
+
+<!-- Sidebar toggle button -->
+<button class="idx-toggle" id="idxToggle" aria-label="Toggle index">
+  <svg viewBox="0 0 10 14" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="7,1 2,7 7,13" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script>
+(function() {
+  const sidebar  = document.getElementById('idxSidebar');
+  const toggle   = document.getElementById('idxToggle');
+  const body     = document.body;
+  const links    = document.querySelectorAll('.idx-link, .idx-section-link');
+
+  // ── Toggle open/collapsed ──────────────────────────────────
+  let open = window.innerWidth > 900;
+  function applyState() {
+    if (open) {
+      sidebar.classList.remove('collapsed');
+      toggle.classList.remove('collapsed');
+      body.classList.add('idx-open');
+      toggle.style.left = sidebar.offsetWidth + 'px';
+    } else {
+      sidebar.classList.add('collapsed');
+      toggle.classList.add('collapsed');
+      body.classList.remove('idx-open');
+      toggle.style.left = '0';
+    }
+  }
+  applyState();
+
+  toggle.addEventListener('click', function() {
+    open = !open;
+    applyState();
+  });
+
+  // ── Smooth scroll on link click ───────────────────────────
+  links.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').slice(1);
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const offset = 24;
+      const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+      // On mobile close sidebar after tap
+      if (window.innerWidth <= 900) {
+        open = false;
+        applyState();
+      }
+    });
+  });
+
+  // ── Highlight active link on scroll ───────────────────────
+  const allIds = [
+    'session1','np-array-creation','np-attributes','np-indexing','np-reshaping',
+    'np-vectorization','np-aggregates','np-more-creation','np-operations',
+    'pd-series-df','pd-selection','pd-inspection','pd-properties','pd-manipulation',
+    'session2','pd-read','pd-save','pd-missing','pd-duplicates','pd-types',
+    'pd-strings','pd-datetime','pd-filtering','pd-sorting','pd-groupby','pd-merge',
+    'eda-intro','eda-describe','eda-correlation','eda-distribution','eda-outliers','eda-pipeline',
+    'visualization','viz-charts','db-readsql','project-pipeline','cheatsheet'
+  ];
+
+  function onScroll() {
+    let current = '';
+    const scrollY = window.pageYOffset + 80;
+    allIds.forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollY) current = id;
+    });
+    links.forEach(function(link) {
+      const href = link.getAttribute('href');
+      if (href === '#' + current) {
+        link.classList.add('active');
+        // Keep active link visible in sidebar
+        const sb = document.getElementById('idxBody');
+        const lTop = link.offsetTop;
+        const sbH  = sb.clientHeight;
+        const sbSc = sb.scrollTop;
+        if (lTop < sbSc + 40 || lTop > sbSc + sbH - 40) {
+          sb.scrollTop = lTop - sbH / 2;
+        }
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <h1>Data Manipulation with <span>Pandas</span></h1>
+  <div class="hero-meta">
+    <span>📅 <b>Session 1</b> NumPy &amp; Pandas Foundations</span>
+    <span>📅 <b>Session 2</b> Loading, Cleaning &amp; EDA</span>
+    <span>📊 <b>Session 3</b> Visualization &amp; Database</span>
+    <span>🧪 <b>Hands-on</b> Student · Titanic · Employee</span>
+    <span>🏗️ <b>Project</b> End-to-End Data Pipeline</span>
+  </div>
+</div>
+
+<div class="page-wrapper">
+
+  <!-- TOC -->
+  <div class="toc">
+    <a href="#session1" class="s1">⚡ Session 1 — NumPy &amp; Pandas Foundations</a>
+    <a href="#session2" class="s2">🧹 Session 2 — Loading, Cleaning &amp; EDA</a>
+    <a href="#visualization" class="s2">📊 Visualization &amp; Database</a>
+    <a href="#cheatsheet">📋 Quick Reference</a>
+  </div>
+
+<!-- ════════════════════════════════════════════════════════
+     SESSION 1
+════════════════════════════════════════════════════════ -->
+<section id="session1">
+  <div class="session-header s1">
+    <span class="session-badge">Session 1</span>
+    <h2>NumPy &amp; Pandas Foundations</h2>
+  </div>
+
+  <!-- ─────── WHY DATA ANALYSIS? ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🌍</span> Why Do We Need Data Analysis in Python?</div>
+    <div class="topic">
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🏦</div>
+          <p>Think of a bank with <strong>10 million customer records</strong>. A manager wants to know: "Who are the top 1000 customers by loan amount?" — In Excel, this would crash. In Python with Pandas, it runs in <strong>under 2 seconds</strong>.</p>
+        </div>
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>NumPy and Pandas are Python libraries built for fast, efficient data manipulation at scale.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Real-world datasets have millions of rows — Python lists are too slow. These libraries use C-optimized routines under the hood.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Any time you work with structured data — CSV files, Excel sheets, database exports, sensor readings, API responses.</p></div>
+          <div class="wcard how"><div class="wcard-label">How</div><p>NumPy gives fast arrays; Pandas gives labeled tables (DataFrames). Together they cover the entire data pipeline.</p></div>
+        </div>
+        <div class="pills">
+          <span class="pill pill-blue">Data Science</span>
+          <span class="pill pill-green">Machine Learning Prep</span>
+          <span class="pill pill-peach">Business Intelligence</span>
+          <span class="pill pill-mauve">ETL Pipelines</span>
+          <span class="pill pill-yellow">OCI AI Foundations</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── NUMPY ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔢</span> NumPy — Numerical Python</div>
+
+    <!-- Array Creation -->
+    <div class="topic" id="np-array-creation">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Array Creation Functions</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>NumPy arrays are grids of values of the <em>same type</em>, stored in contiguous memory — much faster than Python lists.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Python lists store references to objects; NumPy stores raw numbers in a block. Operations on 1M numbers: list ≈ 200ms, NumPy ≈ 1ms.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Mathematical computations, matrix operations, image pixel grids, training data for ML models.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>When you need mixed data types (string + int) — use Pandas DataFrame instead.</p></div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── array() : convert a Python list to NumPy array ──────────</span>
+<span class="cm"># Real-world: store exam scores of 5 students</span>
+scores <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">85</span>, <span class="nm">92</span>, <span class="nm">78</span>, <span class="nm">95</span>, <span class="nm">88</span>])
+<span class="fn">print</span>(scores)          <span class="cm"># [85 92 78 95 88]</span>
+
+<span class="cm"># ── arange() : like Python range(), returns array ───────────</span>
+<span class="cm"># Real-world: generate 10 time-step indices for a sensor</span>
+time_steps <span class="op">=</span> np.<span class="fn">arange</span>(<span class="nm">0</span>, <span class="nm">10</span>, <span class="nm">1</span>)  <span class="cm"># start, stop, step</span>
+<span class="fn">print</span>(time_steps)      <span class="cm"># [0 1 2 3 4 5 6 7 8 9]</span>
+
+<span class="cm"># ── zeros() : array filled with 0.0 ─────────────────────────</span>
+<span class="cm"># Real-world: initialize a score board for 5 students</span>
+board <span class="op">=</span> np.<span class="fn">zeros</span>(<span class="nm">5</span>)
+<span class="fn">print</span>(board)           <span class="cm"># [0. 0. 0. 0. 0.]</span>
+
+<span class="cm"># ── ones() : array filled with 1.0 ──────────────────────────</span>
+<span class="cm"># Real-world: default attendance: all present (1)</span>
+attendance <span class="op">=</span> np.<span class="fn">ones</span>(<span class="nm">7</span>)
+<span class="fn">print</span>(attendance)      <span class="cm"># [1. 1. 1. 1. 1. 1. 1.]</span>
+
+<span class="cm"># ── linspace() : evenly spaced between start and stop ───────</span>
+<span class="cm"># Real-world: generate 5 salary grades between 20k-60k</span>
+grades <span class="op">=</span> np.<span class="fn">linspace</span>(<span class="nm">20000</span>, <span class="nm">60000</span>, <span class="nm">5</span>)
+<span class="fn">print</span>(grades)
+<span class="cm"># [20000. 30000. 40000. 50000. 60000.]</span></pre>
+        </div>
+
+        <table class="ref-table">
+          <thead><tr><th>Function</th><th>Syntax</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td>array()</td><td>np.array([1,2,3])</td><td>Convert existing data to NumPy</td></tr>
+            <tr><td>arange()</td><td>np.arange(0, 10, 2)</td><td>Sequence with step — like range()</td></tr>
+            <tr><td>zeros()</td><td>np.zeros(5)</td><td>Initialize empty score grids</td></tr>
+            <tr><td>ones()</td><td>np.ones((3,3))</td><td>Default flags, masks</td></tr>
+            <tr><td>linspace()</td><td>np.linspace(0, 1, 100)</td><td>Evenly spaced points for ML features</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Array Attributes -->
+    <div class="topic" id="np-attributes">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Array Attributes — shape, dtype, ndim, size</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">📦</div>
+          <p>Think of an array like a <strong>shipping box</strong>. <strong>shape</strong> = dimensions (30cm × 20cm × 10cm), <strong>ndim</strong> = how many sides (3D), <strong>size</strong> = total items inside, <strong>dtype</strong> = what's packed (glass, plastic).</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 2D array: 3 students × 4 subjects</span>
+marks <span class="op">=</span> np.<span class="fn">array</span>([
+    [<span class="nm">85</span>, <span class="nm">90</span>, <span class="nm">78</span>, <span class="nm">92</span>],   <span class="cm"># Student A</span>
+    [<span class="nm">70</span>, <span class="nm">65</span>, <span class="nm">80</span>, <span class="nm">75</span>],   <span class="cm"># Student B</span>
+    [<span class="nm">95</span>, <span class="nm">88</span>, <span class="nm">91</span>, <span class="nm">97</span>]    <span class="cm"># Student C</span>
+])
+
+<span class="fn">print</span>(marks.<span class="at">shape</span>)   <span class="cm"># (3, 4)  → 3 rows, 4 cols</span>
+<span class="fn">print</span>(marks.<span class="at">ndim</span>)    <span class="cm"># 2       → 2-dimensional</span>
+<span class="fn">print</span>(marks.<span class="at">size</span>)    <span class="cm"># 12      → total elements (3×4)</span>
+<span class="fn">print</span>(marks.<span class="at">dtype</span>)   <span class="cm"># int64   → integer data type</span></pre>
+        </div>
+        <div class="box box-info"><strong>📌 Try This:</strong> If you have 100 students and 10 subjects, what would the shape be? Think about it — the answer is (100, 10). Rows × Columns.</div>
+      </div>
+    </div>
+
+    <!-- Indexing & Slicing -->
+    <div class="topic" id="np-indexing">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Indexing &amp; Slicing</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Select specific elements, rows, or columns from an array using position numbers.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>You never want the entire dataset — you want Student B's Science mark, or the last 3 months of sales, etc.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Feature extraction, filtering training data, isolating time periods in time-series data.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>marks <span class="op">=</span> np.<span class="fn">array</span>([
+    [<span class="nm">85</span>, <span class="nm">90</span>, <span class="nm">78</span>, <span class="nm">92</span>],
+    [<span class="nm">70</span>, <span class="nm">65</span>, <span class="nm">80</span>, <span class="nm">75</span>],
+    [<span class="nm">95</span>, <span class="nm">88</span>, <span class="nm">91</span>, <span class="nm">97</span>]
+])
+
+<span class="cm"># ── Single element ───────────────────────────────────────────</span>
+<span class="fn">print</span>(marks[<span class="nm">0</span>][<span class="nm">1</span>])    <span class="cm"># 90  (row 0, col 1)</span>
+<span class="fn">print</span>(marks[<span class="nm">1</span>, <span class="nm">2</span>])    <span class="cm"># 80  (row 1, col 2) — preferred syntax</span>
+
+<span class="cm"># ── Slice: all students, only Science (col 2) ───────────────</span>
+<span class="fn">print</span>(marks[:, <span class="nm">2</span>])    <span class="cm"># [78 80 91]</span>
+
+<span class="cm"># ── Slice: last 2 students, first 2 subjects ────────────────</span>
+<span class="fn">print</span>(marks[<span class="nm">1</span>:, :<span class="nm">2</span>])  <span class="cm"># [[70 65] [95 88]]</span>
+
+<span class="cm"># ── Negative indexing: last column ──────────────────────────</span>
+<span class="fn">print</span>(marks[:, <span class="op">-</span><span class="nm">1</span>])   <span class="cm"># [92 75 97]</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reshaping -->
+    <div class="topic" id="np-reshaping">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Reshaping</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🧩</div>
+          <p>You have <strong>12 eggs in a single row</strong> (1×12 array). You can reshape them into a <strong>3×4 carton</strong> — same eggs, different arrangement. The <em>total count must remain the same</em>.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>data <span class="op">=</span> np.<span class="fn">arange</span>(<span class="nm">1</span>, <span class="nm">13</span>)  <span class="cm"># [1 2 3 ... 12]</span>
+<span class="fn">print</span>(data.<span class="at">shape</span>)         <span class="cm"># (12,)</span>
+
+<span class="cm"># Reshape to 3 rows × 4 columns (3 students, 4 subjects)</span>
+reshaped <span class="op">=</span> data.<span class="fn">reshape</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(reshaped)
+<span class="cm"># [[ 1  2  3  4]
+#  [ 5  6  7  8]
+#  [ 9 10 11 12]]</span>
+
+<span class="cm"># Flatten back to 1D</span>
+flat <span class="op">=</span> reshaped.<span class="fn">flatten</span>()
+<span class="fn">print</span>(flat)               <span class="cm"># [1 2 3 ... 12]</span></pre>
+        </div>
+        <div class="box box-warn"><strong>⚠️ Common Mistake:</strong> Trying to reshape (12,) into (4,4) → ERROR because 4×4=16 ≠ 12. Total elements must match.</div>
+      </div>
+    </div>
+
+    <!-- Vectorization & Broadcasting -->
+    <div class="topic" id="np-vectorization">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Vectorization &amp; Broadcasting</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">Vectorization</div><p>Apply an operation to the whole array at once — no loops needed. NumPy runs it in optimized C code.</p></div>
+          <div class="wcard what" style="border-color:#7C3AED"><div class="wcard-label" style="color:#7C3AED">Broadcasting</div><p>Apply an operation between arrays of different shapes — NumPy "stretches" the smaller array automatically.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>A loop over 1 million items takes ~500ms. Vectorized NumPy: ~2ms. <strong>250× faster.</strong></p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Vectorization : add 5 bonus to ALL students ──────────────</span>
+scores <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">78</span>, <span class="nm">85</span>, <span class="nm">90</span>, <span class="nm">65</span>, <span class="nm">72</span>])
+scores_with_bonus <span class="op">=</span> scores <span class="op">+</span> <span class="nm">5</span>     <span class="cm"># adds 5 to ALL — no loop!</span>
+<span class="fn">print</span>(scores_with_bonus)            <span class="cm"># [83 90 95 70 77]</span>
+
+<span class="cm"># ── Broadcasting : matrix + row vector ───────────────────────</span>
+<span class="cm"># 3 students, 4 subjects. Add subject-wise bonus.</span>
+marks <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">80</span>, <span class="nm">75</span>, <span class="nm">90</span>, <span class="nm">85</span>],
+                   [<span class="nm">70</span>, <span class="nm">65</span>, <span class="nm">80</span>, <span class="nm">75</span>],
+                   [<span class="nm">95</span>, <span class="nm">88</span>, <span class="nm">91</span>, <span class="nm">97</span>]])
+
+bonus <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">2</span>, <span class="nm">5</span>, <span class="nm">3</span>, <span class="nm">1</span>])  <span class="cm"># bonus per subject</span>
+final <span class="op">=</span> marks <span class="op">+</span> bonus              <span class="cm"># broadcasts bonus across all rows</span>
+<span class="fn">print</span>(final)
+<span class="cm"># [[82 80 93 86]
+#  [72 70 83 76]
+#  [97 93 94 98]]</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aggregate Functions -->
+    <div class="topic" id="np-aggregates">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Aggregate Functions — sum, mean, max, min, std</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">📊</div>
+          <p>A teacher checks <strong>class performance</strong>: total marks (sum), class average (mean), topper score (max), weakest score (min), how spread out the scores are (std). These are aggregates.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>marks <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">85</span>, <span class="nm">90</span>, <span class="nm">78</span>, <span class="nm">92</span>],
+                   [<span class="nm">70</span>, <span class="nm">65</span>, <span class="nm">80</span>, <span class="nm">75</span>],
+                   [<span class="nm">95</span>, <span class="nm">88</span>, <span class="nm">91</span>, <span class="nm">97</span>]])
+
+<span class="cm"># ── Global aggregates ────────────────────────────────────────</span>
+<span class="fn">print</span>(np.<span class="fn">sum</span>(marks))      <span class="cm"># 1006  (all elements)</span>
+<span class="fn">print</span>(np.<span class="fn">mean</span>(marks))     <span class="cm"># 83.83 (class average)</span>
+<span class="fn">print</span>(np.<span class="fn">max</span>(marks))      <span class="cm"># 97    (topper's best)</span>
+<span class="fn">print</span>(np.<span class="fn">min</span>(marks))      <span class="cm"># 65    (lowest mark)</span>
+<span class="fn">print</span>(np.<span class="fn">std</span>(marks))      <span class="cm"># 10.16 (spread of scores)</span>
+
+<span class="cm"># ── Axis-wise aggregates ─────────────────────────────────────</span>
+<span class="cm"># axis=0 → column-wise (per subject average)</span>
+<span class="fn">print</span>(np.<span class="fn">mean</span>(marks, axis<span class="op">=</span><span class="nm">0</span>))   <span class="cm"># [83.3 81.0 83.0 88.0]</span>
+
+<span class="cm"># axis=1 → row-wise (per student average)</span>
+<span class="fn">print</span>(np.<span class="fn">mean</span>(marks, axis<span class="op">=</span><span class="nm">1</span>))   <span class="cm"># [86.25 72.5  92.75]</span></pre>
+        </div>
+        <div class="box box-info"><strong>📌 Key Insight:</strong> <code>axis=0</code> collapses rows (goes DOWN), <code>axis=1</code> collapses columns (goes ACROSS). Tip: draw a quick grid on paper and trace which direction axis=0 and axis=1 collapse — it clicks immediately.</div>
+      </div>
+    </div>
+
+    <!-- ── Additional NumPy Creation Functions ── -->
+    <div class="topic" id="np-more-creation">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>More Array Creation — empty, full, eye, random</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>empty()</code>, <code>full()</code>, <code>eye()</code>, <code>random.rand()</code> and <code>random.randint()</code> create arrays with specific initial values — used heavily in ML model initialisation.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>In ML you often need pre-filled weight matrices, identity matrices for transformations, or random numbers to initialise model weights.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Model weight initialisation, simulation data, unit testing with random inputs, creating identity matrices for linear algebra.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p><code>empty()</code> returns garbage values — never use it when you need zero-initialised arrays. Use <code>zeros()</code> instead.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — more_array_creation.py</span></div>
+          <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── empty() : allocate memory WITHOUT initialising values ────</span>
+<span class="cm"># Faster than zeros() — but values are garbage. Use carefully.</span>
+e <span class="op">=</span> np.<span class="fn">empty</span>((<span class="nm">2</span>, <span class="nm">3</span>))
+<span class="fn">print</span>(e)    <span class="cm"># [[some random garbage values]]</span>
+
+<span class="cm"># ── full() : fill array with a specific value ────────────────</span>
+<span class="cm"># Real-world: all employees start at performance rating 3</span>
+ratings <span class="op">=</span> np.<span class="fn">full</span>((<span class="nm">5</span>,), <span class="nm">3</span>)
+<span class="fn">print</span>(ratings)   <span class="cm"># [3 3 3 3 3]</span>
+
+<span class="cm"># 3×3 matrix filled with 99 (placeholder sentinel value)</span>
+placeholder <span class="op">=</span> np.<span class="fn">full</span>((<span class="nm">3</span>, <span class="nm">3</span>), <span class="nm">99</span>)
+
+<span class="cm"># ── eye() : identity matrix (1s on diagonal) ─────────────────</span>
+<span class="cm"># Real-world: used in matrix algebra and ML transformations</span>
+I <span class="op">=</span> np.<span class="fn">eye</span>(<span class="nm">4</span>)   <span class="cm"># 4×4 identity matrix</span>
+<span class="fn">print</span>(I)
+<span class="cm"># [[1. 0. 0. 0.]
+#  [0. 1. 0. 0.]
+#  [0. 0. 1. 0.]
+#  [0. 0. 0. 1.]]</span>
+
+<span class="cm"># ── random.rand() : random floats between 0.0 and 1.0 ───────</span>
+<span class="cm"># Real-world: initialise neural network weights randomly</span>
+weights <span class="op">=</span> np.random.<span class="fn">rand</span>(<span class="nm">3</span>, <span class="nm">4</span>)   <span class="cm"># 3×4 matrix of random floats</span>
+<span class="fn">print</span>(weights.<span class="at">shape</span>)             <span class="cm"># (3, 4)</span>
+
+<span class="cm"># ── random.randint() : random integers in a range ───────────</span>
+<span class="cm"># Real-world: simulate dice rolls or random student IDs</span>
+dice <span class="op">=</span> np.random.<span class="fn">randint</span>(<span class="nm">1</span>, <span class="nm">7</span>, size<span class="op">=</span><span class="nm">10</span>)  <span class="cm"># 10 dice rolls (1 to 6)</span>
+<span class="fn">print</span>(dice)    <span class="cm"># [3 6 1 4 2 5 1 6 4 3]  (random)</span>
+
+<span class="cm"># Reproducible random: set seed for consistent results</span>
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+<span class="fn">print</span>(np.random.<span class="fn">randint</span>(<span class="nm">1</span>, <span class="nm">100</span>, <span class="nm">5</span>))   <span class="cm"># always the same output</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Function</th><th>Syntax</th><th>Returns</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td>empty()</td><td>np.empty((2,3))</td><td>Uninitialized floats</td><td>Fast placeholder — fill before use</td></tr>
+            <tr><td>full()</td><td>np.full((5,), 3)</td><td>Array filled with value</td><td>Default ratings, sentinel values</td></tr>
+            <tr><td>eye()</td><td>np.eye(4)</td><td>Identity matrix</td><td>Matrix algebra, ML transforms</td></tr>
+            <tr><td>random.rand()</td><td>np.random.rand(3,4)</td><td>Floats 0.0–1.0</td><td>NN weight initialisation</td></tr>
+            <tr><td>random.randint()</td><td>np.random.randint(1,7,10)</td><td>Random integers</td><td>Simulation, sampling, testing</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-tip"><strong>✅ Corporate Tip:</strong> Always set <code>np.random.seed(42)</code> at the top of any script that uses random numbers. This makes results <strong>reproducible</strong> — a must in data science projects and code reviews.</div>
+      </div>
+    </div>
+
+    <!-- ── NumPy Array Operations ── -->
+    <div class="topic" id="np-operations">
+      <div class="topic-header">
+        <span class="topic-tag tag-numpy">NumPy</span>
+        <h3>Array Operations — copy, view, concatenate, split, unique, where, sort</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Operations that combine arrays, find unique values, sort, apply conditional logic, and safely duplicate arrays.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>In corporate data pipelines you constantly merge datasets, deduplicate IDs, and apply conditional flags across millions of rows.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Merging sensor readings, removing duplicate employee IDs, conditionally flagging records, sorting leaderboards.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">copy() vs view()</div><p>A <strong>view</strong> shares memory — changes affect the original. A <strong>copy</strong> is independent. Always use <code>copy()</code> when you don't want to modify the source.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — array_operations.py</span></div>
+          <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── copy() vs view() ─────────────────────────────────────────</span>
+original <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>, <span class="nm">40</span>])
+
+view_arr <span class="op">=</span> original.<span class="fn">view</span>()      <span class="cm"># shares memory</span>
+copy_arr <span class="op">=</span> original.<span class="fn">copy</span>()      <span class="cm"># independent copy</span>
+
+view_arr[<span class="nm">0</span>] <span class="op">=</span> <span class="nm">999</span>
+<span class="fn">print</span>(original)   <span class="cm"># [999  20  30  40] ← view changed original!</span>
+
+copy_arr[<span class="nm">0</span>] <span class="op">=</span> <span class="nm">777</span>
+<span class="fn">print</span>(original)   <span class="cm"># [999  20  30  40] ← copy did NOT change original</span>
+
+<span class="cm"># ── concatenate() : join arrays ──────────────────────────────</span>
+<span class="cm"># Real-world: combine Q1 and Q2 sales arrays</span>
+q1 <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">100</span>, <span class="nm">200</span>, <span class="nm">150</span>])
+q2 <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">180</span>, <span class="nm">220</span>, <span class="nm">190</span>])
+h1 <span class="op">=</span> np.<span class="fn">concatenate</span>([q1, q2])
+<span class="fn">print</span>(h1)   <span class="cm"># [100 200 150 180 220 190]</span>
+
+<span class="cm"># Join 2D arrays row-wise (axis=0) or column-wise (axis=1)</span>
+a <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>, <span class="nm">2</span>], [<span class="nm">3</span>, <span class="nm">4</span>]])
+b <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">5</span>, <span class="nm">6</span>]])
+<span class="fn">print</span>(np.<span class="fn">concatenate</span>([a, b], axis<span class="op">=</span><span class="nm">0</span>))   <span class="cm"># adds row</span>
+
+<span class="cm"># ── split() : divide array into parts ────────────────────────</span>
+<span class="cm"># Real-world: split 6 months of data into 2 quarters</span>
+months <span class="op">=</span> np.<span class="fn">arange</span>(<span class="nm">1</span>, <span class="nm">7</span>)               <span class="cm"># [1 2 3 4 5 6]</span>
+q1, q2 <span class="op">=</span> np.<span class="fn">split</span>(months, <span class="nm">2</span>)
+<span class="fn">print</span>(q1)    <span class="cm"># [1 2 3]</span>
+<span class="fn">print</span>(q2)    <span class="cm"># [4 5 6]</span>
+
+<span class="cm"># ── unique() : find unique values ────────────────────────────</span>
+<span class="cm"># Real-world: find unique departments in a list</span>
+depts <span class="op">=</span> np.<span class="fn">array</span>([<span class="st">"IT"</span>, <span class="st">"HR"</span>, <span class="st">"IT"</span>, <span class="st">"Finance"</span>, <span class="st">"HR"</span>, <span class="st">"IT"</span>])
+<span class="fn">print</span>(np.<span class="fn">unique</span>(depts))   <span class="cm"># ['Finance' 'HR' 'IT']</span>
+
+<span class="cm"># unique with counts</span>
+vals, counts <span class="op">=</span> np.<span class="fn">unique</span>(depts, return_counts<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(vals)    <span class="cm"># ['Finance' 'HR' 'IT']</span>
+<span class="fn">print</span>(counts)  <span class="cm"># [1 2 3]</span>
+
+<span class="cm"># ── where() : conditional selection / replacement ────────────</span>
+<span class="cm"># Real-world: flag students as Pass/Fail based on score</span>
+scores <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">85</span>, <span class="nm">45</span>, <span class="nm">78</span>, <span class="nm">32</span>, <span class="nm">91</span>])
+result <span class="op">=</span> np.<span class="fn">where</span>(scores <span class="op">&gt;=</span> <span class="nm">50</span>, <span class="st">"Pass"</span>, <span class="st">"Fail"</span>)
+<span class="fn">print</span>(result)   <span class="cm"># ['Pass' 'Fail' 'Pass' 'Fail' 'Pass']</span>
+
+<span class="cm"># ── sort() : sort an array ───────────────────────────────────</span>
+marks <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">78</span>, <span class="nm">45</span>, <span class="nm">92</span>, <span class="nm">61</span>, <span class="nm">88</span>])
+<span class="fn">print</span>(np.<span class="fn">sort</span>(marks))           <span class="cm"># [45 61 78 88 92]  ascending</span>
+<span class="fn">print</span>(np.<span class="fn">sort</span>(marks)[::<span class="op">-</span><span class="nm">1</span>])     <span class="cm"># [92 88 78 61 45]  descending</span>
+
+<span class="cm"># ── argsort() : returns INDICES that would sort the array ────</span>
+<span class="cm"># Real-world: who is the top scorer? (get rank positions)</span>
+idx <span class="op">=</span> np.<span class="fn">argsort</span>(marks)
+<span class="fn">print</span>(idx)      <span class="cm"># [1 3 0 4 2] → student at pos 1 scored lowest</span>
+
+<span class="cm"># ── argmax() / argmin() : position of max/min value ─────────</span>
+<span class="fn">print</span>(np.<span class="fn">argmax</span>(marks))   <span class="cm"># 2 → index of highest score (92)</span>
+<span class="fn">print</span>(np.<span class="fn">argmin</span>(marks))   <span class="cm"># 1 → index of lowest score (45)</span>
+
+<span class="cm"># ── median() and var() : additional statistics ───────────────</span>
+<span class="fn">print</span>(np.<span class="fn">median</span>(marks))   <span class="cm"># 78.0 (middle value)</span>
+<span class="fn">print</span>(np.<span class="fn">var</span>(marks))      <span class="cm"># 320.8 (variance = std²)</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Function</th><th>Purpose</th><th>Key Parameter</th></tr></thead>
+          <tbody>
+            <tr><td>copy()</td><td>Independent duplicate</td><td>No params — safe to modify</td></tr>
+            <tr><td>view()</td><td>Shared memory alias</td><td>Changes affect original</td></tr>
+            <tr><td>concatenate()</td><td>Join arrays</td><td>axis=0 (rows) / axis=1 (cols)</td></tr>
+            <tr><td>split()</td><td>Divide into equal parts</td><td>Number of sections</td></tr>
+            <tr><td>unique()</td><td>Distinct values</td><td>return_counts=True for frequency</td></tr>
+            <tr><td>where()</td><td>Conditional replace</td><td>condition, true_val, false_val</td></tr>
+            <tr><td>sort()</td><td>Sort ascending</td><td>Use [::-1] for descending</td></tr>
+            <tr><td>argsort()</td><td>Indices that sort</td><td>Returns positions not values</td></tr>
+            <tr><td>argmax()/argmin()</td><td>Index of max/min</td><td>axis= for row/col-wise</td></tr>
+            <tr><td>median()</td><td>Middle value</td><td>Robust to outliers</td></tr>
+            <tr><td>var()</td><td>Variance (spread²)</td><td>var = std²</td></tr>
+          </tbody>
+        </table>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — NumPy</h4>
+          <ul>
+            <li>What is the difference between copy() and view() in NumPy?</li>
+            <li>Why does modifying a view change the original array?</li>
+            <li>What does argsort() return — values or indices?</li>
+            <li>How would you find the top 3 scorers from a marks array?</li>
+            <li>When would you use np.where() instead of Python if-else?</li>
+            <li>What is the difference between median and mean, and when is median preferred?</li>
+          </ul>
+        </div>
+        <div class="exercise-box">
+          <h4>🧪 Hands-on Exercise — NumPy Operations</h4>
+          <ol>
+            <li>Create an array of 10 random integers between 50 and 100 (use seed=10).</li>
+            <li>Find the index of the maximum and minimum score using argmax() and argmin().</li>
+            <li>Use np.where() to flag scores ≥ 75 as "Grade A" and below 75 as "Grade B".</li>
+            <li>Sort the scores in descending order and print the top 3.</li>
+            <li>Find unique values in: [1,2,2,3,3,3,4]. Print unique values and their counts.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="icon">🐼</span> Pandas — Panel Data Analysis</div>
+
+    <!-- Series vs DataFrame -->
+    <div class="topic" id="pd-series-df">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>Series vs DataFrame — The Core Data Structures</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">Series = 1 Column</div><p>A one-dimensional labeled array. Like a single column in Excel. Has an index on the left.</p></div>
+          <div class="wcard what" style="border-color:#16A34A"><div class="wcard-label" style="color:#16A34A">DataFrame = Full Table</div><p>A two-dimensional table with rows + columns. Like an Excel spreadsheet. The primary object in Pandas.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Real data is tabular (name, age, salary). Series handles one column; DataFrame handles the whole record.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ── Series : one column of student names ────────────────────</span>
+names <span class="op">=</span> pd.<span class="cl">Series</span>([<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>])
+<span class="fn">print</span>(names)
+<span class="cm"># 0    Arjun
+# 1    Priya
+# 2    Rahul
+# 3    Divya
+# dtype: object</span>
+
+<span class="cm"># ── DataFrame : student records ─────────────────────────────</span>
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Name"</span>   : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>],
+    <span class="st">"Age"</span>    : [<span class="nm">21</span>, <span class="nm">22</span>, <span class="nm">20</span>, <span class="nm">23</span>],
+    <span class="st">"Score"</span>  : [<span class="nm">85.0</span>, <span class="nm">92.0</span>, <span class="nm">78.0</span>, <span class="nm">95.0</span>],
+    <span class="st">"Passed"</span> : [<span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>, <span class="kw">True</span>]
+})
+<span class="fn">print</span>(df)</pre>
+        </div>
+        <div class="output-block"><div class="output-label">Output</div>    Name  Age  Score  Passed
+0  Arjun   21   85.0    True
+1  Priya   22   92.0    True
+2  Rahul   20   78.0    True
+3  Divya   23   95.0    True</div>
+      </div>
+    </div>
+
+    <!-- Column & Row Selection -->
+    <div class="topic" id="pd-selection">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>Column Selection &amp; Row Selection — loc vs iloc</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">loc — Label Based</div><p>Select by column/row NAME. Use this when you know the column name or row index label.</p></div>
+          <div class="wcard what" style="border-color:#7C3AED"><div class="wcard-label" style="color:#7C3AED">iloc — Position Based</div><p>Select by column/row NUMBER (integer position, 0-based). Use when you know the position.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>In a real dataset with 50 columns, you can't always remember position 23. You use the name. That's <code>loc</code>.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">Common Trap</div><p><code>iloc</code> end is exclusive (like Python range). <code>loc</code> end is INCLUSIVE. Don't mix them up.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Column Selection ─────────────────────────────────────────</span>
+<span class="fn">print</span>(df[<span class="st">"Name"</span>])             <span class="cm"># Single column → Series</span>
+<span class="fn">print</span>(df[[<span class="st">"Name"</span>, <span class="st">"Score"</span>]])   <span class="cm"># Multiple columns → DataFrame</span>
+
+<span class="cm"># ── loc : label-based ────────────────────────────────────────</span>
+<span class="cm"># Get row with index label 1, all columns</span>
+<span class="fn">print</span>(df.<span class="fn">loc</span>[<span class="nm">1</span>])               <span class="cm"># Priya's row</span>
+
+<span class="cm"># Get rows 0-2 (INCLUSIVE), columns "Name" and "Score"</span>
+<span class="fn">print</span>(df.<span class="fn">loc</span>[<span class="nm">0</span>:<span class="nm">2</span>, [<span class="st">"Name"</span>, <span class="st">"Score"</span>]])
+
+<span class="cm"># ── iloc : position-based ────────────────────────────────────</span>
+<span class="cm"># Row 0 (first row)</span>
+<span class="fn">print</span>(df.<span class="fn">iloc</span>[<span class="nm">0</span>])
+
+<span class="cm"># Rows 0-1 (EXCLUSIVE of 2), columns 0-1</span>
+<span class="fn">print</span>(df.<span class="fn">iloc</span>[<span class="nm">0</span>:<span class="nm">2</span>, <span class="nm">0</span>:<span class="nm">2</span>])
+
+<span class="cm"># Last row</span>
+<span class="fn">print</span>(df.<span class="fn">iloc</span>[<span class="op">-</span><span class="nm">1</span>])</pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Selector</th><th>Syntax</th><th>When to Use</th></tr></thead>
+          <tbody>
+            <tr><td>df["col"]</td><td>df["Name"]</td><td>Single column by name</td></tr>
+            <tr><td>df[["c1","c2"]]</td><td>df[["Name","Age"]]</td><td>Multiple columns</td></tr>
+            <tr><td>loc</td><td>df.loc[0:2, ["Name","Score"]]</td><td>By label/name — end INCLUSIVE</td></tr>
+            <tr><td>iloc</td><td>df.iloc[0:2, 0:2]</td><td>By position number — end EXCLUSIVE</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Inspection Methods -->
+    <div class="topic" id="pd-inspection">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>Dataset Inspection — head, tail, info, describe, shape, dtypes</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🔍</div>
+          <p>When you open a new Excel file, you first <strong>scroll through the top rows</strong>, check <strong>column names</strong>, spot <strong>data types</strong>, and look at <strong>summary stats</strong>. These Pandas functions do exactly that — but for 10 million rows.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── head() / tail() : preview rows ──────────────────────────</span>
+df.<span class="fn">head</span>()     <span class="cm"># first 5 rows (default)</span>
+df.<span class="fn">head</span>(<span class="nm">3</span>)    <span class="cm"># first 3 rows</span>
+df.<span class="fn">tail</span>(<span class="nm">2</span>)    <span class="cm"># last 2 rows</span>
+
+<span class="cm"># ── shape : dimensions ───────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="at">shape</span>)   <span class="cm"># (4, 4) → 4 rows, 4 columns</span>
+
+<span class="cm"># ── dtypes : data types of each column ──────────────────────</span>
+<span class="fn">print</span>(df.<span class="at">dtypes</span>)
+<span class="cm"># Name      object
+# Age        int64
+# Score    float64
+# Passed      bool</span>
+
+<span class="cm"># ── info() : non-null counts + memory usage ──────────────────</span>
+df.<span class="fn">info</span>()
+<span class="cm"># &lt;class 'pandas.core.frame.DataFrame'&gt;
+# RangeIndex: 4 entries, 0 to 3
+# Data columns (total 4 columns):
+#  #   Column   Non-Null Count  Dtype
+# ---  ------   --------------  -----
+#  0   Name     4 non-null      object
+#  1   Age      4 non-null      int64
+#  2   Score    4 non-null      float64
+#  3   Passed   4 non-null      bool</span>
+
+<span class="cm"># ── describe() : summary statistics ─────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">describe</span>())
+<span class="cm"># Shows count, mean, std, min, 25%, 50%, 75%, max
+# For numeric columns only</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Method</th><th>What it shows</th><th>When to use</th></tr></thead>
+          <tbody>
+            <tr><td>head(n)</td><td>First n rows</td><td>Quick glance at data structure</td></tr>
+            <tr><td>tail(n)</td><td>Last n rows</td><td>Check if file loaded completely</td></tr>
+            <tr><td>shape</td><td>(rows, cols)</td><td>Know dataset size instantly</td></tr>
+            <tr><td>dtypes</td><td>Type per column</td><td>Spot columns that need type conversion</td></tr>
+            <tr><td>info()</td><td>Non-null counts, types, memory</td><td>First thing to run on any new dataset</td></tr>
+            <tr><td>describe()</td><td>Stats: mean, std, min, max, quartiles</td><td>Understand numerical distributions</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-tip"><strong>✅ Best Practice:</strong> On any new dataset, always run <code>df.info()</code> first, then <code>df.describe()</code>. These two commands reveal ~80% of data quality issues before you even start cleaning.</div>
+      </div>
+    </div>
+  </div>
+
+    <!-- DataFrame Properties -->
+    <div class="topic" id="pd-properties">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>DataFrame Properties — columns, index, values</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>.columns</code>, <code>.index</code>, and <code>.values</code> are DataFrame attributes — they describe the structure without running any computation.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>You need column names to rename them, index to set/reset row labels, and values to extract a raw NumPy array for ML models.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Before feature engineering, passing data to sklearn (needs numpy arrays), checking schema programmatically in automated pipelines.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — df_properties.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Name"</span>  : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>],
+    <span class="st">"Age"</span>   : [<span class="nm">28</span>, <span class="nm">25</span>, <span class="nm">30</span>],
+    <span class="st">"Salary"</span>: [<span class="nm">55000</span>, <span class="nm">48000</span>, <span class="nm">62000</span>]
+})
+
+<span class="cm"># ── .columns : list of column names ──────────────────────────</span>
+<span class="fn">print</span>(df.<span class="at">columns</span>)
+<span class="cm"># Index(['Name', 'Age', 'Salary'], dtype='object')</span>
+<span class="fn">print</span>(df.<span class="at">columns</span>.<span class="fn">tolist</span>())   <span class="cm"># ['Name', 'Age', 'Salary']</span>
+
+<span class="cm"># ── .index : row labels ───────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="at">index</span>)              <span class="cm"># RangeIndex(start=0, stop=3, step=1)</span>
+
+<span class="cm"># Set a column as the row index</span>
+df_idx <span class="op">=</span> df.<span class="fn">set_index</span>(<span class="st">"Name"</span>)
+<span class="fn">print</span>(df_idx.<span class="at">index</span>)         <span class="cm"># Index(['Arjun', 'Priya', 'Rahul'])</span>
+
+<span class="cm"># Reset index back to 0, 1, 2...</span>
+df_reset <span class="op">=</span> df_idx.<span class="fn">reset_index</span>()
+
+<span class="cm"># ── .values : get raw NumPy array ────────────────────────────</span>
+<span class="cm"># Real-world: pass numeric features to sklearn ML model</span>
+<span class="fn">print</span>(df[[<span class="st">"Age"</span>, <span class="st">"Salary"</span>]].<span class="at">values</span>)
+<span class="cm"># [[28 55000]
+#  [25 48000]
+#  [30 62000]]</span>
+<span class="fn">print</span>(<span class="fn">type</span>(df.<span class="at">values</span>))   <span class="cm"># &lt;class 'numpy.ndarray'&gt;</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Property</th><th>Returns</th><th>Common Use</th></tr></thead>
+          <tbody>
+            <tr><td>.columns</td><td>Index of column names</td><td>Rename, check schema, iterate columns in loops</td></tr>
+            <tr><td>.index</td><td>Row labels (default 0,1,2...)</td><td>set_index(), reset_index()</td></tr>
+            <tr><td>.values</td><td>NumPy ndarray</td><td>Pass to ML models, fast numeric computation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DataFrame Manipulation -->
+    <div class="topic" id="pd-manipulation">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>DataFrame Manipulation — rename, drop, assign, copy, sample, query</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🗂️</div>
+          <p>Think of a DataFrame like a <strong>company spreadsheet</strong>. You rename column headers for clarity, drop irrelevant columns before sharing with a client, assign new computed columns for analysis, and query it like a mini-database — all without touching the original file.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — df_manipulation.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"emp_id"</span>  : [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>, <span class="nm">105</span>],
+    <span class="st">"emp_name"</span>: [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>, <span class="st">"Kiran"</span>],
+    <span class="st">"dept"</span>    : [<span class="st">"IT"</span>, <span class="st">"HR"</span>, <span class="st">"IT"</span>, <span class="st">"Finance"</span>, <span class="st">"IT"</span>],
+    <span class="st">"salary"</span>  : [<span class="nm">55000</span>, <span class="nm">45000</span>, <span class="nm">62000</span>, <span class="nm">48000</span>, <span class="nm">58000</span>]
+})
+
+<span class="cm"># ── rename() : rename columns ────────────────────────────────</span>
+df_renamed <span class="op">=</span> df.<span class="fn">rename</span>(columns<span class="op">=</span>{
+    <span class="st">"emp_id"</span>   : <span class="st">"EmpID"</span>,
+    <span class="st">"emp_name"</span> : <span class="st">"Name"</span>,
+    <span class="st">"dept"</span>     : <span class="st">"Department"</span>,
+    <span class="st">"salary"</span>   : <span class="st">"Salary"</span>
+})
+<span class="fn">print</span>(df_renamed.<span class="at">columns</span>.<span class="fn">tolist</span>())
+<span class="cm"># ['EmpID', 'Name', 'Department', 'Salary']</span>
+
+<span class="cm"># ── drop() : remove columns or rows ──────────────────────────</span>
+df_no_id  <span class="op">=</span> df.<span class="fn">drop</span>(columns<span class="op">=</span>[<span class="st">"emp_id"</span>])
+df_no_row <span class="op">=</span> df.<span class="fn">drop</span>(index<span class="op">=</span><span class="nm">2</span>)            <span class="cm"># drops row at position 2</span>
+df_slim   <span class="op">=</span> df.<span class="fn">drop</span>(columns<span class="op">=</span>[<span class="st">"emp_id"</span>, <span class="st">"dept"</span>])
+
+<span class="cm"># ── assign() : add computed column without modifying original ─</span>
+df_ann <span class="op">=</span> df.<span class="fn">assign</span>(Annual_Salary<span class="op">=</span>df[<span class="st">"salary"</span>] <span class="op">*</span> <span class="nm">12</span>)
+<span class="fn">print</span>(df_ann[[<span class="st">"emp_name"</span>, <span class="st">"salary"</span>, <span class="st">"Annual_Salary"</span>]])
+<span class="cm"># emp_name  salary  Annual_Salary
+# Arjun      55000         660000
+# Priya      45000         540000</span>
+
+<span class="cm"># ── copy() : safe independent copy ───────────────────────────</span>
+df_clean <span class="op">=</span> df.<span class="fn">copy</span>()
+df_clean[<span class="st">"salary"</span>] <span class="op">=</span> df_clean[<span class="st">"salary"</span>] <span class="op">*</span> <span class="nm">1.1</span>   <span class="cm"># 10% hike</span>
+<span class="cm"># df is unchanged; df_clean has the raise applied</span>
+
+<span class="cm"># ── sample() : random row selection ──────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">sample</span>(<span class="nm">3</span>))                    <span class="cm"># 3 random rows</span>
+<span class="fn">print</span>(df.<span class="fn">sample</span>(frac<span class="op">=</span><span class="nm">0.4</span>))             <span class="cm"># 40% of rows randomly</span>
+<span class="fn">print</span>(df.<span class="fn">sample</span>(<span class="nm">3</span>, random_state<span class="op">=</span><span class="nm">42</span>))   <span class="cm"># reproducible sample</span>
+
+<span class="cm"># ── query() : SQL-like filter string ─────────────────────────</span>
+it_high <span class="op">=</span> df.<span class="fn">query</span>(<span class="st">"dept == 'IT' and salary &gt; 56000"</span>)
+<span class="fn">print</span>(it_high)   <span class="cm"># Rahul (62k) and Kiran (58k)</span>
+
+<span class="cm"># Use @ to reference a Python variable inside query string</span>
+min_sal <span class="op">=</span> <span class="nm">50000</span>
+<span class="fn">print</span>(df.<span class="fn">query</span>(<span class="st">"salary &gt;= @min_sal"</span>))</pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Method</th><th>Purpose</th><th>Key Param</th><th>Corporate Use</th></tr></thead>
+          <tbody>
+            <tr><td>rename()</td><td>Rename columns/index</td><td>columns={old:new}</td><td>Standardize naming conventions across teams</td></tr>
+            <tr><td>drop()</td><td>Remove rows or columns</td><td>columns=[], index=</td><td>Remove PII columns before sharing data</td></tr>
+            <tr><td>assign()</td><td>Add computed column</td><td>new_col=expression</td><td>Feature engineering in ML pipelines</td></tr>
+            <tr><td>copy()</td><td>Independent duplicate</td><td>—</td><td>Prevent SettingWithCopyWarning errors</td></tr>
+            <tr><td>sample()</td><td>Random rows</td><td>n=, frac=, random_state=</td><td>Quick testing on large datasets</td></tr>
+            <tr><td>query()</td><td>SQL-like filter</td><td>"col op val"</td><td>Readable filter conditions in reports</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-warn"><strong>⚠️ SettingWithCopyWarning:</strong> When you slice a DataFrame and modify the slice, Pandas warns you may be modifying a copy. Fix: always use <code>df_new = df.copy()</code> before modifying a filtered subset.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — Pandas Manipulation</h4>
+          <ul>
+            <li>What is the difference between df.copy() and df2 = df (simple assignment)?</li>
+            <li>How do you rename multiple columns at once in Pandas?</li>
+            <li>What is the difference between drop(columns=) and drop(index=)?</li>
+            <li>When would you use query() instead of boolean masking?</li>
+            <li>How do you add a new column that is the product of two existing columns?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════════════
+     SESSION 2
+════════════════════════════════════════════════════════ -->
+<section id="session2">
+  <div class="session-header s2">
+    <span class="session-badge">Session 2</span>
+    <h2>Loading, Cleaning Data &amp; Basic EDA</h2>
+  </div>
+
+  <!-- ─────── DATA LOADING ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📥</span> Data Loading &amp; Saving</div>
+
+    <div class="topic" id="pd-read">
+      <div class="topic-header">
+        <span class="topic-tag tag-load">Loading</span>
+        <h3>read_csv · read_excel · read_json</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Functions to load data from external files directly into a Pandas DataFrame. The file stays on disk; Pandas reads it into RAM.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>All real-world data lives in files or databases. You need to bring it into Python before you can analyze it.</p></div>
+          <div class="wcard when"><div class="wcard-label">When to use which</div><p>CSV → most common, lightweight. Excel → when clients send .xlsx. JSON → API responses, web data.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>If data is in a database — use <code>pd.read_sql()</code> with a connection instead.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ── CSV : Comma Separated Values ─────────────────────────────</span>
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="st">"employees.csv"</span>)
+
+<span class="cm"># Useful parameters:</span>
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(
+    <span class="st">"employees.csv"</span>,
+    sep<span class="op">=</span><span class="st">","</span>,            <span class="cm"># delimiter (default is comma)</span>
+    header<span class="op">=</span><span class="nm">0</span>,           <span class="cm"># row 0 is column headers</span>
+    index_col<span class="op">=</span><span class="st">"EmpID"</span>, <span class="cm"># use EmpID column as row index</span>
+    nrows<span class="op">=</span><span class="nm">1000</span>,         <span class="cm"># only load first 1000 rows (large files)</span>
+    encoding<span class="op">=</span><span class="st">"utf-8"</span>    <span class="cm"># handles special characters</span>
+)
+
+<span class="cm"># ── Excel ────────────────────────────────────────────────────</span>
+df_xl <span class="op">=</span> pd.<span class="fn">read_excel</span>(<span class="st">"sales_report.xlsx"</span>, sheet_name<span class="op">=</span><span class="st">"Sheet1"</span>)
+
+<span class="cm"># ── JSON : API responses ──────────────────────────────────────</span>
+df_js <span class="op">=</span> pd.<span class="fn">read_json</span>(<span class="st">"api_response.json"</span>)
+
+<span class="cm"># From a URL (e.g. public dataset)</span>
+df_web <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="st">"https://example.com/titanic.csv"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic" id="pd-save">
+      <div class="topic-header">
+        <span class="topic-tag tag-load">Saving</span>
+        <h3>to_csv · to_excel · to_json</h3>
+      </div>
+      <div class="topic-body">
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Save to CSV ───────────────────────────────────────────────</span>
+df.<span class="fn">to_csv</span>(<span class="st">"cleaned_employees.csv"</span>, index<span class="op">=</span><span class="kw">False</span>)
+<span class="cm"># index=False → don't save the row numbers (0,1,2...) as a column</span>
+
+<span class="cm"># ── Save to Excel ─────────────────────────────────────────────</span>
+df.<span class="fn">to_excel</span>(<span class="st">"report.xlsx"</span>, sheet_name<span class="op">=</span><span class="st">"Cleaned"</span>, index<span class="op">=</span><span class="kw">False</span>)
+
+<span class="cm"># ── Save to JSON ──────────────────────────────────────────────</span>
+df.<span class="fn">to_json</span>(<span class="st">"output.json"</span>, orient<span class="op">=</span><span class="st">"records"</span>)
+<span class="cm"># orient="records" → each row is one JSON object in a list</span></pre>
+        </div>
+        <div class="box box-warn"><strong>⚠️ Always use <code>index=False</code></strong> when saving to CSV/Excel, unless you explicitly want the row numbers saved. If you forget, you'll get an unnamed extra column next time you load the file.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── MISSING VALUES ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🕳️</span> Data Cleaning — Missing Values</div>
+
+    <div class="topic" id="pd-missing">
+      <div class="topic-header">
+        <span class="topic-tag tag-clean">Cleaning</span>
+        <h3>isnull · notnull · fillna · dropna</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Missing values appear as <code>NaN</code> (Not a Number) in Pandas. They represent absent, unknown, or unrecorded data.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why it matters</div><p>NaN values break calculations — <code>mean([85, NaN, 90])</code> doesn't give 87.5 unless you handle NaN first. ML models crash on NaN input.</p></div>
+          <div class="wcard when"><div class="wcard-label">fillna vs dropna</div><p>fillna: when missing data can be estimated (use mean/median). dropna: when the row is meaningless without that value.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT to drop</div><p>Don't drop rows blindly — if 30% of your data is missing in one column, you'd lose too much. Fill instead.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">📋</div>
+          <p>A hospital admission form where <strong>Age is blank</strong>. You can either fill it with the average patient age (fillna), or remove that patient's record if age is critical for your analysis (dropna). The choice depends on how important the field is.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+data <span class="op">=</span> {
+    <span class="st">"Name"</span>  : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="kw">None</span>,   <span class="st">"Divya"</span>],
+    <span class="st">"Age"</span>   : [<span class="nm">21</span>,     <span class="nm">22</span>,    <span class="nm">20</span>,    np.<span class="at">nan</span>],
+    <span class="st">"Score"</span> : [<span class="nm">85.0</span>,   np.<span class="at">nan</span>, <span class="nm">78.0</span>, <span class="nm">95.0</span>]
+}
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>(data)
+
+<span class="cm"># ── isnull() : Find missing values ───────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">isnull</span>())
+<span class="cm">#     Name    Age  Score
+# 0  False  False  False
+# 1  False  False   True
+# 2   True  False  False
+# 3  False   True  False</span>
+
+<span class="cm"># Count missing per column</span>
+<span class="fn">print</span>(df.<span class="fn">isnull</span>().<span class="fn">sum</span>())
+<span class="cm"># Name     1
+# Age      1
+# Score    1</span>
+
+<span class="cm"># ── notnull() : opposite of isnull ───────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">notnull</span>().<span class="fn">sum</span>())   <span class="cm"># count of valid values per column</span>
+
+<span class="cm"># ── fillna() : fill missing values ───────────────────────────</span>
+<span class="cm"># Option 1: Fill with a specific value</span>
+df[<span class="st">"Name"</span>] <span class="op">=</span> df[<span class="st">"Name"</span>].<span class="fn">fillna</span>(<span class="st">"Unknown"</span>)
+
+<span class="cm"># Option 2: Fill with column mean (most common for numeric)</span>
+df[<span class="st">"Score"</span>] <span class="op">=</span> df[<span class="st">"Score"</span>].<span class="fn">fillna</span>(df[<span class="st">"Score"</span>].<span class="fn">mean</span>())
+
+<span class="cm"># Option 3: Forward fill (use previous row's value)</span>
+df[<span class="st">"Age"</span>] <span class="op">=</span> df[<span class="st">"Age"</span>].<span class="fn">fillna</span>(method<span class="op">=</span><span class="st">"ffill"</span>)
+
+<span class="cm"># ── dropna() : remove rows with missing values ───────────────</span>
+df_clean <span class="op">=</span> df.<span class="fn">dropna</span>()              <span class="cm"># remove ANY row with NaN</span>
+df_clean <span class="op">=</span> df.<span class="fn">dropna</span>(subset<span class="op">=</span>[<span class="st">"Score"</span>])  <span class="cm"># only if Score is missing</span>
+df_clean <span class="op">=</span> df.<span class="fn">dropna</span>(thresh<span class="op">=</span><span class="nm">2</span>)     <span class="cm"># keep rows with at least 2 valid values</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Function</th><th>Purpose</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>isnull()</td><td>Boolean mask of missing values</td><td>True where NaN</td></tr>
+            <tr><td>notnull()</td><td>Boolean mask of present values</td><td>True where NOT NaN</td></tr>
+            <tr><td>isnull().sum()</td><td>Count missing per column</td><td>Integer per column</td></tr>
+            <tr><td>fillna(value)</td><td>Replace NaN with a value</td><td>Filled DataFrame</td></tr>
+            <tr><td>fillna(df["col"].mean())</td><td>Fill with column average</td><td>Statistically sensible fill</td></tr>
+            <tr><td>dropna()</td><td>Remove rows with any NaN</td><td>Smaller clean DataFrame</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── DUPLICATES ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">♻️</span> Data Cleaning — Duplicate Records</div>
+
+    <div class="topic" id="pd-duplicates">
+      <div class="topic-header">
+        <span class="topic-tag tag-clean">Cleaning</span>
+        <h3>duplicated · drop_duplicates</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🛒</div>
+          <p>An e-commerce order file where <strong>Customer #1042 appears 3 times</strong> because of a system glitch. If you calculate total sales, you'd triple-count that order. You need to detect and remove duplicates first.</p>
+        </div>
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Duplicate rows are identical (or near-identical) entries that appear more than once in a dataset.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Duplicates inflate counts, skew averages, and cause incorrect analysis. An ML model trained on duplicates will overfit to them.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>After every data load — always check for duplicates before analysis. Common in: survey data, API logs, merged datasets.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"EmpID"</span> : [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>],
+    <span class="st">"Name"</span>  : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>],
+    <span class="st">"Dept"</span>  : [<span class="st">"IT"</span>, <span class="st">"HR"</span>, <span class="st">"HR"</span>, <span class="st">"Finance"</span>, <span class="st">"IT"</span>]
+})
+
+<span class="cm"># ── duplicated() : mark duplicates ───────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">duplicated</span>())
+<span class="cm"># 0    False
+# 1    False
+# 2     True   ← this is the duplicate row
+# 3    False
+# 4    False</span>
+
+<span class="cm"># Count duplicates</span>
+<span class="fn">print</span>(df.<span class="fn">duplicated</span>().<span class="fn">sum</span>())   <span class="cm"># 1</span>
+
+<span class="cm"># ── drop_duplicates() : remove them ─────────────────────────</span>
+df_clean <span class="op">=</span> df.<span class="fn">drop_duplicates</span>()          <span class="cm"># keep first occurrence</span>
+df_clean <span class="op">=</span> df.<span class="fn">drop_duplicates</span>(keep<span class="op">=</span><span class="st">"last"</span>)   <span class="cm"># keep last occurrence</span>
+
+<span class="cm"># Duplicates based on specific column only</span>
+df_clean <span class="op">=</span> df.<span class="fn">drop_duplicates</span>(subset<span class="op">=</span>[<span class="st">"EmpID"</span>])
+
+<span class="fn">print</span>(df_clean.<span class="at">shape</span>)   <span class="cm"># (4, 3) — one duplicate removed</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── DATA TYPES ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔄</span> Data Cleaning — Type Conversion</div>
+
+    <div class="topic" id="pd-types">
+      <div class="topic-header">
+        <span class="topic-tag tag-clean">Cleaning</span>
+        <h3>astype() — Convert Column Data Types</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">📱</div>
+          <p>A CSV stores phone numbers as <strong>"9876543210"</strong> — Pandas reads it as <em>integer</em> and strips the leading zero from numbers starting with 0. Or salary "₹50,000" is read as a <em>string</em> — you can't do math on it. <code>astype()</code> fixes these.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Age"</span>    : [<span class="st">"21"</span>, <span class="st">"22"</span>, <span class="st">"20"</span>],    <span class="cm"># stored as strings!</span>
+    <span class="st">"Salary"</span> : [<span class="st">"50000"</span>, <span class="st">"60000"</span>, <span class="st">"45000"</span>],
+    <span class="st">"Passed"</span> : [<span class="st">"True"</span>, <span class="st">"False"</span>, <span class="st">"True"</span>]
+})
+<span class="fn">print</span>(df.<span class="at">dtypes</span>)
+<span class="cm"># Age      object  ← string, can't do Age + 1
+# Salary   object  ← can't calculate average salary
+# Passed   object  ← can't filter True/False</span>
+
+<span class="cm"># ── Convert types ────────────────────────────────────────────</span>
+df[<span class="st">"Age"</span>]    <span class="op">=</span> df[<span class="st">"Age"</span>].<span class="fn">astype</span>(<span class="fn">int</span>)
+df[<span class="st">"Salary"</span>] <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">astype</span>(<span class="fn">float</span>)
+df[<span class="st">"Passed"</span>] <span class="op">=</span> df[<span class="st">"Passed"</span>].<span class="fn">astype</span>(<span class="fn">bool</span>)
+
+<span class="fn">print</span>(df.<span class="at">dtypes</span>)
+<span class="cm"># Age       int64
+# Salary    float64
+# Passed    bool</span>
+
+<span class="cm"># ── Date conversion (common in real datasets) ────────────────</span>
+df[<span class="st">"JoinDate"</span>] <span class="op">=</span> pd.<span class="fn">to_datetime</span>(df[<span class="st">"JoinDate"</span>])
+<span class="cm"># Now you can: df["JoinDate"].dt.year / .dt.month</span></pre>
+        </div>
+        <div class="box box-error"><strong>⚠️ Common Error:</strong> Trying to convert "₹50,000" directly to float will throw a ValueError. You must clean the string first: <code>df["Salary"].str.replace("₹","").str.replace(",","").astype(float)</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── STRING OPERATIONS ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔤</span> String Operations — df["col"].str.*</div>
+
+    <div class="topic" id="pd-strings">
+      <div class="topic-header">
+        <span class="topic-tag tag-string">String</span>
+        <h3>Pandas String Methods — str.upper, lower, strip, replace, contains, split, len</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Pandas <code>.str</code> accessor applies Python string methods to an entire Series (column) at once — no loops needed.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Text data in real datasets is almost always dirty — names in different cases, extra spaces, inconsistent formatting. String methods clean and standardize it.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Before matching/merging on text columns, cleaning customer names, extracting domain from email, validating phone formats.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>Don't use string methods on numeric columns — convert to string first with <code>.astype(str)</code> if needed.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🧹</div>
+          <p>You receive 10,000 customer records where names are entered as <strong>"arjun"</strong>, <strong>"PRIYA"</strong>, <strong>"  Rahul  "</strong>. Before sending any email, you need to standardize them. <code>str.title()</code> and <code>str.strip()</code> fix this for all 10,000 rows instantly.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — string_operations.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Name"</span>  : [<span class="st">"  arjun  "</span>, <span class="st">"PRIYA"</span>, <span class="st">"rahul kumar"</span>, <span class="st">"divya"</span>],
+    <span class="st">"Email"</span> : [<span class="st">"arjun@tcs.com"</span>, <span class="st">"priya@infosys.com"</span>,
+                <span class="st">"rahul@accenture.com"</span>, <span class="st">"divya@wipro.com"</span>],
+    <span class="st">"Dept"</span>  : [<span class="st">"it dept"</span>, <span class="st">"Human Resources"</span>, <span class="st">"it dept"</span>, <span class="st">"Finance Dept"</span>]
+})
+
+<span class="cm"># ── str.strip() : remove leading and trailing whitespace ──────</span>
+df[<span class="st">"Name"</span>] <span class="op">=</span> df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">strip</span>()
+<span class="fn">print</span>(df[<span class="st">"Name"</span>].<span class="fn">tolist</span>())
+<span class="cm"># ['arjun', 'PRIYA', 'rahul kumar', 'divya']</span>
+
+<span class="cm"># ── str.upper() / str.lower() / str.title() ──────────────────</span>
+<span class="fn">print</span>(df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">upper</span>())    <span class="cm"># ARJUN, PRIYA, RAHUL KUMAR, DIVYA</span>
+<span class="fn">print</span>(df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">lower</span>())    <span class="cm"># arjun, priya, rahul kumar, divya</span>
+<span class="fn">print</span>(df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">title</span>())    <span class="cm"># Arjun, Priya, Rahul Kumar, Divya</span>
+
+<span class="cm"># Apply title case and save back</span>
+df[<span class="st">"Name"</span>] <span class="op">=</span> df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">title</span>()
+
+<span class="cm"># ── str.replace() : find and replace ─────────────────────────</span>
+<span class="cm"># Real-world: standardize department names</span>
+df[<span class="st">"Dept"</span>] <span class="op">=</span> df[<span class="st">"Dept"</span>].<span class="at">str</span>.<span class="fn">replace</span>(<span class="st">"it dept"</span>, <span class="st">"IT"</span>, case<span class="op">=</span><span class="kw">False</span>)
+df[<span class="st">"Dept"</span>] <span class="op">=</span> df[<span class="st">"Dept"</span>].<span class="at">str</span>.<span class="fn">replace</span>(<span class="st">"Dept"</span>, <span class="st">""</span>).<span class="at">str</span>.<span class="fn">strip</span>()
+
+<span class="cm"># ── str.contains() : filter rows containing a pattern ────────</span>
+<span class="cm"># Real-world: find all gmail users from an email column</span>
+tcs_users <span class="op">=</span> df[df[<span class="st">"Email"</span>].<span class="at">str</span>.<span class="fn">contains</span>(<span class="st">"tcs"</span>)]
+<span class="fn">print</span>(tcs_users)   <span class="cm"># Arjun's row only</span>
+
+<span class="cm"># Case-insensitive contains</span>
+it_team <span class="op">=</span> df[df[<span class="st">"Dept"</span>].<span class="at">str</span>.<span class="fn">contains</span>(<span class="st">"IT"</span>, case<span class="op">=</span><span class="kw">False</span>, na<span class="op">=</span><span class="kw">False</span>)]
+
+<span class="cm"># ── str.split() : split string into parts ────────────────────</span>
+<span class="cm"># Real-world: extract domain from email</span>
+df[<span class="st">"Domain"</span>] <span class="op">=</span> df[<span class="st">"Email"</span>].<span class="at">str</span>.<span class="fn">split</span>(<span class="st">"@"</span>).<span class="at">str</span>[<span class="nm">1</span>]
+<span class="fn">print</span>(df[<span class="st">"Domain"</span>].<span class="fn">tolist</span>())
+<span class="cm"># ['tcs.com', 'infosys.com', 'accenture.com', 'wipro.com']</span>
+
+<span class="cm"># ── str.len() : length of each string ────────────────────────</span>
+df[<span class="st">"Name_Length"</span>] <span class="op">=</span> df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">len</span>()
+<span class="fn">print</span>(df[[<span class="st">"Name"</span>, <span class="st">"Name_Length"</span>]])
+<span class="cm"># Name          Name_Length
+# Arjun               5
+# Priya               5
+# Rahul Kumar        11
+# Divya               5</span>
+
+<span class="cm"># ── str.startswith() / str.endswith() ────────────────────────</span>
+starts_a <span class="op">=</span> df[df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">startswith</span>(<span class="st">"A"</span>)]    <span class="cm"># Arjun</span>
+ends_com <span class="op">=</span> df[df[<span class="st">"Email"</span>].<span class="at">str</span>.<span class="fn">endswith</span>(<span class="st">".com"</span>)]  <span class="cm"># all 4</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Method</th><th>Purpose</th><th>Real-world Use</th></tr></thead>
+          <tbody>
+            <tr><td>str.strip()</td><td>Remove leading/trailing spaces</td><td>Clean user input, form data</td></tr>
+            <tr><td>str.upper() / lower()</td><td>Case conversion</td><td>Standardize before merging on text</td></tr>
+            <tr><td>str.title()</td><td>Title case each word</td><td>Clean customer names for display</td></tr>
+            <tr><td>str.replace()</td><td>Find and replace text</td><td>Fix abbreviations, clean categories</td></tr>
+            <tr><td>str.contains()</td><td>Boolean mask: contains pattern</td><td>Filter emails by domain, flag keywords</td></tr>
+            <tr><td>str.split("@").str[1]</td><td>Split and pick part</td><td>Extract domain from email</td></tr>
+            <tr><td>str.len()</td><td>String length</td><td>Validate phone number length = 10</td></tr>
+            <tr><td>str.startswith() / endswith()</td><td>Match start/end pattern</td><td>Filter by prefix/suffix</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-tip"><strong>✅ Best Practice:</strong> Always use <code>na=False</code> inside <code>str.contains()</code> to avoid errors when the column has NaN values. Without it, NaN rows will throw a TypeError.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — String Operations</h4>
+          <ul>
+            <li>How do you remove extra spaces from all values in a column?</li>
+            <li>How do you extract the domain name from an email column?</li>
+            <li>What is the difference between str.replace() and str.contains()?</li>
+            <li>How do you filter rows where a name starts with the letter "A"?</li>
+            <li>What does na=False do in str.contains()?</li>
+          </ul>
+        </div>
+        <div class="exercise-box">
+          <h4>🧪 Hands-on Exercise — String Operations</h4>
+          <ol>
+            <li>Create a DataFrame with 5 employee names in mixed case (e.g., "arjun", "PRIYA"). Standardize all names to title case.</li>
+            <li>Add a column "Email" with email addresses. Extract the domain (e.g., "tcs.com") into a new column "Domain".</li>
+            <li>Filter all rows where the email contains "gmail".</li>
+            <li>Create a column "Name_Length" with the character count of each name.</li>
+            <li>Replace all occurrences of "Dept" with "" in the Department column and strip extra spaces.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── DATETIME ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📅</span> DateTime Operations</div>
+
+    <div class="topic" id="pd-datetime">
+      <div class="topic-header">
+        <span class="topic-tag tag-datetime">DateTime</span>
+        <h3>to_datetime() and dt Accessor — year, month, day, weekday</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>pd.to_datetime()</code> converts a string column to a proper datetime type. The <code>.dt</code> accessor then lets you extract year, month, day, weekday, etc.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Dates loaded from CSV are just strings — "2024-01-15" can't be sorted correctly or compared. After converting, Pandas knows it's a date and enables powerful date operations.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Any time your dataset has a date/timestamp column — joining dates, calculating tenure (years of experience), filtering by month or quarter, trend analysis.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>Don't keep dates as strings — it leads to wrong sort order (alphabetical instead of chronological). Always convert on load.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">📆</div>
+          <p>A date stored as a string <strong>"2024-01-15"</strong> is like writing a date on a sticky note — you can read it but you can't calculate how many days ago it was. After <strong>to_datetime()</strong>, Pandas treats it like a real calendar date and lets you do date arithmetic.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — datetime_operations.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"EmpID"</span>   : [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>],
+    <span class="st">"Name"</span>    : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>],
+    <span class="st">"JoinDate"</span>: [<span class="st">"2021-06-01"</span>, <span class="st">"2020-03-15"</span>,
+                  <span class="st">"2019-11-20"</span>, <span class="st">"2022-08-05"</span>]
+})
+
+<span class="fn">print</span>(df[<span class="st">"JoinDate"</span>].<span class="at">dtype</span>)   <span class="cm"># object (string — can't do date math)</span>
+
+<span class="cm"># ── to_datetime() : convert string to datetime ───────────────</span>
+df[<span class="st">"JoinDate"</span>] <span class="op">=</span> pd.<span class="fn">to_datetime</span>(df[<span class="st">"JoinDate"</span>])
+<span class="fn">print</span>(df[<span class="st">"JoinDate"</span>].<span class="at">dtype</span>)   <span class="cm"># datetime64[ns]</span>
+
+<span class="cm"># ── .dt accessor : extract date components ───────────────────</span>
+df[<span class="st">"Year"</span>]    <span class="op">=</span> df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">year</span>
+df[<span class="st">"Month"</span>]   <span class="op">=</span> df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">month</span>
+df[<span class="st">"Day"</span>]     <span class="op">=</span> df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">day</span>
+df[<span class="st">"Weekday"</span>] <span class="op">=</span> df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">day_name</span>()  <span class="cm"># Monday, Tuesday...</span>
+
+<span class="fn">print</span>(df[[<span class="st">"Name"</span>, <span class="st">"JoinDate"</span>, <span class="st">"Year"</span>, <span class="st">"Month"</span>, <span class="st">"Day"</span>, <span class="st">"Weekday"</span>]])
+<span class="cm"># Name   JoinDate    Year  Month  Day   Weekday
+# Arjun  2021-06-01  2021      6    1   Tuesday
+# Priya  2020-03-15  2020      3   15    Sunday
+# Rahul  2019-11-20  2019     11   20 Wednesday
+# Divya  2022-08-05  2022      8    5    Friday</span>
+
+<span class="cm"># ── Calculate tenure (years of experience) ───────────────────</span>
+today <span class="op">=</span> pd.<span class="fn">Timestamp</span>(<span class="st">"today"</span>)
+df[<span class="st">"Tenure_Years"</span>] <span class="op">=</span> (today <span class="op">-</span> df[<span class="st">"JoinDate"</span>]).<span class="at">dt</span>.<span class="at">days</span> <span class="op">//</span> <span class="nm">365</span>
+<span class="fn">print</span>(df[[<span class="st">"Name"</span>, <span class="st">"JoinDate"</span>, <span class="st">"Tenure_Years"</span>]])
+
+<span class="cm"># ── Filter by date ────────────────────────────────────────────</span>
+<span class="cm"># Employees who joined after 2020</span>
+recent <span class="op">=</span> df[df[<span class="st">"JoinDate"</span>] <span class="op">&gt;</span> <span class="st">"2020-12-31"</span>]
+<span class="fn">print</span>(recent[[<span class="st">"Name"</span>, <span class="st">"JoinDate"</span>]])
+<span class="cm"># Arjun 2021-06-01
+# Divya 2022-08-05</span>
+
+<span class="cm"># ── Filter by month ───────────────────────────────────────────</span>
+june_joiners <span class="op">=</span> df[df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">month</span> <span class="op">==</span> <span class="nm">6</span>]
+<span class="fn">print</span>(june_joiners[[<span class="st">"Name"</span>]])   <span class="cm"># Arjun</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Operation</th><th>Code</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Convert to datetime</td><td>pd.to_datetime(df["col"])</td><td>datetime64 dtype column</td></tr>
+            <tr><td>Extract year</td><td>df["col"].dt.year</td><td>Integer year (2024)</td></tr>
+            <tr><td>Extract month</td><td>df["col"].dt.month</td><td>Integer month (1–12)</td></tr>
+            <tr><td>Extract day</td><td>df["col"].dt.day</td><td>Integer day (1–31)</td></tr>
+            <tr><td>Day name</td><td>df["col"].dt.day_name()</td><td>"Monday", "Tuesday"...</td></tr>
+            <tr><td>Weekday number</td><td>df["col"].dt.weekday</td><td>0=Monday, 6=Sunday</td></tr>
+            <tr><td>Calculate age</td><td>(today - df["col"]).dt.days // 365</td><td>Years since date</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-tip"><strong>✅ Corporate Tip:</strong> When loading CSV files with date columns, pass <code>parse_dates=["JoinDate"]</code> directly in <code>read_csv()</code> to automatically convert dates on load. This saves the extra <code>to_datetime()</code> step.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — DateTime</h4>
+          <ul>
+            <li>Why do you need to convert date strings to datetime before working with them?</li>
+            <li>How do you extract only the month from a date column in Pandas?</li>
+            <li>How do you calculate the number of years between a join date and today?</li>
+            <li>What is parse_dates in pd.read_csv() and why is it useful?</li>
+            <li>How do you filter all records from the year 2022?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── FILTERING ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔎</span> Filtering &amp; Boolean Masking</div>
+
+    <div class="topic" id="pd-filtering">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>Filtering with Boolean Masking</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Boolean masking creates a True/False array. You use it to select only the rows where the condition is True.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>You never work with ALL the data. You want "employees in IT dept with salary > 50k". Filtering gives you the right subset.</p></div>
+          <div class="wcard how"><div class="wcard-label">How</div><p>Condition creates a boolean Series → pass it into df[] → only True rows are returned.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre>df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Name"</span>  : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>, <span class="st">"Kiran"</span>],
+    <span class="st">"Dept"</span>  : [<span class="st">"IT"</span>,    <span class="st">"HR"</span>,   <span class="st">"IT"</span>,    <span class="st">"Finance"</span>, <span class="st">"IT"</span>],
+    <span class="st">"Salary"</span>: [<span class="nm">55000</span>,  <span class="nm">45000</span>, <span class="nm">62000</span>,  <span class="nm">48000</span>,    <span class="nm">58000</span>],
+    <span class="st">"Age"</span>   : [<span class="nm">28</span>,     <span class="nm">30</span>,    <span class="nm">25</span>,     <span class="nm">35</span>,       <span class="nm">29</span>]
+})
+
+<span class="cm"># ── Single condition ──────────────────────────────────────────</span>
+it_team <span class="op">=</span> df[df[<span class="st">"Dept"</span>] <span class="op">==</span> <span class="st">"IT"</span>]
+<span class="fn">print</span>(it_team)       <span class="cm"># Arjun, Rahul, Kiran</span>
+
+<span class="cm"># ── Multiple conditions ───────────────────────────────────────</span>
+<span class="cm"># & = AND,  | = OR,  ~ = NOT</span>
+it_high_sal <span class="op">=</span> df[(df[<span class="st">"Dept"</span>] <span class="op">==</span> <span class="st">"IT"</span>) <span class="op">&amp;</span> (df[<span class="st">"Salary"</span>] <span class="op">&gt;</span> <span class="nm">56000</span>)]
+<span class="fn">print</span>(it_high_sal)   <span class="cm"># Rahul (62k), Kiran (58k)</span>
+
+<span class="cm"># ── isin() : match one of several values ─────────────────────</span>
+tech_depts <span class="op">=</span> df[df[<span class="st">"Dept"</span>].<span class="fn">isin</span>([<span class="st">"IT"</span>, <span class="st">"Finance"</span>])]
+
+<span class="cm"># ── String filtering ──────────────────────────────────────────</span>
+starts_a <span class="op">=</span> df[df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">startswith</span>(<span class="st">"A"</span>)]  <span class="cm"># Arjun</span>
+contains_r<span class="op">=</span> df[df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">contains</span>(<span class="st">"r"</span>)]   <span class="cm"># Arjun, Priya</span></pre>
+        </div>
+        <div class="box box-warn"><strong>⚠️ Common Mistake:</strong> Using Python <code>and</code>/<code>or</code> instead of <code>&amp;</code>/<code>|</code> will throw a ValueError. Always use bitwise operators with multiple conditions, and wrap each condition in parentheses.</div>
+      </div>
+    </div>
+
+    <!-- Sorting -->
+    <div class="topic" id="pd-sorting">
+      <div class="topic-header">
+        <span class="topic-tag tag-pandas">Pandas</span>
+        <h3>Sorting — sort_values()</h3>
+      </div>
+      <div class="topic-body">
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Sort by Salary, highest first ────────────────────────────</span>
+df.<span class="fn">sort_values</span>(<span class="st">"Salary"</span>, ascending<span class="op">=</span><span class="kw">False</span>, inplace<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(df.<span class="fn">head</span>(<span class="nm">3</span>))  <span class="cm"># top 3 earners</span>
+
+<span class="cm"># ── Sort by multiple columns ──────────────────────────────────</span>
+<span class="cm"># Sort by Dept (A-Z), then within each dept by Salary (desc)</span>
+df_sorted <span class="op">=</span> df.<span class="fn">sort_values</span>(
+    by<span class="op">=</span>[<span class="st">"Dept"</span>, <span class="st">"Salary"</span>],
+    ascending<span class="op">=</span>[<span class="kw">True</span>, <span class="kw">False</span>]
+)
+<span class="fn">print</span>(df_sorted)</pre>
+        </div>
+        <div class="box box-info"><strong>📌 <code>inplace=True</code></strong> modifies the original DataFrame. Without it, you get a new DataFrame and the original is unchanged. Good practice: always assign to a new variable during exploration; use inplace only when certain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── GROUPBY & AGGREGATION ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📦</span> Groupby &amp; Aggregation</div>
+
+    <div class="topic" id="pd-groupby">
+      <div class="topic-header">
+        <span class="topic-tag tag-groupby">Pandas</span>
+        <h3>groupby() — Split, Apply, Combine</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>groupby()</code> splits a DataFrame into groups based on a column, applies a function to each group, and combines results.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>One of the most used operations in data analysis. Without it, you'd have to loop over each category manually — groupby does it in one line.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>Department-wise salary reports, monthly sales totals, category-wise product counts — any "by group" analysis.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>When you only have one group (entire dataset) — just use direct aggregates like df["Salary"].mean().</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🏢</div>
+          <p>An HR manager wants the <strong>average salary per department</strong>. Without groupby you'd filter IT, then HR, then Finance separately. With groupby, you say: <em>"Group by Dept, then give me the mean Salary"</em> — one line, all departments at once.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — groupby.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Name"</span>  : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>, <span class="st">"Kiran"</span>, <span class="st">"Meena"</span>],
+    <span class="st">"Dept"</span>  : [<span class="st">"IT"</span>,    <span class="st">"HR"</span>,   <span class="st">"IT"</span>,    <span class="st">"Finance"</span>, <span class="st">"IT"</span>,   <span class="st">"HR"</span>],
+    <span class="st">"Salary"</span>: [<span class="nm">55000</span>,  <span class="nm">45000</span>, <span class="nm">62000</span>,  <span class="nm">48000</span>,    <span class="nm">58000</span>, <span class="nm">47000</span>],
+    <span class="st">"Exp"</span>   : [<span class="nm">3</span>,      <span class="nm">2</span>,     <span class="nm">5</span>,      <span class="nm">4</span>,        <span class="nm">3</span>,     <span class="nm">2</span>]
+})
+
+<span class="cm"># ── Basic groupby: mean salary per department ─────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>)[<span class="st">"Salary"</span>].<span class="fn">mean</span>())
+<span class="cm"># Dept
+# Finance    48000.0
+# HR         46000.0
+# IT         58333.3</span>
+
+<span class="cm"># ── Multiple aggregates on one column ────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>)[<span class="st">"Salary"</span>].<span class="fn">agg</span>([<span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"mean"</span>, <span class="st">"count"</span>]))
+<span class="cm">#            min    max      mean  count
+# Dept
+# Finance  48000  48000  48000.0      1
+# HR       45000  47000  46000.0      2
+# IT       55000  62000  58333.3      3</span>
+
+<span class="cm"># ── Aggregate multiple columns ────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>).<span class="fn">agg</span>({
+    <span class="st">"Salary"</span>: [<span class="st">"mean"</span>, <span class="st">"max"</span>],
+    <span class="st">"Exp"</span>   : <span class="st">"mean"</span>
+}))
+
+<span class="cm"># ── value_counts() : frequency of each category ──────────────</span>
+<span class="cm"># Real-world: how many employees in each department?</span>
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">value_counts</span>())
+<span class="cm"># IT         3
+# HR         2
+# Finance    1</span>
+
+<span class="cm"># With percentage</span>
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">value_counts</span>(normalize<span class="op">=</span><span class="kw">True</span>))
+<span class="cm"># IT         0.50
+# HR         0.33
+# Finance    0.17</span>
+
+<span class="cm"># ── count() and nunique() ─────────────────────────────────────</span>
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">count</span>())    <span class="cm"># 6  (total non-null entries)</span>
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">nunique</span>()) <span class="cm"># 3  (number of unique depts)</span>
+
+<span class="cm"># nunique per group — how many unique names per dept?</span>
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>)[<span class="st">"Name"</span>].<span class="fn">nunique</span>())
+<span class="cm"># Dept
+# Finance    1
+# HR         2
+# IT         3</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Method</th><th>Purpose</th><th>Corporate Use</th></tr></thead>
+          <tbody>
+            <tr><td>groupby("col")</td><td>Split by category</td><td>Department-wise reports</td></tr>
+            <tr><td>.mean() / .sum() / .max()</td><td>Single aggregate</td><td>Avg salary, total sales, max score</td></tr>
+            <tr><td>.agg(["min","max","mean"])</td><td>Multiple aggregates</td><td>Summary reports with multiple stats</td></tr>
+            <tr><td>.agg({"col1":"mean","col2":"sum"})</td><td>Different agg per column</td><td>Mixed aggregation reports</td></tr>
+            <tr><td>value_counts()</td><td>Frequency per category</td><td>Count orders per product, users per region</td></tr>
+            <tr><td>count()</td><td>Non-null entries</td><td>Audit data completeness</td></tr>
+            <tr><td>nunique()</td><td>Unique value count</td><td>Count distinct customers, SKUs</td></tr>
+          </tbody>
+        </table>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — groupby</h4>
+          <ul>
+            <li>What does groupby() return — a DataFrame or a GroupBy object?</li>
+            <li>How do you calculate both mean and max salary department-wise in one line?</li>
+            <li>What is the difference between count() and nunique()?</li>
+            <li>How would you find the top earning department from a salary DataFrame?</li>
+            <li>What is normalize=True in value_counts()?</li>
+          </ul>
+        </div>
+        <div class="exercise-box">
+          <h4>🧪 Hands-on Exercise — groupby</h4>
+          <ol>
+            <li>Load employees.csv (or use the sample DataFrame above).</li>
+            <li>Find average, min, and max salary per department using groupby + agg.</li>
+            <li>Count the number of employees in each department using value_counts().</li>
+            <li>Find how many unique departments exist using nunique().</li>
+            <li>Which department has the highest average salary? (Hint: use .idxmax())</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- merge / join / concat -->
+    <div class="topic" id="pd-merge">
+      <div class="topic-header">
+        <span class="topic-tag tag-merge">Pandas</span>
+        <h3>Combining DataFrames — merge, join, concat</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>merge()</code> joins two DataFrames on a common column (like SQL JOIN). <code>concat()</code> stacks DataFrames row-wise or column-wise. <code>join()</code> merges on the index.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Real-world data comes from multiple sources — employee details from HR, salaries from Finance, attendance from another system. You need to combine them.</p></div>
+          <div class="wcard when"><div class="wcard-label">When to use which</div><p><strong>merge()</strong>: when merging on a shared column. <strong>concat()</strong>: when stacking rows or columns. <strong>join()</strong>: when merging on index.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>Don't use merge when you just want to add new columns from the same-sized DataFrame — use assign() or direct column assignment instead.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🔗</div>
+          <p>You have <strong>two Excel sheets</strong>: Sheet 1 has employee names and IDs, Sheet 2 has employee IDs and salaries. <strong>merge()</strong> is the VLOOKUP that connects them using the common EmpID column.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — merge_join_concat.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Two separate DataFrames</span>
+df_emp <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"EmpID"</span>: [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>],
+    <span class="st">"Name"</span> : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>],
+    <span class="st">"Dept"</span> : [<span class="st">"IT"</span>, <span class="st">"HR"</span>, <span class="st">"IT"</span>, <span class="st">"Finance"</span>]
+})
+
+df_sal <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"EmpID"</span> : [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">105</span>],   <span class="cm"># 105 not in df_emp</span>
+    <span class="st">"Salary"</span>: [<span class="nm">55000</span>, <span class="nm">45000</span>, <span class="nm">62000</span>, <span class="nm">50000</span>]
+})
+
+<span class="cm"># ── merge() : join on common column ──────────────────────────</span>
+<span class="cm"># INNER JOIN : only matching EmpIDs from both</span>
+inner <span class="op">=</span> pd.<span class="fn">merge</span>(df_emp, df_sal, on<span class="op">=</span><span class="st">"EmpID"</span>, how<span class="op">=</span><span class="st">"inner"</span>)
+<span class="fn">print</span>(inner)
+<span class="cm"># EmpID  Name  Dept   Salary
+# 101    Arjun  IT    55000
+# 102    Priya  HR    45000
+# 103    Rahul  IT    62000</span>
+
+<span class="cm"># LEFT JOIN : all rows from df_emp, NaN where salary is missing</span>
+left <span class="op">=</span> pd.<span class="fn">merge</span>(df_emp, df_sal, on<span class="op">=</span><span class="st">"EmpID"</span>, how<span class="op">=</span><span class="st">"left"</span>)
+<span class="fn">print</span>(left)
+<span class="cm"># EmpID  Name   Dept    Salary
+# 101    Arjun  IT       55000.0
+# 102    Priya  HR       45000.0
+# 103    Rahul  IT       62000.0
+# 104    Divya  Finance      NaN   ← Divya has no salary record</span>
+
+<span class="cm"># OUTER JOIN : all rows from both, NaN where no match</span>
+outer <span class="op">=</span> pd.<span class="fn">merge</span>(df_emp, df_sal, on<span class="op">=</span><span class="st">"EmpID"</span>, how<span class="op">=</span><span class="st">"outer"</span>)
+
+<span class="cm"># ── concat() : stack DataFrames row-wise ─────────────────────</span>
+<span class="cm"># Real-world: monthly sales files — Jan, Feb, Mar loaded separately</span>
+df_jan <span class="op">=</span> pd.<span class="cl">DataFrame</span>({<span class="st">"Month"</span>:[<span class="st">"Jan"</span>], <span class="st">"Sales"</span>:[<span class="nm">100000</span>]})
+df_feb <span class="op">=</span> pd.<span class="cl">DataFrame</span>({<span class="st">"Month"</span>:[<span class="st">"Feb"</span>], <span class="st">"Sales"</span>:[<span class="nm">120000</span>]})
+df_mar <span class="op">=</span> pd.<span class="cl">DataFrame</span>({<span class="st">"Month"</span>:[<span class="st">"Mar"</span>], <span class="st">"Sales"</span>:[<span class="nm">115000</span>]})
+
+all_months <span class="op">=</span> pd.<span class="fn">concat</span>([df_jan, df_feb, df_mar], ignore_index<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(all_months)
+<span class="cm"># Month   Sales
+# Jan    100000
+# Feb    120000
+# Mar    115000</span>
+
+<span class="cm"># Stack column-wise (axis=1)</span>
+df_combined_cols <span class="op">=</span> pd.<span class="fn">concat</span>([df_emp, df_sal.<span class="fn">drop</span>(<span class="st">"EmpID"</span>, axis<span class="op">=</span><span class="nm">1</span>)], axis<span class="op">=</span><span class="nm">1</span>)</pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Method</th><th>SQL Equivalent</th><th>How parameter</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td>merge(inner)</td><td>INNER JOIN</td><td>how="inner"</td><td>Only matching records in both</td></tr>
+            <tr><td>merge(left)</td><td>LEFT JOIN</td><td>how="left"</td><td>All from left, matching from right</td></tr>
+            <tr><td>merge(right)</td><td>RIGHT JOIN</td><td>how="right"</td><td>All from right, matching from left</td></tr>
+            <tr><td>merge(outer)</td><td>FULL OUTER JOIN</td><td>how="outer"</td><td>All rows from both, NaN for no match</td></tr>
+            <tr><td>concat(axis=0)</td><td>UNION ALL</td><td>ignore_index=True</td><td>Stack same-structure files row-wise</td></tr>
+            <tr><td>concat(axis=1)</td><td>—</td><td>axis=1</td><td>Add columns side-by-side</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-warn"><strong>⚠️ Common Mistake:</strong> Using concat() on DataFrames with different column names creates NaN columns. Always ensure column names match before concatenating row-wise.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — merge / concat</h4>
+          <ul>
+            <li>What is the difference between merge() and concat()?</li>
+            <li>Which merge type (how=) keeps all rows from the left DataFrame?</li>
+            <li>What happens to unmatched rows in an inner join?</li>
+            <li>How do you concatenate 12 monthly CSV files into one DataFrame?</li>
+            <li>What does ignore_index=True do in concat()?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── EDA ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">⭐</span> Basic EDA — Exploratory Data Analysis</div>
+
+    <div class="topic" id="eda-intro">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>What is EDA and Why is it Critical?</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>EDA is the process of summarizing, visualizing, and understanding a dataset before any modeling or decision-making.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Data is almost never clean and well-structured. EDA reveals hidden patterns, anomalies, wrong assumptions, and key relationships that determine what analysis is even possible.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>ALWAYS — before any ML model, before any business report, before any data pipeline. EDA is step zero.</p></div>
+          <div class="wcard how"><div class="wcard-label">How</div><p>describe() → correlation() → distribution check → outlier detection. In order.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🩺</div>
+          <p>A doctor doesn't prescribe medicine without a full checkup. EDA is the <strong>medical checkup for your data</strong>. You understand what's there, what's broken, and what's normal — before you act on it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- describe() -->
+    <div class="topic" id="eda-describe">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>describe() — Statistical Summary</h3>
+      </div>
+      <div class="topic-body">
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># Using Titanic dataset as example</span>
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="st">"titanic.csv"</span>)
+<span class="fn">print</span>(df.<span class="fn">describe</span>())
+<span class="cm">#           PassengerId         Age       Fare
+# count    891.000000  714.000000  891.000000
+# mean     446.000000   29.699118   32.204208
+# std      257.353842   14.526497   49.693429
+# min        1.000000    0.420000    0.000000
+# 25%      223.500000   20.125000    7.910400
+# 50%      446.000000   28.000000   14.454200
+# 75%      668.500000   38.000000   31.000000
+# max      891.000000   80.000000  512.329200</span>
+
+<span class="cm"># Include non-numeric (object) columns</span>
+<span class="fn">print</span>(df.<span class="fn">describe</span>(include<span class="op">=</span><span class="st">"all"</span>))
+
+<span class="cm"># ── What to look for in describe() output ────────────────────</span>
+<span class="cm"># count < total rows → missing values in that column</span>
+<span class="cm"># min/max very far from mean → potential outliers</span>
+<span class="cm"># 25%=50%=75% → data is heavily skewed or all same value</span>
+<span class="cm"># std very high → data is spread out widely</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Stat</th><th>Meaning</th><th>What to watch for</th></tr></thead>
+          <tbody>
+            <tr><td>count</td><td>Non-null entries</td><td>If less than total rows → missing values exist</td></tr>
+            <tr><td>mean</td><td>Average</td><td>Is it realistic? ₹50 avg salary → something wrong</td></tr>
+            <tr><td>std</td><td>Standard deviation</td><td>Very high std = lots of variation / outliers</td></tr>
+            <tr><td>min / max</td><td>Extreme values</td><td>Negative age? 999 salary? → data quality issue</td></tr>
+            <tr><td>25%, 50%, 75%</td><td>Quartiles</td><td>Far gap between 75% and max → right-skewed / outliers</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Correlation -->
+    <div class="topic" id="eda-correlation">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>Correlation — How Columns Relate to Each Other</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Correlation measures how strongly two numeric columns move together. Value ranges from -1 to +1.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>In ML, highly correlated features are redundant — you can drop one. For business: understand if "experience" really predicts "salary".</p></div>
+          <div class="wcard how"><div class="wcard-label">Reading the Values</div><p>+1 = perfect positive. -1 = perfect negative. 0 = no relation. &gt;0.7 = strong correlation.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Correlation matrix ────────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">corr</span>())
+<span class="cm">#              Age      Fare  Survived
+# Age     1.000000 -0.051722 -0.077221
+# Fare   -0.051722  1.000000  0.257307
+# Survived -0.077221  0.257307  1.000000</span>
+
+<span class="cm"># Interpretation:
+# Fare vs Survived = 0.26 → slight positive (higher fare = more likely to survive)
+# Age vs Survived = -0.08 → very weak negative</span>
+
+<span class="cm"># ── Correlation of all columns with one target column ────────</span>
+<span class="fn">print</span>(df.<span class="fn">corr</span>()[<span class="st">"Survived"</span>].<span class="fn">sort_values</span>(ascending<span class="op">=</span><span class="kw">False</span>))
+<span class="cm"># Fare        0.257307
+# Survived    1.000000
+# Age        -0.077221</span>
+
+<span class="cm"># ── Quick heatmap (if matplotlib available) ───────────────────</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+sns.<span class="fn">heatmap</span>(df.<span class="fn">corr</span>(), annot<span class="op">=</span><span class="kw">True</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>)
+plt.<span class="fn">show</span>()</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribution -->
+    <div class="topic" id="eda-distribution">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>Distribution — Understanding Data Spread</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">📈</div>
+          <p>Distribution tells you <strong>where most of the data is concentrated</strong>. Employee salaries: Is most of the workforce earning 30k-40k (normal distribution) or are there a few people earning 10 lakh+ pulling the mean up (right-skewed)?</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── Value Counts : frequency of each category ────────────────</span>
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">value_counts</span>())
+<span class="cm"># IT         120
+# HR          85
+# Finance     60
+# Operations  45</span>
+
+<span class="cm"># ── Distribution stats ───────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"Mean:"</span>,   df[<span class="st">"Salary"</span>].<span class="fn">mean</span>())
+<span class="fn">print</span>(<span class="st">"Median:"</span>, df[<span class="st">"Salary"</span>].<span class="fn">median</span>())
+<span class="fn">print</span>(<span class="st">"Mode:"</span>,   df[<span class="st">"Salary"</span>].<span class="fn">mode</span>()[<span class="nm">0</span>])
+<span class="fn">print</span>(<span class="st">"Skew:"</span>,   df[<span class="st">"Salary"</span>].<span class="fn">skew</span>())
+
+<span class="cm"># Mean > Median → right-skewed (a few high salaries pull mean up)
+# Mean < Median → left-skewed
+# Mean ≈ Median → symmetric / normal distribution</span>
+
+<span class="cm"># ── Histogram ────────────────────────────────────────────────</span>
+df[<span class="st">"Salary"</span>].<span class="fn">hist</span>(bins<span class="op">=</span><span class="nm">20</span>)
+plt.<span class="fn">title</span>(<span class="st">"Salary Distribution"</span>)
+plt.<span class="fn">show</span>()</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outlier Detection -->
+    <div class="topic" id="eda-outliers">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>Outlier Detection — Spotting Extreme Values</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Outliers are data points that are significantly different from the rest. They can be genuine anomalies or data errors.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>One outlier can skew your entire analysis. Mean salary of 10 employees: 9 earn ₹40k, CEO earns ₹10L — mean becomes ₹130k, misleading.</p></div>
+          <div class="wcard how"><div class="wcard-label">IQR Method</div><p>IQR = Q3 - Q1. Outlier if: value &lt; Q1 - 1.5×IQR or value &gt; Q3 + 1.5×IQR. This is the standard method.</p></div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python</span></div>
+          <pre><span class="cm"># ── IQR Method for Outlier Detection ─────────────────────────</span>
+Q1 <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">quantile</span>(<span class="nm">0.25</span>)   <span class="cm"># 25th percentile</span>
+Q3 <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">quantile</span>(<span class="nm">0.75</span>)   <span class="cm"># 75th percentile</span>
+IQR <span class="op">=</span> Q3 <span class="op">-</span> Q1
+
+lower_bound <span class="op">=</span> Q1 <span class="op">-</span> <span class="nm">1.5</span> <span class="op">*</span> IQR
+upper_bound <span class="op">=</span> Q3 <span class="op">+</span> <span class="nm">1.5</span> <span class="op">*</span> IQR
+
+<span class="fn">print</span>(<span class="st">f"Lower: {lower_bound:.0f}, Upper: {upper_bound:.0f}"</span>)
+
+<span class="cm"># Find outliers</span>
+outliers <span class="op">=</span> df[(df[<span class="st">"Salary"</span>] <span class="op">&lt;</span> lower_bound) <span class="op">|</span> (df[<span class="st">"Salary"</span>] <span class="op">&gt;</span> upper_bound)]
+<span class="fn">print</span>(<span class="st">f"Outlier rows: {len(outliers)}"</span>)
+<span class="fn">print</span>(outliers)
+
+<span class="cm"># ── Remove outliers (if needed) ───────────────────────────────</span>
+df_no_outliers <span class="op">=</span> df[
+    (df[<span class="st">"Salary"</span>] <span class="op">&gt;=</span> lower_bound) <span class="op">&amp;</span>
+    (df[<span class="st">"Salary"</span>] <span class="op">&lt;=</span> upper_bound)
+]
+
+<span class="cm"># ── Z-Score Method (alternative) ─────────────────────────────</span>
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+z_scores <span class="op">=</span> np.<span class="fn">abs</span>(stats.<span class="fn">zscore</span>(df[<span class="st">"Salary"</span>]))
+outliers_z <span class="op">=</span> df[z_scores <span class="op">&gt;</span> <span class="nm">3</span>]  <span class="cm"># more than 3 std deviations away</span></pre>
+        </div>
+        <div class="box box-tip"><strong>✅ Business Rule of Thumb:</strong> Don't automatically remove outliers. First ask: "Is this a data error or a real business event?" A CEO salary of ₹10L is real, not an error. A customer age of 150 is an error.</div>
+      </div>
+    </div>
+
+    <!-- Full EDA Workflow -->
+    <div class="topic" id="eda-pipeline">
+      <div class="topic-header">
+        <span class="topic-tag tag-eda">EDA ⭐</span>
+        <h3>Complete EDA Workflow — Titanic Dataset</h3>
+      </div>
+      <div class="topic-body">
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — Full EDA Pipeline</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ─── STEP 1: Load ─────────────────────────────────────────────</span>
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="st">"titanic.csv"</span>)
+<span class="fn">print</span>(<span class="st">"Shape:"</span>, df.<span class="at">shape</span>)          <span class="cm"># (891, 12)</span>
+
+<span class="cm"># ─── STEP 2: First Look ───────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">head</span>())
+<span class="fn">print</span>(df.<span class="at">dtypes</span>)
+
+<span class="cm"># ─── STEP 3: Missing Values ───────────────────────────────────</span>
+missing <span class="op">=</span> df.<span class="fn">isnull</span>().<span class="fn">sum</span>()
+missing_pct <span class="op">=</span> (missing <span class="op">/</span> <span class="fn">len</span>(df) <span class="op">*</span> <span class="nm">100</span>).<span class="fn">round</span>(<span class="nm">2</span>)
+<span class="fn">print</span>(pd.<span class="cl">DataFrame</span>({<span class="st">"Missing"</span>: missing, <span class="st">"Pct"</span>: missing_pct}))
+<span class="cm"># Age: 177 missing (19.8%) → fillna with median
+# Cabin: 687 missing (77%) → drop column
+# Embarked: 2 missing → fillna with mode</span>
+
+<span class="cm"># ─── STEP 4: Handle Missing ───────────────────────────────────</span>
+df[<span class="st">"Age"</span>]      <span class="op">=</span> df[<span class="st">"Age"</span>].<span class="fn">fillna</span>(df[<span class="st">"Age"</span>].<span class="fn">median</span>())
+df[<span class="st">"Embarked"</span>] <span class="op">=</span> df[<span class="st">"Embarked"</span>].<span class="fn">fillna</span>(df[<span class="st">"Embarked"</span>].<span class="fn">mode</span>()[<span class="nm">0</span>])
+df.<span class="fn">drop</span>(columns<span class="op">=</span>[<span class="st">"Cabin"</span>], inplace<span class="op">=</span><span class="kw">True</span>)
+
+<span class="cm"># ─── STEP 5: Duplicates ───────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"Duplicates:"</span>, df.<span class="fn">duplicated</span>().<span class="fn">sum</span>())   <span class="cm"># 0</span>
+df.<span class="fn">drop_duplicates</span>(inplace<span class="op">=</span><span class="kw">True</span>)
+
+<span class="cm"># ─── STEP 6: Summary Stats ────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">describe</span>())
+
+<span class="cm"># ─── STEP 7: Key Insights (without visualization) ────────────</span>
+survival_rate <span class="op">=</span> df[<span class="st">"Survived"</span>].<span class="fn">mean</span>() <span class="op">*</span> <span class="nm">100</span>
+<span class="fn">print</span>(<span class="st">f"Survival Rate: {survival_rate:.1f}%"</span>)   <span class="cm"># 38.4%</span>
+
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Pclass"</span>)[<span class="st">"Survived"</span>].<span class="fn">mean</span>())
+<span class="cm"># Pclass 1 → 0.63 (63% survived)
+# Pclass 2 → 0.47
+# Pclass 3 → 0.24 (24% survived)</span>
+
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"Sex"</span>)[<span class="st">"Survived"</span>].<span class="fn">mean</span>())
+<span class="cm"># female → 0.742 (74% survived)
+# male   → 0.189 (19% survived)</span>
+
+<span class="cm"># ─── STEP 8: Correlation ─────────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">corr</span>()[<span class="st">"Survived"</span>].<span class="fn">sort_values</span>(ascending<span class="op">=</span><span class="kw">False</span>))
+
+<span class="cm"># ─── STEP 9: Outlier Check ───────────────────────────────────</span>
+Q1, Q3 <span class="op">=</span> df[<span class="st">"Fare"</span>].<span class="fn">quantile</span>([<span class="nm">0.25</span>, <span class="nm">0.75</span>])
+IQR <span class="op">=</span> Q3 <span class="op">-</span> Q1
+fare_outliers <span class="op">=</span> df[df[<span class="st">"Fare"</span>] <span class="op">&gt;</span> Q3 <span class="op">+</span> <span class="nm">1.5</span><span class="op">*</span>IQR]
+<span class="fn">print</span>(<span class="st">f"Fare outliers: {len(fare_outliers)}"</span>)  <span class="cm"># 116</span>
+
+<span class="cm"># ─── STEP 10: Export Clean Dataset ───────────────────────────</span>
+df.<span class="fn">to_csv</span>(<span class="st">"titanic_clean.csv"</span>, index<span class="op">=</span><span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">"✅ Clean dataset saved!"</span>)</pre>
+        </div>
+        <ol class="steps">
+          <li>Load the dataset — check shape immediately</li>
+          <li>Head + dtypes — understand structure and column types</li>
+          <li>Missing value audit — how much is missing, per column</li>
+          <li>Fill or drop based on business context, not blindly</li>
+          <li>Check and remove duplicates</li>
+          <li>describe() — summary statistics, spot anomalies</li>
+          <li>Business insights — groupby, aggregates, survival rates</li>
+          <li>Correlation analysis — which columns predict the target</li>
+          <li>Outlier detection — IQR method per numeric column</li>
+          <li>Export clean dataset for next phase</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     BASIC VISUALIZATION
+════════════════════════════════════════════════════════ -->
+<section id="visualization">
+  <div class="session-header s2">
+    <span class="session-badge">Visualization</span>
+    <h2>Basic Visualization with Matplotlib &amp; Pandas</h2>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">📊</span> Matplotlib — Introduction</div>
+
+    <div class="topic" id="viz-charts">
+      <div class="topic-header">
+        <span class="topic-tag tag-viz">Visualization</span>
+        <h3>Why Visualize Data? — plot, bar, hist, scatter, boxplot</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p>Matplotlib is Python's foundational plotting library. Pandas DataFrames have a built-in <code>.plot()</code> interface that calls Matplotlib underneath.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>Numbers alone don't communicate patterns. A chart reveals outliers, trends, and distributions instantly that tables take minutes to read. Every corporate report needs visuals.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>After EDA — to communicate findings to management, to spot trends, to validate data quality, to prepare reports and dashboards.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>Don't plot raw, uncleaned data — outliers and NaN values will distort charts. Always clean first, then visualize.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🎨</div>
+          <p>A sales manager stares at a table of 365 daily revenue numbers and sees nothing. You show them a <strong>line chart</strong> — instantly they spot the November dip and the December spike. Visualization turns numbers into <strong>decisions</strong>.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — basic_visualization.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Month"</span>  : [<span class="st">"Jan"</span>, <span class="st">"Feb"</span>, <span class="st">"Mar"</span>, <span class="st">"Apr"</span>, <span class="st">"May"</span>],
+    <span class="st">"Sales"</span>  : [<span class="nm">120000</span>, <span class="nm">95000</span>, <span class="nm">140000</span>, <span class="nm">130000</span>, <span class="nm">160000</span>],
+    <span class="st">"Profit"</span> : [<span class="nm">30000</span>, <span class="nm">20000</span>, <span class="nm">42000</span>, <span class="nm">38000</span>, <span class="nm">55000</span>]
+})
+
+<span class="cm"># ── plot() : line chart — trends over time ────────────────────</span>
+<span class="cm"># Real-world: monthly sales trend for management report</span>
+df.<span class="fn">plot</span>(x<span class="op">=</span><span class="st">"Month"</span>, y<span class="op">=</span><span class="st">"Sales"</span>, kind<span class="op">=</span><span class="st">"line"</span>,
+       title<span class="op">=</span><span class="st">"Monthly Sales Trend"</span>,
+       xlabel<span class="op">=</span><span class="st">"Month"</span>, ylabel<span class="op">=</span><span class="st">"Sales (₹)"</span>, marker<span class="op">=</span><span class="st">"o"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ── bar() : bar chart — compare categories ────────────────────</span>
+<span class="cm"># Real-world: compare department-wise headcount</span>
+dept_count <span class="op">=</span> pd.<span class="cl">Series</span>({<span class="st">"IT"</span>: <span class="nm">45</span>, <span class="st">"HR"</span>: <span class="nm">20</span>, <span class="st">"Finance"</span>: <span class="nm">15</span>})
+dept_count.<span class="fn">plot</span>(kind<span class="op">=</span><span class="st">"bar"</span>, color<span class="op">=</span><span class="st">"steelblue"</span>,
+               title<span class="op">=</span><span class="st">"Headcount by Department"</span>)
+plt.<span class="fn">xticks</span>(rotation<span class="op">=</span><span class="nm">0</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ── hist() : histogram — distribution of a column ────────────</span>
+<span class="cm"># Real-world: understand salary distribution across employees</span>
+salaries <span class="op">=</span> pd.<span class="cl">Series</span>([<span class="nm">35000</span>, <span class="nm">42000</span>, <span class="nm">55000</span>, <span class="nm">48000</span>, <span class="nm">62000</span>,
+                      <span class="nm">38000</span>, <span class="nm">70000</span>, <span class="nm">45000</span>, <span class="nm">52000</span>, <span class="nm">65000</span>])
+salaries.<span class="fn">plot</span>(kind<span class="op">=</span><span class="st">"hist"</span>, bins<span class="op">=</span><span class="nm">5</span>,
+              title<span class="op">=</span><span class="st">"Salary Distribution"</span>, color<span class="op">=</span><span class="st">"coral"</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">"Salary (₹)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ── scatter() : scatter plot — relationship between 2 columns ─</span>
+<span class="cm"># Real-world: does experience predict salary?</span>
+emp_df <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"Experience"</span>: [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">5</span>, <span class="nm">7</span>, <span class="nm">10</span>, <span class="nm">12</span>],
+    <span class="st">"Salary"</span>    : [<span class="nm">30000</span>, <span class="nm">38000</span>, <span class="nm">45000</span>, <span class="nm">55000</span>,
+                    <span class="nm">65000</span>, <span class="nm">80000</span>, <span class="nm">90000</span>]
+})
+emp_df.<span class="fn">plot</span>(x<span class="op">=</span><span class="st">"Experience"</span>, y<span class="op">=</span><span class="st">"Salary"</span>, kind<span class="op">=</span><span class="st">"scatter"</span>,
+           title<span class="op">=</span><span class="st">"Experience vs Salary"</span>, color<span class="op">=</span><span class="st">"green"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ── boxplot() : box plot — spot outliers in a column ──────────</span>
+<span class="cm"># Real-world: detect extreme salaries in dataset</span>
+df_box <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"IT"</span>     : [<span class="nm">55000</span>, <span class="nm">62000</span>, <span class="nm">58000</span>, <span class="nm">70000</span>, <span class="nm">150000</span>],
+    <span class="st">"HR"</span>     : [<span class="nm">42000</span>, <span class="nm">45000</span>, <span class="nm">43000</span>, <span class="nm">47000</span>, <span class="nm">44000</span>],
+    <span class="st">"Finance"</span>: [<span class="nm">48000</span>, <span class="nm">52000</span>, <span class="nm">50000</span>, <span class="nm">49000</span>, <span class="nm">51000</span>]
+})
+df_box.<span class="fn">plot</span>(kind<span class="op">=</span><span class="st">"box"</span>, title<span class="op">=</span><span class="st">"Salary Box Plot by Department"</span>)
+plt.<span class="fn">ylabel</span>(<span class="st">"Salary (₹)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+<span class="cm"># The IT box will show the 150000 as an outlier dot above the whisker</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Chart Type</th><th>kind= param</th><th>Best For</th><th>Avoid When</th></tr></thead>
+          <tbody>
+            <tr><td>Line chart</td><td>"line"</td><td>Trends over time (sales, stock)</td><td>Categorical, unordered data</td></tr>
+            <tr><td>Bar chart</td><td>"bar"</td><td>Comparing categories (dept counts)</td><td>Too many categories (&gt;20)</td></tr>
+            <tr><td>Histogram</td><td>"hist"</td><td>Distribution of numeric column</td><td>Categorical columns</td></tr>
+            <tr><td>Scatter plot</td><td>"scatter"</td><td>Relationship between 2 numeric cols</td><td>More than 2 variables</td></tr>
+            <tr><td>Box plot</td><td>"box"</td><td>Spread, median, outliers per group</td><td>Very few data points</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-info"><strong>📌 Setup:</strong> Always call <code>plt.tight_layout()</code> before <code>plt.show()</code> to prevent labels from being cut off. For notebooks, use <code>%matplotlib inline</code> at the top.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — Visualization</h4>
+          <ul>
+            <li>Which chart type is best for showing sales trend over 12 months?</li>
+            <li>What does a box plot show that a histogram doesn't?</li>
+            <li>How do you set chart title and axis labels in Pandas plot()?</li>
+            <li>What is the difference between a bar chart and a histogram?</li>
+            <li>Which chart would you use to show if experience and salary are correlated?</li>
+          </ul>
+        </div>
+        <div class="exercise-box">
+          <h4>🧪 Hands-on Exercise — Visualization</h4>
+          <ol>
+            <li>Create a DataFrame with monthly revenue for 6 months. Plot a line chart with markers.</li>
+            <li>Create a bar chart showing headcount per department from the employee DataFrame.</li>
+            <li>Plot a histogram of the Salary column with 5 bins. What does the distribution look like?</li>
+            <li>Plot a scatter chart of Experience vs Salary. Do you see a positive trend?</li>
+            <li>Create a box plot for salaries by department. Which department has the widest spread?</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── DATABASE INTRO ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🗄️</span> Database Introduction — read_sql()</div>
+
+    <div class="topic" id="db-readsql">
+      <div class="topic-header">
+        <span class="topic-tag tag-db">Database</span>
+        <h3>read_sql() — Load Data from a Database</h3>
+      </div>
+      <div class="topic-body">
+        <div class="wwwwh">
+          <div class="wcard what"><div class="wcard-label">What</div><p><code>pd.read_sql()</code> executes a SQL query on a connected database and returns the result directly as a Pandas DataFrame.</p></div>
+          <div class="wcard why"><div class="wcard-label">Why</div><p>In corporate environments, data lives in databases (MySQL, Oracle, PostgreSQL), not in CSV files. You must connect to the database and query it programmatically.</p></div>
+          <div class="wcard when"><div class="wcard-label">When</div><p>When building ETL pipelines, pulling reports from production databases, automating data extraction from Oracle, MySQL, or PostgreSQL systems.</p></div>
+          <div class="wcard whennot"><div class="wcard-label">When NOT</div><p>Don't use for small, one-time queries where a CSV export is simpler. Also avoid for real-time data — use streaming tools instead.</p></div>
+        </div>
+        <div class="analogy">
+          <div class="emoji">🗄️</div>
+          <p>Imagine <strong>all employee data lives inside a MySQL server</strong> — you can't just open it as a file. <code>read_sql()</code> is like sending a SQL message to the database: "Give me all employees in the IT department" — and it hands the result directly to your Pandas DataFrame.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — database_intro.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> sqlite3           <span class="cm"># built-in — no install needed</span>
+
+<span class="cm"># ── Step 1: Create a connection ───────────────────────────────</span>
+<span class="cm"># SQLite3: file-based DB, perfect for learning</span>
+conn <span class="op">=</span> sqlite3.<span class="fn">connect</span>(<span class="st">"company.db"</span>)   <span class="cm"># creates file if not exists</span>
+
+<span class="cm"># ── Step 2: Write a sample table to the database ─────────────</span>
+df_emp <span class="op">=</span> pd.<span class="cl">DataFrame</span>({
+    <span class="st">"EmpID"</span>  : [<span class="nm">101</span>, <span class="nm">102</span>, <span class="nm">103</span>, <span class="nm">104</span>],
+    <span class="st">"Name"</span>   : [<span class="st">"Arjun"</span>, <span class="st">"Priya"</span>, <span class="st">"Rahul"</span>, <span class="st">"Divya"</span>],
+    <span class="st">"Dept"</span>   : [<span class="st">"IT"</span>, <span class="st">"HR"</span>, <span class="st">"IT"</span>, <span class="st">"Finance"</span>],
+    <span class="st">"Salary"</span> : [<span class="nm">55000</span>, <span class="nm">45000</span>, <span class="nm">62000</span>, <span class="nm">48000</span>]
+})
+df_emp.<span class="fn">to_sql</span>(<span class="st">"employees"</span>, conn, if_exists<span class="op">=</span><span class="st">"replace"</span>, index<span class="op">=</span><span class="kw">False</span>)
+
+<span class="cm"># ── Step 3: Read data from database using SQL query ───────────</span>
+query <span class="op">=</span> <span class="st">"SELECT * FROM employees"</span>
+df_from_db <span class="op">=</span> pd.<span class="fn">read_sql</span>(query, conn)
+<span class="fn">print</span>(df_from_db)
+<span class="cm"># EmpID   Name     Dept  Salary
+#   101  Arjun       IT   55000
+#   102  Priya       HR   45000  ...</span>
+
+<span class="cm"># ── Query only IT employees ───────────────────────────────────</span>
+it_query <span class="op">=</span> <span class="st">"SELECT Name, Salary FROM employees WHERE Dept = 'IT'"</span>
+df_it <span class="op">=</span> pd.<span class="fn">read_sql</span>(it_query, conn)
+<span class="fn">print</span>(df_it)
+<span class="cm"># Name   Salary
+# Arjun   55000
+# Rahul   62000</span>
+
+<span class="cm"># ── Always close the connection ───────────────────────────────</span>
+conn.<span class="fn">close</span>()
+
+<span class="cm"># ── MySQL / Oracle (for corporate systems) ────────────────────</span>
+<span class="cm"># pip install sqlalchemy mysql-connector-python</span>
+<span class="cm"># from sqlalchemy import create_engine</span>
+<span class="cm"># engine = create_engine("mysql+mysqlconnector://user:pass@host/dbname")</span>
+<span class="cm"># df = pd.read_sql("SELECT * FROM employees", engine)</span></pre>
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Database</th><th>Connection Method</th><th>Corporate Use</th></tr></thead>
+          <tbody>
+            <tr><td>SQLite3</td><td>sqlite3.connect("file.db")</td><td>Local development, prototyping</td></tr>
+            <tr><td>MySQL</td><td>create_engine("mysql+mysqlconnector://...")</td><td>Web apps, e-commerce systems</td></tr>
+            <tr><td>Oracle</td><td>create_engine("oracle+cx_oracle://...")</td><td>Banking, ERP (TCS, Infosys projects)</td></tr>
+            <tr><td>PostgreSQL</td><td>create_engine("postgresql+psycopg2://...")</td><td>Analytics, data warehouses</td></tr>
+          </tbody>
+        </table>
+        <div class="box box-info"><strong>📌 Note for Freshers:</strong> In your first corporate project, data will almost never come from CSV files — it will come from Oracle or MySQL. The workflow is: connect → read_sql() → clean → analyze → export. Master this flow early.</div>
+        <div class="interview-box">
+          <h4>🎯 Interview Questions — Database</h4>
+          <ul>
+            <li>How do you load data from a MySQL database into a Pandas DataFrame?</li>
+            <li>What does to_sql() do and when would you use it?</li>
+            <li>What is SQLAlchemy and why is it used with Pandas?</li>
+            <li>Why do you need to close the database connection after use?</li>
+            <li>What is the difference between SQLite and MySQL in a corporate context?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── INCREMENTAL PROJECT ─────── -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🏗️</span> Incremental Project — Employee Dataset Pipeline</div>
+
+    <div class="topic" id="project-pipeline">
+      <div class="topic-header">
+        <span class="topic-tag tag-project">Project</span>
+        <h3>Complete Employee Data Pipeline — Load → Clean → Analyse → Export</h3>
+      </div>
+      <div class="topic-body">
+        <div class="analogy">
+          <div class="emoji">🏢</div>
+          <p>You are a <strong>Junior Data Analyst at a company</strong>. The HR team has sent you a raw employee Excel file. Your job: load it, clean it, analyse it, generate a summary report, and save the clean version for the BI team. This is a real corporate day-1 task.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code-bar"><div class="dots"><span class="d-red"></span><span class="d-yel"></span><span class="d-grn"></span></div><span class="lang">python — employee_pipeline.py</span></div>
+          <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># ─── STEP 1: Load Dataset ─────────────────────────────────────</span>
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="st">"employees.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">"JoinDate"</span>])
+<span class="fn">print</span>(<span class="st">f"Loaded: {df.shape[0]} rows, {df.shape[1]} columns"</span>)
+
+<span class="cm"># ─── STEP 2: Inspect Dataset ──────────────────────────────────</span>
+<span class="fn">print</span>(df.<span class="fn">head</span>())
+df.<span class="fn">info</span>()
+<span class="fn">print</span>(df.<span class="at">columns</span>.<span class="fn">tolist</span>())
+
+<span class="cm"># ─── STEP 3: Rename Columns (Standardize) ────────────────────</span>
+df <span class="op">=</span> df.<span class="fn">rename</span>(columns<span class="op">=</span>{
+    <span class="st">"emp_id"</span>   : <span class="st">"EmpID"</span>,
+    <span class="st">"emp_name"</span> : <span class="st">"Name"</span>,
+    <span class="st">"department"</span>: <span class="st">"Dept"</span>,
+    <span class="st">"salary"</span>   : <span class="st">"Salary"</span>,
+    <span class="st">"join_date"</span>: <span class="st">"JoinDate"</span>
+})
+
+<span class="cm"># ─── STEP 4: Clean Missing Values ────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"Missing values:
+"</span>, df.<span class="fn">isnull</span>().<span class="fn">sum</span>())
+df[<span class="st">"Salary"</span>] <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">fillna</span>(df[<span class="st">"Salary"</span>].<span class="fn">median</span>())
+df[<span class="st">"Dept"</span>]   <span class="op">=</span> df[<span class="st">"Dept"</span>].<span class="fn">fillna</span>(<span class="st">"Unknown"</span>)
+df           <span class="op">=</span> df.<span class="fn">dropna</span>(subset<span class="op">=</span>[<span class="st">"EmpID"</span>, <span class="st">"Name"</span>])
+
+<span class="cm"># ─── STEP 5: Handle Duplicates ───────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">f"Duplicates before: {df.duplicated().sum()}"</span>)
+df <span class="op">=</span> df.<span class="fn">drop_duplicates</span>(subset<span class="op">=</span>[<span class="st">"EmpID"</span>])
+<span class="fn">print</span>(<span class="st">f"Duplicates after : {df.duplicated().sum()}"</span>)
+
+<span class="cm"># ─── STEP 6: Convert Data Types ──────────────────────────────</span>
+df[<span class="st">"Salary"</span>] <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">astype</span>(<span class="fn">float</span>)
+df[<span class="st">"JoinDate"</span>] <span class="op">=</span> pd.<span class="fn">to_datetime</span>(df[<span class="st">"JoinDate"</span>])
+df[<span class="st">"Name"</span>]   <span class="op">=</span> df[<span class="st">"Name"</span>].<span class="at">str</span>.<span class="fn">strip</span>().<span class="at">str</span>.<span class="fn">title</span>()
+df[<span class="st">"Dept"</span>]   <span class="op">=</span> df[<span class="st">"Dept"</span>].<span class="at">str</span>.<span class="fn">strip</span>().<span class="at">str</span>.<span class="fn">title</span>()
+
+<span class="cm"># ─── STEP 7: Feature Engineering ─────────────────────────────</span>
+today <span class="op">=</span> pd.<span class="fn">Timestamp</span>(<span class="st">"today"</span>)
+df[<span class="st">"Tenure_Years"</span>]  <span class="op">=</span> (today <span class="op">-</span> df[<span class="st">"JoinDate"</span>]).<span class="at">dt</span>.<span class="at">days</span> <span class="op">//</span> <span class="nm">365</span>
+df[<span class="st">"Annual_Salary"</span>] <span class="op">=</span> df[<span class="st">"Salary"</span>] <span class="op">*</span> <span class="nm">12</span>
+df[<span class="st">"Join_Year"</span>]     <span class="op">=</span> df[<span class="st">"JoinDate"</span>].<span class="at">dt</span>.<span class="at">year</span>
+
+<span class="cm"># ─── STEP 8: Basic EDA ───────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"
+── Summary Statistics ──"</span>)
+<span class="fn">print</span>(df.<span class="fn">describe</span>())
+
+<span class="fn">print</span>(<span class="st">"
+── Dept-wise Salary Report ──"</span>)
+salary_report <span class="op">=</span> df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>)[<span class="st">"Salary"</span>].<span class="fn">agg</span>(
+    [<span class="st">"mean"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"count"</span>]
+).<span class="fn">round</span>(<span class="nm">2</span>)
+<span class="fn">print</span>(salary_report)
+
+<span class="fn">print</span>(<span class="st">"
+── Headcount per Department ──"</span>)
+<span class="fn">print</span>(df[<span class="st">"Dept"</span>].<span class="fn">value_counts</span>())
+
+<span class="cm"># ─── STEP 9: Visualize ───────────────────────────────────────</span>
+df.<span class="fn">groupby</span>(<span class="st">"Dept"</span>)[<span class="st">"Salary"</span>].<span class="fn">mean</span>().<span class="fn">plot</span>(
+    kind<span class="op">=</span><span class="st">"bar"</span>, title<span class="op">=</span><span class="st">"Avg Salary by Department"</span>,
+    color<span class="op">=</span><span class="st">"steelblue"</span>, rot<span class="op">=</span><span class="nm">0</span>
+)
+plt.<span class="fn">ylabel</span>(<span class="st">"Avg Salary (₹)"</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ─── STEP 10: Outlier Detection ──────────────────────────────</span>
+Q1 <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">quantile</span>(<span class="nm">0.25</span>)
+Q3 <span class="op">=</span> df[<span class="st">"Salary"</span>].<span class="fn">quantile</span>(<span class="nm">0.75</span>)
+IQR <span class="op">=</span> Q3 <span class="op">-</span> Q1
+outliers <span class="op">=</span> df[(df[<span class="st">"Salary"</span>] <span class="op">&lt;</span> Q1 <span class="op">-</span> <span class="nm">1.5</span><span class="op">*</span>IQR) <span class="op">|</span>
+               (df[<span class="st">"Salary"</span>] <span class="op">&gt;</span> Q3 <span class="op">+</span> <span class="nm">1.5</span><span class="op">*</span>IQR)]
+<span class="fn">print</span>(<span class="st">f"
+Salary outliers: {len(outliers)}"</span>)
+
+<span class="cm"># ─── STEP 11: Export Clean Dataset ───────────────────────────</span>
+df.<span class="fn">to_csv</span>(<span class="st">"employees_clean.csv"</span>, index<span class="op">=</span><span class="kw">False</span>)
+salary_report.<span class="fn">to_excel</span>(<span class="st">"dept_salary_report.xlsx"</span>)
+<span class="fn">print</span>(<span class="st">"✅ Clean dataset and report exported!"</span>)</pre>
+        </div>
+        <ol class="steps">
+          <li>Load dataset with parse_dates — convert date columns automatically on load</li>
+          <li>Inspect: head(), info(), columns — understand structure before touching data</li>
+          <li>Rename columns — standardize naming conventions for your team</li>
+          <li>Fill missing Salary with median, Dept with "Unknown", drop rows missing EmpID/Name</li>
+          <li>Drop duplicates on EmpID — each employee must appear exactly once</li>
+          <li>Type conversion — Salary float, JoinDate datetime, Name/Dept title-cased strings</li>
+          <li>Feature engineering — Tenure, Annual Salary, Join Year as new columns</li>
+          <li>EDA — describe(), groupby salary report, value_counts for headcount</li>
+          <li>Visualize — bar chart of avg salary per dept for management report</li>
+          <li>Outlier detection — IQR method on Salary column</li>
+          <li>Export — clean CSV for analysts, Excel summary for HR managers</li>
+        </ol>
+        <div class="project-box">
+          <h4>🏗️ Mini Challenge — Extend the Project</h4>
+          <ol>
+            <li>Add a column "Performance_Grade" using np.where(): salary ≥ 60000 → "A", ≥ 45000 → "B", else → "C".</li>
+            <li>Filter only employees with Tenure_Years ≥ 3 and create a "Senior_Employee" flag column.</li>
+            <li>Group by Join_Year and count how many employees joined each year. Plot as a bar chart.</li>
+            <li>Find the top 3 highest-paid employees per department using groupby + nlargest.</li>
+            <li>Export a separate Excel file with only employees whose Salary is above the company median.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     QUICK REFERENCE CHEATSHEET
+════════════════════════════════════════════════════════ -->
+<section id="cheatsheet">
+  <div class="cheatsheet">
+    <h2>📋 Quick Reference — All Commands</h2>
+    <div class="cs-grid">
+      <div class="cs-col">
+        <h4>NumPy Arrays</h4>
+        <ul>
+          <li><code>np.array([1,2,3])</code> — from list</li>
+          <li><code>np.arange(0,10,2)</code> — sequence</li>
+          <li><code>np.zeros(5)</code> — all zeros</li>
+          <li><code>np.ones((3,3))</code> — all ones</li>
+          <li><code>np.linspace(0,1,100)</code> — evenly spaced</li>
+          <li><code>arr.shape / .ndim / .size / .dtype</code></li>
+          <li><code>arr.reshape(3,4)</code> — change dimensions</li>
+          <li><code>arr.flatten()</code> — to 1D</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>NumPy Aggregates</h4>
+        <ul>
+          <li><code>np.sum(arr)</code> — total</li>
+          <li><code>np.mean(arr, axis=0)</code> — column avg</li>
+          <li><code>np.mean(arr, axis=1)</code> — row avg</li>
+          <li><code>np.max(arr)</code> — maximum</li>
+          <li><code>np.min(arr)</code> — minimum</li>
+          <li><code>np.std(arr)</code> — std deviation</li>
+          <li><code>arr + 5</code> — vectorized add</li>
+          <li><code>arr1 + arr2</code> — broadcasting</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — Inspect</h4>
+        <ul>
+          <li><code>df.head(5)</code> — first 5 rows</li>
+          <li><code>df.tail(5)</code> — last 5 rows</li>
+          <li><code>df.shape</code> — (rows, cols)</li>
+          <li><code>df.dtypes</code> — column types</li>
+          <li><code>df.info()</code> — null counts + types</li>
+          <li><code>df.describe()</code> — summary stats</li>
+          <li><code>df["col"]</code> — single column</li>
+          <li><code>df.loc[0:2, ["A","B"]]</code> — by label</li>
+          <li><code>df.iloc[0:2, 0:2]</code> — by position</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — Load &amp; Save</h4>
+        <ul>
+          <li><code>pd.read_csv("file.csv")</code></li>
+          <li><code>pd.read_excel("file.xlsx")</code></li>
+          <li><code>pd.read_json("file.json")</code></li>
+          <li><code>df.to_csv("out.csv", index=False)</code></li>
+          <li><code>df.to_excel("out.xlsx", index=False)</code></li>
+          <li><code>df.to_json("out.json", orient="records")</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — Cleaning</h4>
+        <ul>
+          <li><code>df.isnull().sum()</code> — count NaN per col</li>
+          <li><code>df["col"].fillna(value)</code> — fill NaN</li>
+          <li><code>df["col"].fillna(df["col"].mean())</code></li>
+          <li><code>df.dropna()</code> — drop rows with NaN</li>
+          <li><code>df.dropna(subset=["col"])</code></li>
+          <li><code>df.duplicated().sum()</code> — count dups</li>
+          <li><code>df.drop_duplicates()</code> — remove dups</li>
+          <li><code>df["col"].astype(int)</code> — type convert</li>
+          <li><code>pd.to_datetime(df["date"])</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — EDA</h4>
+        <ul>
+          <li><code>df.describe()</code> — stats summary</li>
+          <li><code>df.corr()</code> — correlation matrix</li>
+          <li><code>df["col"].value_counts()</code> — frequencies</li>
+          <li><code>df["col"].mean() / .median() / .std()</code></li>
+          <li><code>df["col"].skew()</code> — distribution shape</li>
+          <li><code>df[df["col"] > val]</code> — filter</li>
+          <li><code>df.sort_values("col", ascending=False)</code></li>
+          <li><code>df.groupby("cat")["num"].mean()</code></li>
+          <li><code>df["col"].quantile([.25,.75])</code> — IQR</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>NumPy — Extra</h4>
+        <ul>
+          <li><code>np.empty((2,3))</code> — uninitialized</li>
+          <li><code>np.full((5,), 3)</code> — filled with value</li>
+          <li><code>np.eye(4)</code> — identity matrix</li>
+          <li><code>np.random.rand(3,4)</code> — random floats</li>
+          <li><code>np.random.randint(1,7,10)</code> — random ints</li>
+          <li><code>np.where(cond, a, b)</code> — conditional</li>
+          <li><code>np.sort(arr)[::-1]</code> — descending</li>
+          <li><code>np.argmax(arr) / argmin(arr)</code></li>
+          <li><code>np.unique(arr, return_counts=True)</code></li>
+          <li><code>np.concatenate([a, b])</code></li>
+          <li><code>arr.copy() / arr.view()</code></li>
+          <li><code>np.median(arr) / np.var(arr)</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — Manipulation</h4>
+        <ul>
+          <li><code>df.columns.tolist()</code></li>
+          <li><code>df.set_index("col")</code></li>
+          <li><code>df.reset_index()</code></li>
+          <li><code>df.rename(columns={old:new})</code></li>
+          <li><code>df.drop(columns=["col"])</code></li>
+          <li><code>df.assign(new_col=expr)</code></li>
+          <li><code>df.copy()</code> — independent copy</li>
+          <li><code>df.sample(n=5, random_state=42)</code></li>
+          <li><code>df.query("col == 'val'")</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Pandas — groupby &amp; merge</h4>
+        <ul>
+          <li><code>df.groupby("col")["num"].mean()</code></li>
+          <li><code>df.groupby("col").agg(["min","max"])</code></li>
+          <li><code>df["col"].value_counts(normalize=True)</code></li>
+          <li><code>df["col"].nunique()</code></li>
+          <li><code>pd.merge(df1, df2, on="id", how="inner")</code></li>
+          <li><code>pd.concat([df1, df2], ignore_index=True)</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>String &amp; DateTime</h4>
+        <ul>
+          <li><code>df["col"].str.strip()</code></li>
+          <li><code>df["col"].str.title()</code></li>
+          <li><code>df["col"].str.replace("a","b")</code></li>
+          <li><code>df["col"].str.contains("x", na=False)</code></li>
+          <li><code>df["col"].str.split("@").str[1]</code></li>
+          <li><code>df["col"].str.len()</code></li>
+          <li><code>pd.to_datetime(df["date"])</code></li>
+          <li><code>df["date"].dt.year / .month / .day</code></li>
+          <li><code>df["date"].dt.day_name()</code></li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <h4>Visualization &amp; DB</h4>
+        <ul>
+          <li><code>df.plot(x=, y=, kind="line")</code></li>
+          <li><code>df["col"].plot(kind="bar")</code></li>
+          <li><code>df["col"].plot(kind="hist", bins=10)</code></li>
+          <li><code>df.plot(x=, y=, kind="scatter")</code></li>
+          <li><code>df.plot(kind="box")</code></li>
+          <li><code>plt.tight_layout(); plt.show()</code></li>
+          <li><code>pd.read_sql(query, conn)</code></li>
+          <li><code>df.to_sql("table", conn)</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer></footer>
+
+</div><!-- /page-wrapper -->
+</body>
+</html>

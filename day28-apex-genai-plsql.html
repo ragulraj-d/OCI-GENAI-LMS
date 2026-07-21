@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX + OCI Gen AI — PL/SQL Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --card:      #21253a;
+    --border:    #2e3350;
+    --accent:    #4f8ef7;
+    --accent2:   #7c5cfc;
+    --green:     #3ecf8e;
+    --orange:    #f5a623;
+    --red:       #f56565;
+    --text:      #e2e8f0;
+    --muted:     #8892b0;
+    --code-bg:   #141720;
+    --tag-blue:  rgba(79,142,247,0.15);
+    --tag-green: rgba(62,207,142,0.15);
+    --tag-orange:rgba(245,166,35,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 64px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(79,142,247,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--tag-blue);
+    color: var(--accent);
+    border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 56px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 24px 0 8px;
+    letter-spacing: 0.02em;
+  }
+  p { color: var(--muted); margin-bottom: 12px; }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .code-dots span {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-left: 6px;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f57; }
+  .code-dots span:nth-child(2) { background: #febc2e; }
+  .code-dots span:nth-child(3) { background: #28c840; }
+  pre {
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  /* syntax colours */
+  .kw  { color: #c792ea; }   /* keywords */
+  .fn  { color: #82aaff; }   /* functions */
+  .str { color: #c3e88d; }   /* strings */
+  .cm  { color: #546e7a; font-style: italic; } /* comments */
+  .var { color: #f78c6c; }   /* variables */
+  .num { color: #f78c6c; }   /* numbers */
+  .op  { color: #89ddff; }   /* operators / symbols */
+  .key { color: #ffcb6b; }   /* JSON keys */
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--green);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout.info  { background: var(--tag-blue);   border-left: 3px solid var(--accent); }
+  .callout.good  { background: var(--tag-green);  border-left: 3px solid var(--green); }
+  .callout.warn  { background: var(--tag-orange); border-left: 3px solid var(--orange); }
+  .callout p { margin: 0; color: var(--text); }
+
+  /* ── STEP LIST ── */
+  .steps { list-style: none; padding: 0; }
+  .steps li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    background: var(--tag-blue);
+    border: 1px solid rgba(79,142,247,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .step-text { color: var(--muted); }
+  .step-text strong { color: var(--text); }
+
+  /* ── STATUS PILLS ── */
+  .pill {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .pill.success { background: var(--tag-green); color: var(--green); }
+  .pill.error   { background: rgba(245,101,101,0.15); color: var(--red); }
+  .pill.warn    { background: var(--tag-orange); color: var(--orange); }
+
+  /* ── FLOW ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 16px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+  .flow-arrow {
+    text-align: center;
+    color: var(--border);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .flow-num {
+    width: 22px; height: 22px;
+    background: var(--accent2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="badge">Reference Guide</div>
+  <h1>APEX + OCI Gen AI<br>PL/SQL Reference</h1>
+  <p class="subtitle">Syntax · Parameters · Why We Use Each · Complete Working Example</p>
+</header>
+
+<main>
+
+  <!-- 1. OVERVIEW -->
+  <section class="section">
+    <div class="section-label">01 — Overview</div>
+    <h2>What Are We Building</h2>
+    <p>Oracle APEX has a built-in function that lets your PL/SQL code call any REST API — including OCI Gen AI. You send a question. OCI processes it through a large language model. You get an answer back as JSON. This document covers every line of that call.</p>
+
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div>User types question in APEX textarea</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">2</div>PL/SQL process builds JSON request body</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">3</div><code>apex_web_service.make_rest_request</code> sends POST to OCI endpoint</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">4</div>OCI verifies Web Credential signature → runs model</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">5</div><code>apex_json.parse</code> reads JSON response</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">6</div><code>apex_json.get_varchar2('chatResponse.text')</code> extracts answer</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-num">7</div>Answer displayed in APEX Display Only item</div>
+    </div>
+  </section>
+
+  <!-- 2. VARIABLES -->
+  <section class="section">
+    <div class="section-label">02 — Variables (DECLARE block)</div>
+    <h2>Variables and Why Each Exists</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL — DECLARE</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">DECLARE</span>
+  <span class="var">l_url</span>      <span class="kw">VARCHAR2</span>(<span class="num">500</span>);   <span class="cm">-- OCI Gen AI endpoint address</span>
+  <span class="var">l_body</span>     <span class="kw">CLOB</span>;           <span class="cm">-- JSON request we send to OCI</span>
+  <span class="var">l_response</span> <span class="kw">CLOB</span>;           <span class="cm">-- Raw JSON response from OCI</span>
+  <span class="var">l_answer</span>   <span class="kw">VARCHAR2</span>(<span class="num">32767</span>); <span class="cm">-- Extracted AI answer text</span>
+  <span class="var">l_status</span>   <span class="kw">NUMBER</span>;          <span class="cm">-- HTTP status code (200, 401 etc.)</span>
+  <span class="var">l_comp_id</span>  <span class="kw">VARCHAR2</span>(<span class="num">300</span>);   <span class="cm">-- OCI Compartment OCID</span></pre>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Variable</th><th>Type</th><th>Why This Type</th></tr>
+        <tr><td>l_url</td><td>VARCHAR2(500)</td><td>URL is a short text string. 500 chars is more than enough.</td></tr>
+        <tr><td>l_body</td><td>CLOB</td><td>JSON request can be long (especially with preamble). CLOB holds unlimited text.</td></tr>
+        <tr><td>l_response</td><td>CLOB</td><td>AI response can be very long. CLOB required — VARCHAR2 would overflow.</td></tr>
+        <tr><td>l_answer</td><td>VARCHAR2(32767)</td><td>Extracted answer text. 32767 is the maximum VARCHAR2 size.</td></tr>
+        <tr><td>l_status</td><td>NUMBER</td><td>HTTP status codes are numbers: 200, 401, 429, 500.</td></tr>
+        <tr><td>l_comp_id</td><td>VARCHAR2(300)</td><td>OCI Compartment OCID is a long string. 300 chars is safe.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. SET HEADERS -->
+  <section class="section">
+    <div class="section-label">03 — Request Headers</div>
+    <h2>apex_web_service.set_request_headers</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="fn">apex_web_service.set_request_headers</span>(
+  <span class="var">p_name_01</span>  <span class="op">=></span> <span class="str">'Content-Type'</span>,
+  <span class="var">p_value_01</span> <span class="op">=></span> <span class="str">'application/json'</span>
+);</pre>
+    </div>
+
+    <h3>What It Does</h3>
+    <p>Sets HTTP headers on the outgoing request. Must be called <strong>before</strong> <code>make_rest_request</code>.</p>
+
+    <h3>Why Content-Type: application/json</h3>
+    <p>Tells OCI: "The body I am sending is JSON format." OCI reads this header to know how to parse your request body. Without it, OCI may reject the request or misread the body.</p>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <p><strong>Critical for OCI:</strong> OCI's request signing algorithm includes the Content-Type header in its signature calculation. If the header is missing from the actual request but was included in the signature, the signature will not match and you will get a 401 error.</p>
+    </div>
+
+    <h3>Parameters</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Parameter</th><th>Value</th><th>Purpose</th></tr>
+        <tr><td>p_name_01</td><td>'Content-Type'</td><td>The HTTP header name</td></tr>
+        <tr><td>p_value_01</td><td>'application/json'</td><td>Tells server the body is JSON</td></tr>
+        <tr><td>p_name_02..10</td><td>any string</td><td>You can set up to 10 headers</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4. JSON BODY -->
+  <section class="section">
+    <div class="section-label">04 — Request Body</div>
+    <h2>Building the JSON Body</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL — JSON Construction</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="var">l_body</span> <span class="op">:=</span>
+  <span class="str">'{'</span>
+  <span class="op">||</span> <span class="str">'"compartmentId":"'</span> <span class="op">||</span> <span class="var">l_comp_id</span> <span class="op">||</span> <span class="str">'",'</span>
+  <span class="op">||</span> <span class="str">'"servingMode":{"servingType":"ON_DEMAND",'</span>
+  <span class="op">||</span> <span class="str">'"modelId":"cohere.command-a-03-2025"},'</span>
+  <span class="op">||</span> <span class="str">'"chatRequest":{"apiFormat":"COHERE",'</span>
+  <span class="op">||</span> <span class="str">'"message":"'</span> <span class="op">||</span> <span class="fn">REPLACE</span>(<span class="op">:</span><span class="var">P10_QUESTION</span>, <span class="str">'"'</span>, <span class="str">'\"'</span>) <span class="op">||</span> <span class="str">'",'</span>
+  <span class="op">||</span> <span class="str">'"maxTokens":500,'</span>
+  <span class="op">||</span> <span class="str">'"temperature":0.5,'</span>
+  <span class="op">||</span> <span class="str">'"isStream":false,'</span>
+  <span class="op">||</span> <span class="str">'"preambleOverride":"You are an HR assistant."'</span>
+  <span class="op">||</span> <span class="str">'}}'</span>;</pre>
+    </div>
+
+    <h3>JSON Parameters Explained</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Parameter</th><th>Value Used</th><th>Why</th></tr>
+        <tr><td>compartmentId</td><td>your compartment OCID</td><td>Tells OCI which account/folder to bill and use</td></tr>
+        <tr><td>servingType</td><td>ON_DEMAND</td><td>Pay per call. No reserved GPU. Best for development.</td></tr>
+        <tr><td>modelId</td><td>cohere.command-a-03-2025</td><td>Current active Cohere model on OCI Hyderabad region</td></tr>
+        <tr><td>apiFormat</td><td>COHERE</td><td>Tells OCI to use Cohere's request/response format</td></tr>
+        <tr><td>message</td><td>:P10_QUESTION value</td><td>The actual user question sent to the AI</td></tr>
+        <tr><td>maxTokens</td><td>500</td><td>Limits response length. Prevents long expensive responses. 500 ≈ 375 words.</td></tr>
+        <tr><td>temperature</td><td>0.5</td><td>Controls creativity. 0=always same, 1=very creative. 0.5 is balanced.</td></tr>
+        <tr><td>isStream</td><td>false</td><td>Get complete answer at once. true would stream word by word (more complex).</td></tr>
+        <tr><td>preambleOverride</td><td>system prompt text</td><td>Defines AI's role and behavior before processing user question.</td></tr>
+      </table>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">💡</div>
+      <p><strong>Why REPLACE(:P10_QUESTION, '"', '\"')</strong> — If the user types a double quote in their question, it would break the JSON string. REPLACE escapes it with a backslash so JSON remains valid.</p>
+    </div>
+  </section>
+
+  <!-- 5. MAKE REST REQUEST -->
+  <section class="section">
+    <div class="section-label">05 — The API Call</div>
+    <h2>apex_web_service.make_rest_request</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="var">l_response</span> <span class="op">:=</span> <span class="fn">apex_web_service.make_rest_request</span>(
+  <span class="var">p_url</span>                  <span class="op">=></span> <span class="var">l_url</span>,
+  <span class="var">p_http_method</span>          <span class="op">=></span> <span class="str">'POST'</span>,
+  <span class="var">p_body</span>                 <span class="op">=></span> <span class="var">l_body</span>,
+  <span class="var">p_credential_static_id</span> <span class="op">=></span> <span class="str">'OCI_GENAI_CREDENTIAL'</span>
+);</pre>
+    </div>
+
+    <h3>What This Function Does</h3>
+    <p>The most important line in the entire code. This built-in APEX function sends an HTTP request to any REST API and returns the response as a CLOB.</p>
+
+    <h3>Parameters Explained</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Parameter</th><th>Value</th><th>Why</th></tr>
+        <tr><td>p_url</td><td>l_url (OCI endpoint)</td><td>The web address to send the request to</td></tr>
+        <tr><td>p_http_method</td><td>'POST'</td><td>We are SENDING data (the question). GET is for reading, POST is for sending.</td></tr>
+        <tr><td>p_body</td><td>l_body (JSON)</td><td>The JSON request containing our question and settings</td></tr>
+        <tr><td>p_credential_static_id</td><td>'OCI_GENAI_CREDENTIAL'</td><td>Name of the Web Credential storing OCI API keys. APEX uses this to sign the request.</td></tr>
+      </table>
+    </div>
+
+    <h3>The OCI Endpoint URL</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">URL Structure</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre>https://inference.generativeai.<span class="str">ap-hyderabad-1</span>.oci.oraclecloud.com/<span class="num">20231130</span>/actions/<span class="fn">chat</span>
+                                 <span class="cm">↑ region</span>                              <span class="cm">↑ API version</span>  <span class="cm">↑ action</span></pre>
+    </div>
+
+    <div class="callout good">
+      <div class="callout-icon">✅</div>
+      <p><strong>Why p_credential_static_id matters:</strong> This is how APEX authenticates with OCI. The Web Credential contains your User OCID, Tenancy OCID, Fingerprint, and Private Key. APEX uses these to sign every request using RSA — so OCI knows the call is authorized.</p>
+    </div>
+  </section>
+
+  <!-- 6. STATUS CODE -->
+  <section class="section">
+    <div class="section-label">06 — HTTP Status</div>
+    <h2>apex_web_service.g_status_code</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="var">l_status</span> <span class="op">:=</span> <span class="fn">apex_web_service.g_status_code</span>;</pre>
+    </div>
+
+    <h3>What It Does</h3>
+    <p>After <code>make_rest_request</code> runs, this global variable holds the HTTP response code. Read it immediately after the call.</p>
+
+    <h3>Status Codes You Will See</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Code</th><th>Meaning</th><th>Action</th></tr>
+        <tr><td>200</td><td><span class="pill success">SUCCESS</span> AI responded correctly</td><td>Parse the JSON and extract answer</td></tr>
+        <tr><td>401</td><td><span class="pill error">AUTH FAIL</span> Credentials wrong or missing</td><td>Check Web Credential values</td></tr>
+        <tr><td>404</td><td><span class="pill error">NOT FOUND</span> Model ID does not exist</td><td>Check modelId spelling</td></tr>
+        <tr><td>429</td><td><span class="pill warn">RATE LIMIT</span> Too many requests</td><td>Wait 1 minute and retry</td></tr>
+        <tr><td>500</td><td><span class="pill error">SERVER ERROR</span> OCI had a problem</td><td>Try again later</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7. PARSE JSON -->
+  <section class="section">
+    <div class="section-label">07 — Parse JSON Response</div>
+    <h2>apex_json.parse + apex_json.get_varchar2</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL — JSON Parsing</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="cm">-- Step 1: Parse the raw JSON string into memory</span>
+<span class="fn">apex_json.parse</span>(<span class="var">l_response</span>);
+
+<span class="cm">-- Step 2: Navigate the JSON tree and extract value</span>
+<span class="var">l_answer</span> <span class="op">:=</span> <span class="fn">apex_json.get_varchar2</span>(
+  <span class="var">p_path</span> <span class="op">=></span> <span class="str">'chatResponse.text'</span>
+);</pre>
+    </div>
+
+    <h3>The JSON Response Structure from OCI</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">JSON — OCI Response</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre>{
+  <span class="key">"chatResponse"</span>: {
+    <span class="key">"text"</span>: <span class="str">"Annual leave entitlement is 18 days per year..."</span>,
+    <span class="key">"finishReason"</span>: <span class="str">"COMPLETE"</span>,
+    <span class="key">"chatHistory"</span>: []
+  },
+  <span class="key">"modelId"</span>: <span class="str">"cohere.command-a-03-2025"</span>
+}</pre>
+    </div>
+
+    <h3>How the Path Works</h3>
+    <p><code>'chatResponse.text'</code> means: go inside the <code>chatResponse</code> object, then get the <code>text</code> value. The dot is the path separator — like navigating folders on a computer.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Function</th><th>Purpose</th><th>When to Use</th></tr>
+        <tr><td>apex_json.parse(clob)</td><td>Loads JSON string into APEX memory for querying</td><td>Always first — before any get_ call</td></tr>
+        <tr><td>apex_json.get_varchar2(path)</td><td>Returns a text value from parsed JSON</td><td>For string values like the AI answer</td></tr>
+        <tr><td>apex_json.get_number(path)</td><td>Returns a number from parsed JSON</td><td>For numeric values like token counts</td></tr>
+        <tr><td>apex_json.get_boolean(path)</td><td>Returns true/false from parsed JSON</td><td>For boolean flags</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 8. ERROR HANDLING -->
+  <section class="section">
+    <div class="section-label">08 — Error Handling</div>
+    <h2>IF / EXCEPTION Block</h2>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL — Error Handling</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">IF</span> <span class="var">l_status</span> <span class="op">=</span> <span class="num">200</span> <span class="kw">THEN</span>
+  <span class="cm">-- Success path: parse JSON and display answer</span>
+  <span class="fn">apex_json.parse</span>(<span class="var">l_response</span>);
+  <span class="var">l_answer</span> <span class="op">:=</span> <span class="fn">apex_json.get_varchar2</span>(<span class="var">p_path</span> <span class="op">=></span> <span class="str">'chatResponse.text'</span>);
+  <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'&lt;div&gt;'</span> <span class="op">||</span> <span class="var">l_answer</span> <span class="op">||</span> <span class="str">'&lt;/div&gt;'</span>;
+
+<span class="kw">ELSIF</span> <span class="var">l_status</span> <span class="op">=</span> <span class="num">401</span> <span class="kw">THEN</span>
+  <span class="cm">-- Authentication failed</span>
+  <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'Authentication Error. Check Web Credential.'</span>;
+
+<span class="kw">ELSE</span>
+  <span class="cm">-- All other errors — show status and raw response</span>
+  <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'Error HTTP '</span> <span class="op">||</span> <span class="var">l_status</span> <span class="op">||</span> <span class="str">': '</span> <span class="op">||</span> <span class="fn">SUBSTR</span>(<span class="var">l_response</span>,<span class="num">1</span>,<span class="num">500</span>);
+
+<span class="kw">END IF</span>;
+
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN OTHERS THEN</span>
+    <span class="cm">-- Catches any unexpected PL/SQL or network error</span>
+    <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'System Error: '</span> <span class="op">||</span> <span class="fn">SQLERRM</span>;</pre>
+    </div>
+
+    <h3>Why EXCEPTION WHEN OTHERS</h3>
+    <p>If anything unexpected happens — network timeout, ORA error, NULL variable — SQLERRM captures the Oracle error message. Without this block the page would show a generic APEX error with no useful information.</p>
+  </section>
+
+  <!-- 9. COMPLETE EXAMPLE -->
+  <section class="section">
+    <div class="section-label">09 — Complete Working Example</div>
+    <h2>HR Assistant — Full PL/SQL Code</h2>
+    <p>This is the complete, production-ready code used in the HR Leave Portal. Every line explained above is combined here.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">PL/SQL — Complete HR Assistant Process</span>
+        <div class="code-dots"><span></span><span></span><span></span></div>
+      </div>
+      <pre><span class="kw">DECLARE</span>
+  <span class="var">l_url</span>      <span class="kw">VARCHAR2</span>(<span class="num">500</span>);
+  <span class="var">l_body</span>     <span class="kw">CLOB</span>;
+  <span class="var">l_response</span> <span class="kw">CLOB</span>;
+  <span class="var">l_answer</span>   <span class="kw">VARCHAR2</span>(<span class="num">32767</span>);
+  <span class="var">l_status</span>   <span class="kw">NUMBER</span>;
+  <span class="var">l_comp_id</span>  <span class="kw">VARCHAR2</span>(<span class="num">300</span>);
+<span class="kw">BEGIN</span>
+
+  <span class="cm">-- ① Compartment OCID — identifies your OCI account area</span>
+  <span class="var">l_comp_id</span> <span class="op">:=</span>
+    <span class="str">'ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wav...'</span>;
+
+  <span class="cm">-- ② OCI Gen AI endpoint for Hyderabad region</span>
+  <span class="var">l_url</span> <span class="op">:=</span>
+    <span class="str">'https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com/20231130/actions/chat'</span>;
+
+  <span class="cm">-- ③ Build the JSON request body</span>
+  <span class="var">l_body</span> <span class="op">:=</span>
+    <span class="str">'{"compartmentId":"'</span> <span class="op">||</span> <span class="var">l_comp_id</span> <span class="op">||</span> <span class="str">'",'</span>
+    <span class="op">||</span> <span class="str">'"servingMode":{"servingType":"ON_DEMAND",'</span>
+    <span class="op">||</span> <span class="str">'"modelId":"cohere.command-a-03-2025"},'</span>
+    <span class="op">||</span> <span class="str">'"chatRequest":{"apiFormat":"COHERE",'</span>
+    <span class="op">||</span> <span class="str">'"message":"'</span> <span class="op">||</span> <span class="fn">REPLACE</span>(<span class="op">:</span><span class="var">P10_QUESTION</span>, <span class="str">'"'</span>, <span class="str">'\"'</span>) <span class="op">||</span> <span class="str">'",'</span>
+    <span class="op">||</span> <span class="str">'"maxTokens":500,'</span>        <span class="cm">-- max words in response</span>
+    <span class="op">||</span> <span class="str">'"temperature":0.5,'</span>      <span class="cm">-- 0=factual, 1=creative</span>
+    <span class="op">||</span> <span class="str">'"isStream":false,'</span>        <span class="cm">-- get full response at once</span>
+    <span class="op">||</span> <span class="str">'"preambleOverride":"You are an HR assistant for LTIMindtree. Answer only HR questions."'</span>
+    <span class="op">||</span> <span class="str">'}}'</span>;
+
+  <span class="cm">-- ④ Set Content-Type header BEFORE calling OCI</span>
+  <span class="cm">--    Required for OCI request signature to match</span>
+  <span class="fn">apex_web_service.set_request_headers</span>(
+    <span class="var">p_name_01</span>  <span class="op">=></span> <span class="str">'Content-Type'</span>,
+    <span class="var">p_value_01</span> <span class="op">=></span> <span class="str">'application/json'</span>
+  );
+
+  <span class="cm">-- ⑤ Call OCI Gen AI — this is the actual API call</span>
+  <span class="var">l_response</span> <span class="op">:=</span> <span class="fn">apex_web_service.make_rest_request</span>(
+    <span class="var">p_url</span>                  <span class="op">=></span> <span class="var">l_url</span>,
+    <span class="var">p_http_method</span>          <span class="op">=></span> <span class="str">'POST'</span>,
+    <span class="var">p_body</span>                 <span class="op">=></span> <span class="var">l_body</span>,
+    <span class="var">p_credential_static_id</span> <span class="op">=></span> <span class="str">'OCI_GENAI_CREDENTIAL'</span>
+  );
+
+  <span class="cm">-- ⑥ Read HTTP status code</span>
+  <span class="var">l_status</span> <span class="op">:=</span> <span class="fn">apex_web_service.g_status_code</span>;
+
+  <span class="cm">-- ⑦ Handle response based on status</span>
+  <span class="kw">IF</span> <span class="var">l_status</span> <span class="op">=</span> <span class="num">200</span> <span class="kw">THEN</span>
+
+    <span class="cm">-- Parse JSON and extract the AI's answer text</span>
+    <span class="fn">apex_json.parse</span>(<span class="var">l_response</span>);
+    <span class="var">l_answer</span> <span class="op">:=</span> <span class="fn">apex_json.get_varchar2</span>(
+      <span class="var">p_path</span> <span class="op">=></span> <span class="str">'chatResponse.text'</span>
+    );
+
+    <span class="cm">-- Display with HTML styling</span>
+    <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span>
+      <span class="str">'&lt;div style="background:#f0f7ff;padding:20px;'</span>
+      <span class="op">||</span> <span class="str">'border-left:4px solid #0066cc;border-radius:8px;"&gt;'</span>
+      <span class="op">||</span> <span class="str">'&lt;b&gt;AI HR Assistant&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;'</span>
+      <span class="op">||</span> <span class="fn">REPLACE</span>(<span class="var">l_answer</span>, <span class="fn">CHR</span>(<span class="num">10</span>), <span class="str">'&lt;br/&gt;'</span>)
+      <span class="op">||</span> <span class="str">'&lt;/div&gt;'</span>;
+
+    <span class="cm">-- Clear question box after showing answer</span>
+    <span class="op">:</span><span class="var">P10_QUESTION</span> <span class="op">:=</span> <span class="kw">NULL</span>;
+
+  <span class="kw">ELSIF</span> <span class="var">l_status</span> <span class="op">=</span> <span class="num">401</span> <span class="kw">THEN</span>
+    <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'Authentication Error 401. Check Web Credential.'</span>;
+
+  <span class="kw">ELSE</span>
+    <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'Error HTTP '</span> <span class="op">||</span> <span class="var">l_status</span>
+      <span class="op">||</span> <span class="str">' — '</span> <span class="op">||</span> <span class="fn">SUBSTR</span>(<span class="var">l_response</span>, <span class="num">1</span>, <span class="num">500</span>);
+
+  <span class="kw">END IF</span>;
+
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN OTHERS THEN</span>
+    <span class="op">:</span><span class="var">P10_ANSWER</span> <span class="op">:=</span> <span class="str">'System Error: '</span> <span class="op">||</span> <span class="fn">SQLERRM</span>;
+
+<span class="kw">END</span>;</pre>
+    </div>
+
+    <h3>Line-by-Line Reference</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Line / Symbol</th><th>Explanation</th></tr>
+        <tr><td>:P10_QUESTION</td><td>Colon prefix = APEX page item. Gets the value the user typed in the question box.</td></tr>
+        <tr><td>REPLACE(...,'"','\"')</td><td>Escapes double quotes in user input so JSON stays valid.</td></tr>
+        <tr><td>CHR(10)</td><td>Newline character. AI responses contain these. Replaced with &lt;br/&gt; so HTML shows line breaks.</td></tr>
+        <tr><td>SUBSTR(l_response,1,500)</td><td>Shows first 500 characters of error response for debugging.</td></tr>
+        <tr><td>SQLERRM</td><td>Built-in Oracle function returning the current error message.</td></tr>
+        <tr><td>:= NULL</td><td>Clears the page item value. Used to clear question box after answer shows.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10. QUICK REFERENCE -->
+  <section class="section">
+    <div class="section-label">10 — Quick Reference</div>
+    <h2>All Functions at a Glance</h2>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Function</th><th>Package</th><th>Purpose</th></tr>
+        <tr><td>set_request_headers()</td><td>apex_web_service</td><td>Set HTTP headers before making the call</td></tr>
+        <tr><td>make_rest_request()</td><td>apex_web_service</td><td>Send HTTP request, return response as CLOB</td></tr>
+        <tr><td>g_status_code</td><td>apex_web_service</td><td>Global variable holding HTTP response code</td></tr>
+        <tr><td>parse(clob)</td><td>apex_json</td><td>Load JSON string into memory for querying</td></tr>
+        <tr><td>get_varchar2(path)</td><td>apex_json</td><td>Extract text value using dot-notation path</td></tr>
+        <tr><td>get_number(path)</td><td>apex_json</td><td>Extract numeric value from parsed JSON</td></tr>
+        <tr><td>g_print_success_message</td><td>apex_application</td><td>Show green success message on page after process</td></tr>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  HR Leave Portal · Day 33 Reference · OCI Gen AI + Oracle APEX · LTIMindtree Training
+</footer>
+
+</body>
+</html>

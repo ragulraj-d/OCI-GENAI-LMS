@@ -1,0 +1,464 @@
+
+<div style="background:var(--color-background-secondary);border-radius:16px;padding:24px;font-family:var(--font-sans);">
+<div style="background:#1e1e2e;border-radius:12px;overflow:hidden;max-width:900px;margin:0 auto;border:0.5px solid #333;">
+
+  <!-- Title bar -->
+  <div style="background:#2a2a3d;padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #333;">
+    <span style="width:12px;height:12px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+    <span style="width:12px;height:12px;border-radius:50%;background:#ffbd2e;display:inline-block;"></span>
+    <span style="width:12px;height:12px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+    <span style="font-size:13px;color:#888;margin-left:8px;font-family:var(--font-mono);">SQL Complete Reference — all_commands.sql</span>
+  </div>
+
+  <!-- Tab bar -->
+  <div style="background:#16162a;display:flex;gap:0;overflow-x:auto;border-bottom:1px solid #2a2a3d;" id="tabbar">
+    <button onclick="showTab('basic')" id="tab-basic" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid #7c3aed;background:#1e1e2e;color:#c4b5fd;">Basic Commands</button>
+    <button onclick="showTab('constraints')" id="tab-constraints" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">Constraints</button>
+    <button onclick="showTab('languages')" id="tab-languages" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">Languages</button>
+    <button onclick="showTab('clauses')" id="tab-clauses" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">Clauses</button>
+    <button onclick="showTab('functions')" id="tab-functions" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">Functions</button>
+    <button onclick="showTab('alias')" id="tab-alias" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">Alias</button>
+    <button onclick="showTab('orderby')" id="tab-orderby" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">ORDER BY</button>
+    <button onclick="showTab('groupby')" id="tab-groupby" style="padding:9px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;background:transparent;color:#555;">GROUP BY</button>
+  </div>
+
+  <!-- Content area -->
+  <div style="padding:20px 24px;min-height:360px;" id="content">
+
+    <!-- BASIC COMMANDS -->
+    <div id="panel-basic">
+      <div style="font-size:11px;color:#7c3aed;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- BASIC SQL COMMANDS</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">SELECT</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Fetch data from a table</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">SELECT name FROM users;</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">INSERT INTO</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Add new row(s) to a table</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">INSERT INTO t VALUES(...);</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">UPDATE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Modify existing rows</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">UPDATE t SET col=val;</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #ef4444;">
+          <div style="font-size:13px;font-weight:600;color:#fca5a5;font-family:var(--font-mono);">DELETE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Remove rows from a table</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">DELETE FROM t WHERE id=1;</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #f59e0b;">
+          <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">CREATE TABLE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Define a new table structure</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">CREATE TABLE t (id INT);</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #f59e0b;">
+          <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">DROP TABLE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Delete table permanently</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">DROP TABLE users;</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">ALTER TABLE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Modify table structure</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">ALTER TABLE t ADD col;</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">TRUNCATE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Remove all rows, keep structure</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">TRUNCATE TABLE users;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSTRAINTS -->
+    <div id="panel-constraints" style="display:none;">
+      <div style="font-size:11px;color:#10b981;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- CONSTRAINTS: rules enforced on table columns</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">PRIMARY KEY</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Uniquely identifies each row. NOT NULL + UNIQUE combined</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">id INT PRIMARY KEY</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">FOREIGN KEY</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Links two tables. Enforces referential integrity</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">REFERENCES dept(id)</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">NOT NULL</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Column cannot store NULL values</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">name VARCHAR NOT NULL</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #f59e0b;">
+          <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">UNIQUE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">All values in column must be distinct</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">email VARCHAR UNIQUE</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #ef4444;">
+          <div style="font-size:13px;font-weight:600;color:#fca5a5;font-family:var(--font-mono);">CHECK</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Validates a condition before inserting/updating</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">CHECK (age >= 18)</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">DEFAULT</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Sets a fallback value if none is provided</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">status DEFAULT 'active'</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">INDEX</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Speeds up search queries on a column</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">CREATE INDEX ON t(col)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LANGUAGES -->
+    <div id="panel-languages" style="display:none;">
+      <div style="font-size:11px;color:#3b82f6;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- SQL LANGUAGE CATEGORIES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">DDL</div>
+          <div style="font-size:10px;color:#7c3aed;margin-top:2px;">Definition</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:8px;">Defines DB structure</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">CREATE · ALTER<br>DROP · TRUNCATE<br>RENAME</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">DML</div>
+          <div style="font-size:10px;color:#10b981;margin-top:2px;">Manipulation</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:8px;">Manages data inside tables</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">INSERT · UPDATE<br>DELETE · MERGE</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">DQL</div>
+          <div style="font-size:10px;color:#3b82f6;margin-top:2px;">Query</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:8px;">Retrieves data from DB</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">SELECT</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #f59e0b;">
+          <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">DCL</div>
+          <div style="font-size:10px;color:#f59e0b;margin-top:2px;">Control</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:8px;">Manages user access rights</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">GRANT · REVOKE</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #ef4444;">
+          <div style="font-size:13px;font-weight:600;color:#fca5a5;font-family:var(--font-mono);">TCL</div>
+          <div style="font-size:10px;color:#ef4444;margin-top:2px;">Transaction</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:8px;">Controls DB transactions</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">COMMIT · ROLLBACK<br>SAVEPOINT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLAUSES -->
+    <div id="panel-clauses" style="display:none;">
+      <div style="font-size:11px;color:#f59e0b;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- CLAUSES: modifiers that shape query results</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">WHERE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Filters rows based on a condition</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">WHERE age > 18</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">HAVING</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Filters groups (used with GROUP BY)</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">HAVING COUNT(*) > 5</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">FROM</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Specifies the source table(s)</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">FROM employees</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #f59e0b;">
+          <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">JOIN</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Combines rows from two tables. Types: INNER, LEFT, RIGHT, FULL</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">JOIN dept ON t.id=d.id</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #ef4444;">
+          <div style="font-size:13px;font-weight:600;color:#fca5a5;font-family:var(--font-mono);">LIMIT / TOP</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Restricts number of rows returned</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">LIMIT 10</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">DISTINCT</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Returns only unique values</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">SELECT DISTINCT city</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">LIKE</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">Pattern match using % and _ wildcards</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">WHERE name LIKE 'A%'</div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:12px;border-left:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">IN / BETWEEN</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:4px;">IN: match a list. BETWEEN: range check</div>
+          <div style="font-size:10px;color:#555;margin-top:6px;font-family:var(--font-mono);">WHERE id IN (1,2,3)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUNCTIONS -->
+    <div id="panel-functions" style="display:none;">
+      <div style="font-size:11px;color:#10b981;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- BUILT-IN SQL FUNCTIONS</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <div style="font-size:11px;color:#7c3aed;margin-bottom:8px;font-family:var(--font-mono);">▸ Aggregate Functions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #7c3aed;">
+              <div style="font-size:12px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">COUNT()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Number of rows</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #7c3aed;">
+              <div style="font-size:12px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">SUM()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Total of a numeric column</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #7c3aed;">
+              <div style="font-size:12px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">AVG()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Mean of a numeric column</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #7c3aed;">
+              <div style="font-size:12px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">MIN() / MAX()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Smallest / largest value</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#3b82f6;margin-bottom:8px;font-family:var(--font-mono);">▸ String Functions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #3b82f6;">
+              <div style="font-size:12px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">UPPER() / LOWER()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Change text case</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #3b82f6;">
+              <div style="font-size:12px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">LENGTH()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Number of characters</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #3b82f6;">
+              <div style="font-size:12px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">CONCAT()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Join two or more strings</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #3b82f6;">
+              <div style="font-size:12px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">TRIM() / SUBSTR()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Remove spaces / extract part</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#f59e0b;margin-bottom:8px;font-family:var(--font-mono);">▸ Date Functions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #f59e0b;">
+              <div style="font-size:12px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">NOW()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Current date and time</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #f59e0b;">
+              <div style="font-size:12px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">DATE() / YEAR()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Extract date / year part</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #f59e0b;">
+              <div style="font-size:12px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">DATEDIFF()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Days between two dates</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #f59e0b;">
+              <div style="font-size:12px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">DATEADD()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Add interval to a date</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#10b981;margin-bottom:8px;font-family:var(--font-mono);">▸ Numeric Functions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #10b981;">
+              <div style="font-size:12px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">ROUND()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Round to N decimal places</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #10b981;">
+              <div style="font-size:12px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">ABS()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Absolute (positive) value</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #10b981;">
+              <div style="font-size:12px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">CEIL() / FLOOR()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Round up / round down</div>
+            </div>
+            <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #10b981;">
+              <div style="font-size:12px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">MOD()</div>
+              <div style="font-size:10px;color:#8b8ba0;margin-top:3px;">Remainder of division</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALIAS -->
+    <div id="panel-alias" style="display:none;">
+      <div style="font-size:11px;color:#3b82f6;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- ALIAS: rename columns or tables temporarily</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #3b82f6;">
+          <div style="font-size:13px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">Column Alias</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Renames a column in query output using AS keyword. Does not change actual table.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#6ee7b7;line-height:1.8;">
+            SELECT first_name AS name,<br>
+            salary AS monthly_pay<br>
+            FROM employees;
+          </div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #7c3aed;">
+          <div style="font-size:13px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">Table Alias</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Shortens table name for readability, especially useful in JOINs and subqueries.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#c4b5fd;line-height:1.8;">
+            SELECT e.name, d.dept_name<br>
+            FROM employees AS e<br>
+            JOIN departments AS d<br>
+            ON e.dept_id = d.id;
+          </div>
+        </div>
+      </div>
+      <div style="background:#111122;border-radius:8px;padding:14px;margin-top:14px;border-left:3px solid #f59e0b;">
+        <div style="font-size:12px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">⚡ Key Rules</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+          <div style="font-size:11px;color:#8b8ba0;">✓ AS keyword is optional (space works too)</div>
+          <div style="font-size:11px;color:#8b8ba0;">✓ Use quotes for aliases with spaces: AS "Full Name"</div>
+          <div style="font-size:11px;color:#8b8ba0;">✓ Column alias can be used in ORDER BY</div>
+          <div style="font-size:11px;color:#ef4444;">✗ Cannot use column alias in WHERE clause</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER BY -->
+    <div id="panel-orderby" style="display:none;">
+      <div style="font-size:11px;color:#ef4444;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- ORDER BY: sort the query result set</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #10b981;">
+          <div style="font-size:13px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">ASC — Ascending</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Sorts from lowest to highest. Default behavior when direction is not specified.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#6ee7b7;line-height:1.8;">
+            SELECT name, salary<br>
+            FROM employees<br>
+            ORDER BY salary ASC;
+          </div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #ef4444;">
+          <div style="font-size:13px;font-weight:600;color:#fca5a5;font-family:var(--font-mono);">DESC — Descending</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Sorts from highest to lowest. Commonly used for rankings, top N queries.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#fca5a5;line-height:1.8;">
+            SELECT name, salary<br>
+            FROM employees<br>
+            ORDER BY salary DESC;
+          </div>
+        </div>
+      </div>
+      <div style="background:#111122;border-radius:8px;padding:14px;margin-top:14px;border-left:3px solid #3b82f6;">
+        <div style="font-size:12px;font-weight:600;color:#93c5fd;font-family:var(--font-mono);">Multi-column sort</div>
+        <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Sort by department first, then by salary within each department</div>
+        <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#93c5fd;line-height:1.8;">
+          SELECT name, dept, salary FROM employees<br>
+          ORDER BY dept ASC, salary DESC;
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;">
+        <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #f59e0b;">
+          <div style="font-size:11px;color:#fcd34d;font-family:var(--font-mono);">By column number</div>
+          <div style="font-size:10px;color:#555;margin-top:4px;font-family:var(--font-mono);">ORDER BY 2 DESC</div>
+        </div>
+        <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #7c3aed;">
+          <div style="font-size:11px;color:#c4b5fd;font-family:var(--font-mono);">NULL handling</div>
+          <div style="font-size:10px;color:#555;margin-top:4px;font-family:var(--font-mono);">NULLS LAST / FIRST</div>
+        </div>
+        <div style="background:#111122;border-radius:6px;padding:10px;border-left:3px solid #10b981;">
+          <div style="font-size:11px;color:#6ee7b7;font-family:var(--font-mono);">With alias</div>
+          <div style="font-size:10px;color:#555;margin-top:4px;font-family:var(--font-mono);">ORDER BY alias_name</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP BY -->
+    <div id="panel-groupby" style="display:none;">
+      <div style="font-size:11px;color:#f59e0b;font-family:var(--font-mono);margin-bottom:14px;letter-spacing:1px;">-- GROUP BY: aggregate rows sharing the same value</div>
+      <div style="background:#111122;border-radius:8px;padding:14px;border-left:3px solid #f59e0b;margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:600;color:#fcd34d;font-family:var(--font-mono);">How GROUP BY works</div>
+        <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Collapses rows with the same value in the grouped column into a single row. Always used with aggregate functions (COUNT, SUM, AVG, etc.).</div>
+        <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#fcd34d;line-height:1.8;">
+          SELECT dept, COUNT(*) AS total_emp,<br>
+          AVG(salary) AS avg_salary<br>
+          FROM employees<br>
+          GROUP BY dept;
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #7c3aed;">
+          <div style="font-size:12px;font-weight:600;color:#c4b5fd;font-family:var(--font-mono);">GROUP BY + HAVING</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Filter groups after aggregation. WHERE filters rows BEFORE grouping; HAVING filters AFTER.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#c4b5fd;line-height:1.8;">
+            SELECT dept, COUNT(*) AS cnt<br>
+            FROM employees<br>
+            GROUP BY dept<br>
+            HAVING COUNT(*) > 10;
+          </div>
+        </div>
+        <div style="background:#111122;border-radius:8px;padding:14px;border-top:3px solid #10b981;">
+          <div style="font-size:12px;font-weight:600;color:#6ee7b7;font-family:var(--font-mono);">GROUP BY + ORDER BY</div>
+          <div style="font-size:11px;color:#8b8ba0;margin-top:6px;">Sort the grouped result. ORDER BY always comes after GROUP BY in the query.</div>
+          <div style="background:#0d0d1a;border-radius:6px;padding:10px;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:#6ee7b7;line-height:1.8;">
+            SELECT dept, SUM(salary)<br>
+            FROM employees<br>
+            GROUP BY dept<br>
+            ORDER BY SUM(salary) DESC;
+          </div>
+        </div>
+      </div>
+      <div style="background:#111122;border-radius:8px;padding:12px;margin-top:14px;">
+        <div style="font-size:11px;color:#555;font-family:var(--font-mono);margin-bottom:8px;">Query execution order</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-family:var(--font-mono);color:#3b82f6;background:#0d1b2e;padding:4px 8px;border-radius:4px;">FROM</span>
+          <span style="color:#555;font-size:12px;">→</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:#3b82f6;background:#0d1b2e;padding:4px 8px;border-radius:4px;">WHERE</span>
+          <span style="color:#555;font-size:12px;">→</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:#f59e0b;background:#1a0f00;padding:4px 8px;border-radius:4px;">GROUP BY</span>
+          <span style="color:#555;font-size:12px;">→</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:#7c3aed;background:#1a0f2e;padding:4px 8px;border-radius:4px;">HAVING</span>
+          <span style="color:#555;font-size:12px;">→</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:#10b981;background:#001a0f;padding:4px 8px;border-radius:4px;">SELECT</span>
+          <span style="color:#555;font-size:12px;">→</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:#ef4444;background:#1a0000;padding:4px 8px;border-radius:4px;">ORDER BY</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status bar -->
+  <div style="background:#16162a;padding:8px 24px;display:flex;gap:16px;border-top:1px solid #2a2a3d;">
+    <span style="font-size:10px;color:#555;font-family:var(--font-mono);">UTF-8</span>
+    <span style="font-size:10px;color:#555;font-family:var(--font-mono);">SQL</span>
+    <span style="font-size:10px;color:#28c840;font-family:var(--font-mono);">● Ready</span>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:12px;">
+  <div style="display:inline-block;width:120px;height:8px;background:#2a2a3d;border-radius:4px;"></div>
+</div>
+</div>
+
+<script>
+const tabs = ['basic','constraints','languages','clauses','functions','alias','orderby','groupby'];
+const colors = {
+  basic:'#7c3aed', constraints:'#10b981', languages:'#3b82f6',
+  clauses:'#f59e0b', functions:'#10b981', alias:'#3b82f6',
+  orderby:'#ef4444', groupby:'#f59e0b'
+};
+function showTab(id) {
+  tabs.forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===id ? 'block' : 'none';
+    const btn = document.getElementById('tab-'+t);
+    if(t===id) {
+      btn.style.borderBottom = '2px solid '+colors[t];
+      btn.style.background = '#1e1e2e';
+      btn.style.color = '#e2e8f0';
+    } else {
+      btn.style.borderBottom = '2px solid transparent';
+      btn.style.background = 'transparent';
+      btn.style.color = '#555';
+    }
+  });
+}
+</script>

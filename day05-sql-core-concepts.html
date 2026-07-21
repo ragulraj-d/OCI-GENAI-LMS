@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Core Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f7ff;
+    --surface: #ffffff;
+    --surface-alt: #f3f2fa;
+    --border: #e0ddf0;
+    --text-primary: #1a1730;
+    --text-secondary: #4a4570;
+    --text-muted: #8a86aa;
+    --accent: #6d28d9;
+    --accent-soft: #f5f3ff;
+    --accent-mid: #c4b5fd;
+    --accent-dark: #5b21b6;
+    --green: #16a34a;
+    --green-soft: #f0fdf4;
+    --red: #dc2626;
+    --red-soft: #fef2f2;
+    --yellow: #ca8a04;
+    --yellow-soft: #fefce8;
+    --teal: #0d9488;
+    --teal-soft: #f0fdfa;
+    --mac-bar: #2d2d2d;
+    --mac-bg: #1a1e2e;
+    --mac-text: #cdd6f4;
+    --mac-comment: #6c7086;
+    --mac-keyword: #cba6f7;
+    --mac-string: #a6e3a1;
+    --mac-number: #fab387;
+    --mac-func: #89dceb;
+    --mac-type: #f38ba8;
+    --mac-operator: #89b4fa;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 1280px; margin: 0 auto;
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px;
+    color: var(--text-primary); text-decoration: none;
+  }
+  .header-logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #2e1065 100%);
+    padding: 64px 2rem 56px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(109,40,217,0.4) 0%, transparent 70%);
+  }
+  .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #c4b5fd; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Sora', sans-serif; font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .hero h1 em { font-style: normal; color: #c4b5fd; }
+  .hero-sub { font-size: 15px; color: #ddd6fe; margin-bottom: 36px; opacity: 0.85; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .hero-pill {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+    color: #ede9fe; font-size: 12px; font-weight: 500; padding: 5px 12px;
+    border-radius: 20px; backdrop-filter: blur(4px);
+  }
+
+  /* ── LAYOUT ── */
+  .page-body {
+    max-width: 1280px; margin: 0 auto; padding: 44px 2rem 80px;
+    display: grid; grid-template-columns: 220px minmax(0,1fr);
+    gap: 32px; align-items: start; overflow: hidden;
+  }
+
+  /* ── SIDEBAR TOC ── */
+  .toc {
+    position: sticky; top: 56px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow);
+    max-height: calc(100vh - 72px); overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    width: 220px; flex-shrink: 0;
+  }
+  .toc::-webkit-scrollbar { width: 4px; }
+  .toc::-webkit-scrollbar-track { background: transparent; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .toc::-webkit-scrollbar-thumb:hover { background: var(--accent-mid); }
+  .toc-title {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
+  }
+  .toc-section { margin-bottom: 16px; }
+  .toc-section-label {
+    font-size: 11px; font-weight: 600; color: var(--accent);
+    margin-bottom: 6px; display: block;
+  }
+  .toc a {
+    display: block; font-size: 12px; color: var(--text-secondary);
+    text-decoration: none; padding: 3px 8px; border-radius: 4px; transition: all 0.15s; line-height: 1.5;
+  }
+  .toc a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  /* ── CONTENT ── */
+  .content { min-width: 0; max-width: 100%; overflow: hidden; }
+
+  /* ── SESSION BLOCK ── */
+  .session-block { margin-bottom: 64px; }
+  .session-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid var(--border);
+  }
+  .session-icon {
+    width: 44px; height: 44px; background: var(--accent); border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .session-header h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; }
+  .session-header p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ── TOPIC CARD ── */
+  .topic-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin-bottom: 24px; overflow: hidden; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s; max-width: 100%;
+  }
+  .topic-card:hover { box-shadow: var(--shadow-md); }
+  .topic-card-header {
+    padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .topic-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-mid);
+    padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .topic-card-header h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; line-height: 1.35; }
+  .topic-card-header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+  .topic-body { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text-primary); font-weight: 600; }
+
+  /* ── SUBSECTION ── */
+  .subsection { margin-bottom: 26px; }
+  .subsection:last-child { margin-bottom: 0; }
+  .subsection-title {
+    font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text-primary); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .subsection-title::before {
+    content: ''; display: inline-block; width: 3px; height: 14px;
+    background: var(--accent); border-radius: 2px; flex-shrink: 0;
+  }
+
+  /* ── EXECUTION STEP BADGE ── */
+  .step-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent); color: #fff;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── OUTPUT TABLE ── */
+  .output-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px;
+    margin-top: 10px; border-radius: var(--radius-sm); overflow: hidden;
+    border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace;
+  }
+  .output-table th {
+    background: #1a1e2e; color: #89b4fa; padding: 7px 12px;
+    text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase; border-bottom: 1px solid #313244;
+  }
+  .output-table td {
+    padding: 7px 12px; border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .output-table tr:last-child td { border-bottom: none; }
+  .output-table tr:nth-child(even) td { background: var(--surface-alt); }
+  .null-val { color: #f38ba8; font-style: italic; }
+  .output-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 6px; margin-top: 12px;
+  }
+
+  /* ── OUTPUT BOX (text) ── */
+  .output-box {
+    background: var(--accent-soft); border: 1px solid var(--accent-mid);
+    border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-top: 10px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--accent-dark);
+  }
+
+  /* ── MAC CODE BLOCK ── */
+  .mac-window {
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.12);
+    margin-bottom: 10px; font-family: 'JetBrains Mono', monospace;
+    max-width: 100%; width: 100%;
+  }
+  .mac-titlebar {
+    background: var(--mac-bar); padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mac-btn { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .mac-btn.close { background: #ff5f57; }
+  .mac-btn.min   { background: #febc2e; }
+  .mac-btn.max   { background: #28c840; }
+  .mac-file-label { flex: 1; text-align: center; font-size: 11px; color: #8a8a8a; letter-spacing: 0.3px; }
+  .mac-body { background: var(--mac-bg); padding: 18px 20px; overflow-x: auto; max-width: 100%; }
+  .mac-body pre {
+    margin: 0; font-size: 12.5px; line-height: 1.75;
+    color: var(--mac-text); tab-size: 4; white-space: pre; min-width: 0;
+  }
+  .kw  { color: var(--mac-keyword); }
+  .str { color: var(--mac-string); }
+  .num { color: var(--mac-number); }
+  .fn  { color: var(--mac-func); }
+  .cm  { color: var(--mac-comment); font-style: italic; }
+  .op  { color: var(--mac-operator); }
+  .tp  { color: var(--mac-type); }
+  .ok  { color: #a6e3a1; font-weight: 600; }
+  .bad { color: #f38ba8; font-weight: 600; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--radius-sm);
+    margin-bottom: 16px; font-size: 13.5px; line-height: 1.65;
+  }
+  .callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .callout p { margin: 0; }
+  .callout.tip    { background: var(--green-soft); border-left: 3px solid var(--green); color: #166534; }
+  .callout.warn   { background: var(--yellow-soft); border-left: 3px solid var(--yellow); color: #713f12; }
+  .callout.info   { background: var(--accent-soft); border-left: 3px solid var(--accent); color: var(--accent-dark); }
+  .callout.danger { background: var(--red-soft); border-left: 3px solid var(--red); color: #991b1b; }
+  .callout.teal   { background: var(--teal-soft); border-left: 3px solid var(--teal); color: #0f4f47; }
+
+  /* ── ANALOGY CARD ── */
+  .analogy-card {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    border: 1px solid var(--accent-mid); border-radius: var(--radius); padding: 16px 20px; margin-top: 14px;
+  }
+  .analogy-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .analogy-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .analogy-list li { font-size: 13px; color: #3730a3; padding-left: 20px; position: relative; line-height: 1.55; }
+  .analogy-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-weight: 600; }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;
+    border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);
+  }
+  .data-table th {
+    background: var(--surface-alt); font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);
+    padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; line-height: 1.55; }
+  .data-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--surface-alt); }
+
+  /* ── COMPARE GRID ── */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; overflow: hidden;
+  }
+  @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-grid .mac-window { margin-bottom: 0; }
+
+  /* ── FLOW STEPS ── */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 16px; border: 1px solid var(--border);
+    border-top: none; background: var(--surface); position: relative;
+  }
+  .flow-step:first-child { border-top: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+  .flow-step:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+  .flow-step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .flow-step-kw {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
+    color: var(--accent); min-width: 90px; flex-shrink: 0; margin-top: 3px;
+  }
+  .flow-step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+  .flow-step-desc strong { color: var(--text-primary); }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    border-top: 1px solid var(--border); padding: 28px 2rem; text-align: center; background: var(--surface);
+  }
+  .site-footer p { font-size: 13px; color: var(--text-muted); }
+  .site-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .site-footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; }
+    .toc { position: static; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#" class="header-logo"><span class="dot"></span>Oracle Developer Track</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">SQL Core Concepts</span>
+    <h1>SQL <em>Deep Dive</em><br>Complete Reference</h1>
+    <p class="hero-sub">Execution Flow · Joins · Set Operators · Subqueries · Views · Indexes · Query Optimization</p>
+    <div class="hero-pills">
+      <span class="hero-pill">SQL Execution Flow</span>
+      <span class="hero-pill">All Join Types</span>
+      <span class="hero-pill">Set Operators</span>
+      <span class="hero-pill">Subqueries</span>
+      <span class="hero-pill">IN / EXISTS / ANY / ALL</span>
+      <span class="hero-pill">Views</span>
+      <span class="hero-pill">Indexes</span>
+      <span class="hero-pill">Query Optimization</span>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="toc">
+    <div class="toc-title">On this page</div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">1. Execution Flow</span>
+      <a href="#from">FROM</a>
+      <a href="#where">WHERE</a>
+      <a href="#group-by">GROUP BY</a>
+      <a href="#having">HAVING</a>
+      <a href="#select">SELECT</a>
+      <a href="#distinct">DISTINCT</a>
+      <a href="#order-by">ORDER BY</a>
+      <a href="#fetch-limit">FETCH / LIMIT</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">2. Joins</span>
+      <a href="#why-joins">Why Joins?</a>
+      <a href="#inner-join">INNER JOIN</a>
+      <a href="#left-join">LEFT OUTER JOIN</a>
+      <a href="#right-join">RIGHT OUTER JOIN</a>
+      <a href="#full-join">FULL OUTER JOIN</a>
+      <a href="#cross-join">CROSS JOIN</a>
+      <a href="#self-join">SELF JOIN</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">3. Set Operators</span>
+      <a href="#union">UNION</a>
+      <a href="#union-all">UNION ALL</a>
+      <a href="#intersect">INTERSECT</a>
+      <a href="#minus">MINUS</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">4. Subqueries</span>
+      <a href="#single-row-sub">Single Row</a>
+      <a href="#multi-row-sub">Multiple Row</a>
+      <a href="#nested-sub">Nested</a>
+      <a href="#correlated-sub">Correlated</a>
+      <a href="#in-op">IN</a>
+      <a href="#exists-op">EXISTS</a>
+      <a href="#any-op">ANY</a>
+      <a href="#all-op">ALL</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">5. Views</span>
+      <a href="#simple-view">Simple View</a>
+      <a href="#complex-view">Complex View</a>
+      <a href="#create-view">CREATE VIEW</a>
+      <a href="#replace-view">REPLACE VIEW</a>
+      <a href="#drop-view">DROP VIEW</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">6. Indexes</span>
+      <a href="#why-index">Why Index?</a>
+      <a href="#create-index">CREATE INDEX</a>
+      <a href="#unique-index">UNIQUE INDEX</a>
+      <a href="#composite-index">Composite Index</a>
+      <a href="#index-usage">Index Usage</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">7. Query Optimization</span>
+      <a href="#full-scan">Full Table Scan</a>
+      <a href="#index-scan">Index Scan</a>
+      <a href="#avoid-star">Avoid SELECT *</a>
+      <a href="#efficient-where">Efficient WHERE</a>
+      <a href="#join-opt">Join Optimization</a>
+      <a href="#query-tuning">Query Tuning Basics</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ═══════ SECTION 1: SQL EXECUTION FLOW ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">⚡</div>
+        <div>
+          <h2>SQL Execution Flow</h2>
+          <p>SQL is written in one order but executed by the database engine in a completely different logical sequence</p>
+        </div>
+      </div>
+
+      <!-- Execution Order Overview -->
+      <div class="topic-card">
+        <div class="topic-card-header">
+          <span class="topic-num">1.0</span>
+          <div>
+            <h3>Execution Order — All 8 Steps</h3>
+            <p>The database engine processes clauses in this fixed logical order regardless of how you write them</p>
+          </div>
+        </div>
+        <div class="topic-body">
+          <div class="flow-steps">
+            <div class="flow-step"><span class="flow-step-num">1</span><span class="flow-step-kw">FROM</span><div class="flow-step-desc"><strong>Locate and join tables</strong> — forms the initial raw dataset</div></div>
+            <div class="flow-step"><span class="flow-step-num">2</span><span class="flow-step-kw">WHERE</span><div class="flow-step-desc"><strong>Filter individual rows</strong> — before any grouping or math</div></div>
+            <div class="flow-step"><span class="flow-step-num">3</span><span class="flow-step-kw">GROUP BY</span><div class="flow-step-desc"><strong>Bundle rows into groups</strong> — based on shared column values</div></div>
+            <div class="flow-step"><span class="flow-step-num">4</span><span class="flow-step-kw">HAVING</span><div class="flow-step-desc"><strong>Filter groups</strong> — using aggregate functions like COUNT() or SUM()</div></div>
+            <div class="flow-step"><span class="flow-step-num">5</span><span class="flow-step-kw">SELECT</span><div class="flow-step-desc"><strong>Extract columns and calculate expressions</strong> — aliases are created here</div></div>
+            <div class="flow-step"><span class="flow-step-num">6</span><span class="flow-step-kw">DISTINCT</span><div class="flow-step-desc"><strong>Remove duplicate rows</strong> — from the selected output</div></div>
+            <div class="flow-step"><span class="flow-step-num">7</span><span class="flow-step-kw">ORDER BY</span><div class="flow-step-desc"><strong>Sort the final dataset</strong> — ASC or DESC</div></div>
+            <div class="flow-step"><span class="flow-step-num">8</span><span class="flow-step-kw">FETCH/LIMIT</span><div class="flow-step-desc"><strong>Truncate to N rows</strong> — cuts the bottom of the sorted list</div></div>
+          </div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p><strong>Key insight:</strong> Column aliases defined in SELECT are NOT available in WHERE or HAVING — those clauses run before SELECT. Always repeat the full expression in WHERE.</p></div>
+        </div>
+      </div>
+
+      <!-- FROM -->
+      <div class="topic-card" id="from">
+        <div class="topic-card-header"><span class="topic-num">1.1</span><div><h3>FROM</h3><p>Locates the target tables and joins them — forms the initial raw dataset</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #1</div>
+          <div class="prose"><p>Before filtering or selecting columns, SQL first opens and reads the source table. This is always the very first operation — the entire raw table is made available for subsequent steps.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">from_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees;</pre></div></div>
+          <div class="analogy-card"><div class="analogy-title">💡 What's happening</div><ul class="analogy-list"><li>SQL opens and reads the employees table first, before any filtering or column selection happens</li></ul></div>
+        </div>
+      </div>
+
+      <!-- WHERE -->
+      <div class="topic-card" id="where">
+        <div class="topic-card-header"><span class="topic-num">1.2</span><div><h3>WHERE</h3><p>Filters individual records based on a condition — before any grouping</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #2</div>
+          <div class="prose"><p>Filters data before any grouping or math happens. SQL discards non-matching rows immediately, reducing the dataset that subsequent steps need to process.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">where_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees <span class="kw">WHERE</span> dept = <span class="str">'IT'</span>;</pre></div></div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>Aggregate functions (COUNT, SUM, AVG) <strong>cannot</strong> be used in WHERE — they require HAVING, which runs after GROUP BY.</p></div>
+        </div>
+      </div>
+
+      <!-- GROUP BY -->
+      <div class="topic-card" id="group-by">
+        <div class="topic-card-header"><span class="topic-num">1.3</span><div><h3>GROUP BY</h3><p>Bundles remaining rows into distinct groups based on shared column values</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #3</div>
+          <div class="prose"><p>After WHERE filters individual rows, GROUP BY organises the survivors into separate buckets based on shared values. Each bucket becomes one row in the output.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">group_by_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> dept <span class="kw">FROM</span> employees <span class="kw">GROUP BY</span> dept;</pre></div></div>
+        </div>
+      </div>
+
+      <!-- HAVING -->
+      <div class="topic-card" id="having">
+        <div class="topic-card-header"><span class="topic-num">1.4</span><div><h3>HAVING</h3><p>Filters groups created by GROUP BY — allows aggregate conditions</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #4</div>
+          <div class="prose"><p>HAVING is the group-level equivalent of WHERE. It runs after GROUP BY and can use aggregate math like COUNT() or SUM() in its conditions.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">having_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> dept <span class="kw">FROM</span> employees
+<span class="kw">GROUP BY</span> dept
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) > <span class="num">5</span>;</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p><strong>WHERE vs HAVING:</strong> WHERE filters rows before grouping. HAVING filters groups after grouping. Never use aggregate functions in WHERE.</p></div>
+        </div>
+      </div>
+
+      <!-- SELECT -->
+      <div class="topic-card" id="select">
+        <div class="topic-card-header"><span class="topic-num">1.5</span><div><h3>SELECT</h3><p>Extracts specific columns and processes mathematical expressions and functions</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #5</div>
+          <div class="prose"><p>Column aliases are created here — which is why they cannot be referenced in WHERE or HAVING. Mathematical expressions and function calls are evaluated at this step.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">select_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp_name, (salary * <span class="num">0.1</span>) <span class="kw">AS</span> bonus <span class="kw">FROM</span> employees;</pre></div></div>
+        </div>
+      </div>
+
+      <!-- DISTINCT -->
+      <div class="topic-card" id="distinct">
+        <div class="topic-card-header"><span class="topic-num">1.6</span><div><h3>DISTINCT</h3><p>Eliminates duplicate rows from the final selected output</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #6</div>
+          <div class="prose"><p>After SELECT computes all columns, DISTINCT compares entire rows and discards identical duplicates. This requires a sorting pass which adds processing overhead on large datasets.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">distinct_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT DISTINCT</span> location <span class="kw">FROM</span> departments;</pre></div></div>
+        </div>
+      </div>
+
+      <!-- ORDER BY -->
+      <div class="topic-card" id="order-by">
+        <div class="topic-card-header"><span class="topic-num">1.7</span><div><h3>ORDER BY</h3><p>Sorts the final dataset by specified columns — ASC or DESC</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #7</div>
+          <div class="prose"><p>The final, filtered and selected data is sorted for display. Column aliases defined in SELECT <strong>are</strong> available here since ORDER BY runs after SELECT.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">order_by_clause.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp_name, salary <span class="kw">FROM</span> employees
+<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>;</pre></div></div>
+        </div>
+      </div>
+
+      <!-- FETCH / LIMIT -->
+      <div class="topic-card" id="fetch-limit">
+        <div class="topic-card-header"><span class="topic-num">1.8</span><div><h3>FETCH / LIMIT</h3><p>Truncates the result to a maximum number of rows — cuts the bottom of the sorted list</p></div></div>
+        <div class="topic-body">
+          <div class="step-badge">⚡ Execution Step #8</div>
+          <div class="prose"><p>After sorting, the result is cut down to the specified row count. Always pair with ORDER BY — without it, the rows returned are non-deterministic.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">fetch_limit.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Oracle 12c+ (ANSI standard)</span>
+<span class="kw">SELECT</span> emp_name, salary <span class="kw">FROM</span> employees
+<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>
+<span class="kw">FETCH FIRST</span> <span class="num">3</span> <span class="kw">ROWS ONLY</span>;
+
+<span class="cm">-- Older Oracle (pre-12c)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> (
+    <span class="kw">SELECT</span> emp_name, salary <span class="kw">FROM</span> employees
+    <span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>
+) <span class="kw">WHERE</span> <span class="fn">ROWNUM</span> <= <span class="num">3</span>;</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Oracle uses <strong>FETCH FIRST N ROWS ONLY</strong> (not LIMIT). LIMIT is MySQL/PostgreSQL syntax and will cause an error in Oracle SQL.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 2: JOINS ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">🔗</div>
+        <div>
+          <h2>Joins</h2>
+          <p>Link records across distinct tables using shared columns — INNER, LEFT, RIGHT, FULL, CROSS, SELF</p>
+        </div>
+      </div>
+
+      <!-- Why Joins -->
+      <div class="topic-card" id="why-joins">
+        <div class="topic-card-header"><span class="topic-num">2.0</span><div><h3>Why Joins?</h3><p>Normalization splits data into narrow tables — joins stitch them back together at query time</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Normalization slices data into narrow, efficient tables to avoid redundancy. Joins stitch these tables back together during a query to answer complex business questions.</p></div>
+          <div class="analogy-card"><div class="analogy-title">💡 Real-world Example</div><ul class="analogy-list"><li>To see an employee's name and their department name, you must join the employees table with the departments table using a shared dept_id column</li></ul></div>
+        </div>
+      </div>
+
+      <!-- INNER JOIN -->
+      <div class="topic-card" id="inner-join">
+        <div class="topic-card-header"><span class="topic-num">2.1</span><div><h3>INNER JOIN</h3><p>Returns rows only when a matching key exists in BOTH tables — non-matches are dropped</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">inner_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> e.emp_name, d.dept_name
+<span class="kw">FROM</span>   employees e
+<span class="kw">INNER JOIN</span> departments d <span class="kw">ON</span> e.dept_id = d.dept_id;</pre></div></div>
+          <div class="output-label">Output</div>
+          <table class="output-table"><thead><tr><th>EMP_NAME</th><th>DEPT_NAME</th></tr></thead><tbody><tr><td>Alice</td><td>IT</td></tr><tr><td>Charlie</td><td>Finance</td></tr></tbody></table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Bob has no department and Marketing has no employees — both are excluded from the result.</p></div>
+        </div>
+      </div>
+
+      <!-- LEFT JOIN -->
+      <div class="topic-card" id="left-join">
+        <div class="topic-card-header"><span class="topic-num">2.2</span><div><h3>LEFT OUTER JOIN</h3><p>Returns ALL rows from the left table — unmatched right side fills with NULL</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">left_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> e.emp_name, d.dept_name
+<span class="kw">FROM</span>   employees e
+<span class="kw">LEFT JOIN</span> departments d <span class="kw">ON</span> e.dept_id = d.dept_id;</pre></div></div>
+          <div class="output-label">Output</div>
+          <table class="output-table"><thead><tr><th>EMP_NAME</th><th>DEPT_NAME</th></tr></thead><tbody><tr><td>Alice</td><td>IT</td></tr><tr><td>Bob</td><td class="null-val">NULL</td></tr><tr><td>Charlie</td><td>Finance</td></tr></tbody></table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Bob appears with NULL — he is a new hire not yet assigned to a department.</p></div>
+        </div>
+      </div>
+
+      <!-- RIGHT JOIN -->
+      <div class="topic-card" id="right-join">
+        <div class="topic-card-header"><span class="topic-num">2.3</span><div><h3>RIGHT OUTER JOIN</h3><p>Returns ALL rows from the right table — unmatched left side fills with NULL</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">right_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> e.emp_name, d.dept_name
+<span class="kw">FROM</span>   employees e
+<span class="kw">RIGHT JOIN</span> departments d <span class="kw">ON</span> e.dept_id = d.dept_id;</pre></div></div>
+          <div class="output-label">Output</div>
+          <table class="output-table"><thead><tr><th>EMP_NAME</th><th>DEPT_NAME</th></tr></thead><tbody><tr><td>Alice</td><td>IT</td></tr><tr><td>Charlie</td><td>Finance</td></tr><tr><td class="null-val">NULL</td><td>Marketing</td></tr></tbody></table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Marketing appears with NULL — it is a newly created department with no employees yet.</p></div>
+        </div>
+      </div>
+
+      <!-- FULL OUTER JOIN -->
+      <div class="topic-card" id="full-join">
+        <div class="topic-card-header"><span class="topic-num">2.4</span><div><h3>FULL OUTER JOIN</h3><p>Returns ALL rows from both tables — missing matches on either side fill with NULL</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">full_outer_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> e.emp_name, d.dept_name
+<span class="kw">FROM</span>   employees e
+<span class="kw">FULL OUTER JOIN</span> departments d <span class="kw">ON</span> e.dept_id = d.dept_id;</pre></div></div>
+          <div class="output-label">Output</div>
+          <table class="output-table"><thead><tr><th>EMP_NAME</th><th>DEPT_NAME</th></tr></thead><tbody><tr><td>Alice</td><td>IT</td></tr><tr><td>Bob</td><td class="null-val">NULL</td></tr><tr><td>Charlie</td><td>Finance</td></tr><tr><td class="null-val">NULL</td><td>Marketing</td></tr></tbody></table>
+          <div class="analogy-card"><div class="analogy-title">💡 Use Case</div><ul class="analogy-list"><li>A master audit list showing all employees (even without departments) AND all departments (even without employees)</li></ul></div>
+        </div>
+      </div>
+
+      <!-- CROSS JOIN -->
+      <div class="topic-card" id="cross-join">
+        <div class="topic-card-header"><span class="topic-num">2.5</span><div><h3>CROSS JOIN</h3><p>Cartesian product — every row in the first table paired with every row in the second</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>No ON condition is used. If the first table has 3 rows and the second has 2 rows, the result has 3 × 2 = 6 rows.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">cross_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> s.size_name, c.color_name
+<span class="kw">FROM</span>   sizes s
+<span class="kw">CROSS JOIN</span> colors c;</pre></div></div>
+          <div class="output-label">Output (3 sizes × 2 colors = 6 rows)</div>
+          <table class="output-table"><thead><tr><th>SIZE_NAME</th><th>COLOR_NAME</th></tr></thead><tbody><tr><td>Small</td><td>Red</td></tr><tr><td>Small</td><td>Blue</td></tr><tr><td>Medium</td><td>Red</td></tr><tr><td>Medium</td><td>Blue</td></tr><tr><td>Large</td><td>Red</td></tr><tr><td>Large</td><td>Blue</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- SELF JOIN -->
+      <div class="topic-card" id="self-join">
+        <div class="topic-card-header"><span class="topic-num">2.6</span><div><h3>SELF JOIN</h3><p>Joins a table to itself using two aliases — compares rows within the same table</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">self_join.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp.emp_name  <span class="kw">AS</span> worker,
+       mgr.emp_name  <span class="kw">AS</span> supervisor
+<span class="kw">FROM</span>   employees emp
+<span class="kw">LEFT JOIN</span> employees mgr <span class="kw">ON</span> emp.manager_id = mgr.emp_id;</pre></div></div>
+          <div class="output-label">Output</div>
+          <table class="output-table"><thead><tr><th>WORKER</th><th>SUPERVISOR</th></tr></thead><tbody><tr><td>Alice</td><td>Charlie</td></tr><tr><td>Bob</td><td>Charlie</td></tr><tr><td>Charlie</td><td class="null-val">NULL</td></tr></tbody></table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Charlie has no supervisor (NULL) because he is the top-level manager — his manager_id is NULL so the LEFT JOIN finds no match.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 3: SET OPERATORS ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">🗂️</div>
+        <div>
+          <h2>Set Operators</h2>
+          <p>Stack rows from multiple queries vertically — unlike joins which combine columns side-by-side</p>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <div class="topic-card-header"><span class="topic-num">3.0</span><div><h3>Rules for Set Operators</h3></div></div>
+        <div class="topic-body">
+          <div class="callout info"><span class="callout-icon">📋</span><p>Both queries must return the <strong>same number of columns</strong> with <strong>compatible data types</strong>. Column names in the result come from the first query.</p></div>
+          <table class="data-table">
+            <thead><tr><th>Operator</th><th>Duplicates</th><th>Sort Pass</th><th>Performance</th></tr></thead>
+            <tbody>
+              <tr><td>UNION</td><td>Removed</td><td>Yes</td><td>Slower</td></tr>
+              <tr><td>UNION ALL</td><td>Kept</td><td>No</td><td>Faster</td></tr>
+              <tr><td>INTERSECT</td><td>Removed</td><td>Yes</td><td>Medium</td></tr>
+              <tr><td>MINUS</td><td>Removed</td><td>Yes</td><td>Medium</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="topic-card" id="union">
+        <div class="topic-card-header"><span class="topic-num">3.1</span><div><h3>UNION</h3><p>Merges rows from two queries and removes all duplicates</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">union.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> name <span class="kw">FROM</span> active_employees
+<span class="kw">UNION</span>
+<span class="kw">SELECT</span> name <span class="kw">FROM</span> retired_employees;</pre></div></div>
+          <div class="output-box">A clean, unique list of names — duplicates removed, sorted alphabetically.</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="union-all">
+        <div class="topic-card-header"><span class="topic-num">3.2</span><div><h3>UNION ALL</h3><p>Merges rows quickly without sorting — keeps all duplicates exactly as they appear</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">union_all.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> user_id <span class="kw">FROM</span> server1_logs
+<span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> user_id <span class="kw">FROM</span> server2_logs;</pre></div></div>
+          <div class="output-box">All IDs from both servers — duplicates retained exactly as they appear in the source data.</div>
+          <div class="callout tip"><span class="callout-icon">⚡</span><p>Always prefer <strong>UNION ALL</strong> over UNION when duplicates are acceptable or you know none exist — it skips the expensive deduplication sort pass.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="intersect">
+        <div class="topic-card-header"><span class="topic-num">3.3</span><div><h3>INTERSECT</h3><p>Returns only distinct rows that appear in BOTH query results simultaneously</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">intersect.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> email <span class="kw">FROM</span> customers
+<span class="kw">INTERSECT</span>
+<span class="kw">SELECT</span> email <span class="kw">FROM</span> suppliers;</pre></div></div>
+          <div class="output-box">A list of emails belonging to people who are registered as both customers and suppliers.</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="minus">
+        <div class="topic-card-header"><span class="topic-num">3.4</span><div><h3>MINUS (EXCEPT)</h3><p>Returns rows from the first query that do NOT exist in the second — subtracts matching rows</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">minus.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">SELECT</span> emp_id <span class="kw">FROM</span> employees
+<span class="kw">MINUS</span>
+<span class="kw">SELECT</span> emp_id <span class="kw">FROM</span> expense_reports;</pre></div></div>
+          <div class="output-box">Employee IDs who have zero expense records — appear in employees but not in expense_reports.</div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Oracle uses <strong>MINUS</strong>. PostgreSQL and SQL Server use <strong>EXCEPT</strong>. Both produce the same result.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 4: SUBQUERIES ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">🔍</div>
+        <div>
+          <h2>Subqueries</h2>
+          <p>An inner query nested inside a parent statement — Single Row, Multiple Row, Nested, Correlated, IN, EXISTS, ANY, ALL</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="single-row-sub">
+        <div class="topic-card-header"><span class="topic-num">4.1</span><div><h3>Single Row Subquery</h3><p>Returns exactly one column and one row — used with =, >, &lt; operators</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">single_row_sub.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees earning more than company average</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  salary > (<span class="kw">SELECT</span> <span class="fn">AVG</span>(salary) <span class="kw">FROM</span> employees);</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>The inner query runs first, returns one value (e.g., 50000), and the outer query compares each row's salary against that value.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="multi-row-sub">
+        <div class="topic-card-header"><span class="topic-num">4.2</span><div><h3>Multiple Row Subquery</h3><p>Returns a list of multiple values — used with IN, ANY, or ALL operators</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">multi_row_sub.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees in New York departments</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  dept_id <span class="kw">IN</span> (
+    <span class="kw">SELECT</span> dept_id <span class="kw">FROM</span> departments
+    <span class="kw">WHERE</span>  location = <span class="str">'New York'</span>
+);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="nested-sub">
+        <div class="topic-card-header"><span class="topic-num">4.3</span><div><h3>Nested Subquery</h3><p>A subquery containing another subquery inside itself — multiple layers of nesting</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">nested_sub.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees in the dept with the highest average salary</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  dept_id = (
+    <span class="kw">SELECT</span> dept_id <span class="kw">FROM</span> employees
+    <span class="kw">GROUP BY</span> dept_id
+    <span class="kw">HAVING</span> <span class="fn">AVG</span>(salary) = (
+        <span class="kw">SELECT</span> <span class="fn">MAX</span>(<span class="fn">AVG</span>(salary))
+        <span class="kw">FROM</span>   employees
+        <span class="kw">GROUP BY</span> dept_id
+    )
+);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="correlated-sub">
+        <div class="topic-card-header"><span class="topic-num">4.4</span><div><h3>Correlated Subquery</h3><p>References a column from the outer query — re-executes once for every outer row</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">correlated_sub.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees earning more than their own dept's average</span>
+<span class="kw">SELECT</span> emp_name, salary, dept_id
+<span class="kw">FROM</span>   employees outer_emp
+<span class="kw">WHERE</span>  salary > (
+    <span class="kw">SELECT</span> <span class="fn">AVG</span>(salary)
+    <span class="kw">FROM</span>   employees inner_emp
+    <span class="kw">WHERE</span>  inner_emp.dept_id = outer_emp.dept_id  <span class="cm">-- outer reference</span>
+);</pre></div></div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>Correlated subqueries re-execute for every outer row — they can be slow on large tables. Consider rewriting as a JOIN with a derived table for better performance.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="in-op">
+        <div class="topic-card-header"><span class="topic-num">4.5</span><div><h3>IN Operator</h3><p>Evaluates to TRUE if the value matches any entry in the returned subquery list</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">in_operator.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees in departments 10, 20, or 30</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  dept_id <span class="kw">IN</span> (<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="exists-op">
+        <div class="topic-card-header"><span class="topic-num">4.6</span><div><h3>EXISTS Operator</h3><p>Returns TRUE if the subquery yields at least one row — halts immediately on first match</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">exists_operator.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Departments that have at least one employee</span>
+<span class="kw">SELECT</span> dept_name <span class="kw">FROM</span> departments d
+<span class="kw">WHERE</span>  <span class="kw">EXISTS</span> (
+    <span class="kw">SELECT</span> <span class="num">1</span> <span class="kw">FROM</span> employees e
+    <span class="kw">WHERE</span>  e.dept_id = d.dept_id
+);</pre></div></div>
+          <div class="callout tip"><span class="callout-icon">⚡</span><p><strong>EXISTS vs IN:</strong> EXISTS stops at the first match (highly efficient for large subqueries). IN builds the full result set first then checks. Use EXISTS for existence checks.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="any-op">
+        <div class="topic-card-header"><span class="topic-num">4.7</span><div><h3>ANY Operator</h3><p>TRUE if the value satisfies the condition against at least one element in the list</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">any_operator.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees earning more than the lowest-paid Sales worker</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  salary > <span class="kw">ANY</span> (
+    <span class="kw">SELECT</span> salary <span class="kw">FROM</span> employees
+    <span class="kw">WHERE</span>  dept = <span class="str">'Sales'</span>
+);</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p><strong>ANY</strong> = "more than at least one" = more than the minimum. Equivalent to <code>&gt; MIN(...)</code>.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="all-op">
+        <div class="topic-card-header"><span class="topic-num">4.8</span><div><h3>ALL Operator</h3><p>TRUE only if the value satisfies the condition against every element in the list</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">all_operator.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Employees earning more than the highest-paid Sales worker</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  salary > <span class="kw">ALL</span> (
+    <span class="kw">SELECT</span> salary <span class="kw">FROM</span> employees
+    <span class="kw">WHERE</span>  dept = <span class="str">'Sales'</span>
+);</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p><strong>ALL</strong> = "more than every single one" = more than the maximum. Equivalent to <code>&gt; MAX(...)</code>.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 5: VIEWS ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">🪟</div>
+        <div>
+          <h2>Views</h2>
+          <p>Virtual tables based on stored SQL queries — do not store physical data rows</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="simple-view">
+        <div class="topic-card-header"><span class="topic-num">5.1</span><div><h3>Simple View</h3><p>Single base table, no functions or groupings — supports INSERT and UPDATE through the view</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">simple_view.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- A safe window that hides salary details</span>
+<span class="kw">CREATE VIEW</span> v_emp_public <span class="kw">AS</span>
+<span class="kw">SELECT</span> emp_id, emp_name, dept_id
+<span class="kw">FROM</span>   employees;</pre></div></div>
+          <div class="callout tip"><span class="callout-icon">✅</span><p>Simple views on a single table without functions, DISTINCT, or GROUP BY are <strong>updatable</strong> — you can INSERT or UPDATE rows through them.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="complex-view">
+        <div class="topic-card-header"><span class="topic-num">5.2</span><div><h3>Complex View</h3><p>Contains joins, aggregates, or GROUP BY — strictly read-only</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">complex_view.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Department salary summary (read-only)</span>
+<span class="kw">CREATE VIEW</span> v_dept_summary <span class="kw">AS</span>
+<span class="kw">SELECT</span>   dept_id,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> staff_count,
+         <span class="fn">SUM</span>(salary) <span class="kw">AS</span> payroll
+<span class="kw">FROM</span>     employees
+<span class="kw">GROUP BY</span> dept_id;</pre></div></div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>Views with joins, GROUP BY, aggregate functions, DISTINCT, or ROWNUM are <strong>read-only</strong> — DML operations through them are not permitted.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="create-view">
+        <div class="topic-card-header"><span class="topic-num">5.3</span><div><h3>CREATE VIEW</h3><p>Generates a new saved virtual table definition inside the database schema</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">create_view.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">CREATE VIEW</span> v_it_staff <span class="kw">AS</span>
+<span class="kw">SELECT</span> emp_name
+<span class="kw">FROM</span>   employees
+<span class="kw">WHERE</span>  dept_id = <span class="num">10</span>;</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="replace-view">
+        <div class="topic-card-header"><span class="topic-num">5.4</span><div><h3>CREATE OR REPLACE VIEW</h3><p>Modifies an existing view without dropping it — preserves granted permissions</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">replace_view.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Adds email column to existing IT staff view</span>
+<span class="kw">CREATE OR REPLACE VIEW</span> v_it_staff <span class="kw">AS</span>
+<span class="kw">SELECT</span> emp_name, email
+<span class="kw">FROM</span>   employees
+<span class="kw">WHERE</span>  dept_id = <span class="num">10</span>;</pre></div></div>
+          <div class="callout tip"><span class="callout-icon">✅</span><p>Always use <strong>CREATE OR REPLACE</strong> instead of DROP + CREATE — it preserves all GRANT permissions attached to the existing view.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="drop-view">
+        <div class="topic-card-header"><span class="topic-num">5.5</span><div><h3>DROP VIEW</h3><p>Permanently removes the view definition — does NOT delete data from underlying tables</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">drop_view.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DROP VIEW</span> v_it_staff;</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Dropping a view only removes the stored query definition. All data in the underlying base tables remains completely unaffected.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 6: INDEXES ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">📑</div>
+        <div>
+          <h2>Indexes</h2>
+          <p>Pointer structures that map column values to physical disk locations — like an index at the back of a book</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="why-index">
+        <div class="topic-card-header"><span class="topic-num">6.0</span><div><h3>Why Index?</h3><p>Without an index, finding one row requires scanning every row on disk — Full Table Scan</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Without an index, finding a single row requires the database engine to read every single row on disk sequentially (Full Table Scan). An index allows the engine to jump directly to the exact row, shifting performance from slow O(n) to near-instant O(log n).</p></div>
+          <div class="analogy-card"><div class="analogy-title">💡 Real-world Example</div><ul class="analogy-list"><li>Searching for a specific customer by phone number out of 1,000,000 records — without an index, every row is read. With an index, Oracle jumps straight to the matching entry.</li></ul></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="create-index">
+        <div class="topic-card-header"><span class="topic-num">6.1</span><div><h3>CREATE INDEX</h3><p>Standard B-Tree index — speeds up searches using =, &gt;, &lt;, BETWEEN conditions</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">create_index.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Index for rapid profile searches by last name</span>
+<span class="kw">CREATE INDEX</span> idx_emp_lastname <span class="kw">ON</span> employees(last_name);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="unique-index">
+        <div class="topic-card-header"><span class="topic-num">6.2</span><div><h3>UNIQUE INDEX</h3><p>Fast retrieval AND enforces uniqueness — no two rows can share the same value</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">unique_index.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Fast lookup + data integrity for national ID</span>
+<span class="kw">CREATE UNIQUE INDEX</span> idx_gov_id <span class="kw">ON</span> employees(government_id);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="composite-index">
+        <div class="topic-card-header"><span class="topic-num">6.3</span><div><h3>Composite Index</h3><p>Index across two or more columns — speeds up multi-column search conditions</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">composite_index.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Dashboard always filters by dept AND job title together</span>
+<span class="kw">CREATE INDEX</span> idx_dept_job <span class="kw">ON</span> employees(dept_id, job_title);</pre></div></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="index-usage">
+        <div class="topic-card-header"><span class="topic-num">6.4</span><div><h3>Index Usage Rules</h3><p>Column order matters — the database auto-selects when to use an index based on your WHERE clause</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Databases automatically decide when to use an index based on the structure of your WHERE clauses. The order of columns in composite indexes matters significantly.</p></div>
+          <table class="data-table">
+            <thead><tr><th>Query Pattern</th><th>Index (dept_id, job_title)</th><th>Used?</th></tr></thead>
+            <tbody>
+              <tr><td>WHERE dept_id = 10</td><td>Searches first column</td><td>✅ Yes</td></tr>
+              <tr><td>WHERE dept_id = 10 AND job_title = 'Dev'</td><td>Searches both columns</td><td>✅ Yes</td></tr>
+              <tr><td>WHERE job_title = 'Dev'</td><td>Skips leading column</td><td>❌ No</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>An index on <code>(dept_id, job_title)</code> will help queries filtering by dept_id alone, but will <strong>NOT</strong> help queries filtering by job_title alone — always put the most selective column first.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 7: QUERY OPTIMIZATION ═══════ -->
+    <div class="session-block">
+      <div class="session-header">
+        <div class="session-icon">🚀</div>
+        <div>
+          <h2>Query Optimization</h2>
+          <p>Writing SQL that is both correct AND efficient — without exhausting system resources</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="full-scan">
+        <div class="topic-card-header"><span class="topic-num">7.1</span><div><h3>Full Table Scan</h3><p>Database reads every single page of the table — highly inefficient on large tables</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Happens when you query without indexes or filter on a non-indexed column. Every row on disk is read even if only one row matches. For small tables this is fine; for millions of rows it becomes a serious bottleneck.</p></div>
+          <div class="callout danger"><span class="callout-icon">🔴</span><p><strong>When it occurs:</strong> No index on the filtered column, function wrapped around an indexed column in WHERE, or the optimizer estimates a full scan is cheaper (e.g., returning &gt;20% of rows).</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="index-scan">
+        <div class="topic-card-header"><span class="topic-num">7.2</span><div><h3>Index Scan</h3><p>Database navigates the compact index tree to pinpoint rows directly — bypasses bulk of raw table</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>The engine hits the index tree first (O(log n) traversal), then fetches only the matching rows from disk. Dramatically faster than full table scan for selective queries.</p></div>
+          <div class="analogy-card"><div class="analogy-title">💡 Example</div><ul class="analogy-list"><li>Looking up a primary key ID value — Oracle traverses the B-Tree index in ~20 steps regardless of table size, then reads exactly 1 row</li></ul></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="avoid-star">
+        <div class="topic-card-header"><span class="topic-num">7.3</span><div><h3>Avoid SELECT *</h3><p>Selecting all columns forces unnecessary disk I/O and can break index-only processing</p></div></div>
+        <div class="topic-body">
+          <div class="compare-grid">
+            <div>
+              <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label"><span class="bad">❌ bad_practice.sql</span></span></div>
+              <div class="mac-body"><pre><span class="cm">-- Reads ALL 50 columns</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> employees;</pre></div></div>
+            </div>
+            <div>
+              <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label"><span class="ok">✅ optimized.sql</span></span></div>
+              <div class="mac-body"><pre><span class="cm">-- Reads only needed columns</span>
+<span class="kw">SELECT</span> emp_name, email
+<span class="kw">FROM</span>   employees;</pre></div></div>
+            </div>
+          </div>
+          <div class="callout tip"><span class="callout-icon">✅</span><p>Listing only the columns you need reduces disk I/O, network transfer size, and enables index-only scans where all needed data is in the index itself.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="efficient-where">
+        <div class="topic-card-header"><span class="topic-num">7.4</span><div><h3>Efficient WHERE Clauses</h3><p>Keep columns raw on their side of the operator — wrapping columns in functions disables index matching</p></div></div>
+        <div class="topic-body">
+          <div class="compare-grid">
+            <div>
+              <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label"><span class="bad">❌ disables_index.sql</span></span></div>
+              <div class="mac-body"><pre><span class="cm">-- EXTRACT() wraps the column</span>
+<span class="cm">-- index on hire_date is disabled</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> hire_date)
+       = <span class="num">2026</span>;</pre></div></div>
+            </div>
+            <div>
+              <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label"><span class="ok">✅ uses_index.sql</span></span></div>
+              <div class="mac-body"><pre><span class="cm">-- Column is raw — index is used</span>
+<span class="kw">SELECT</span> emp_name <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span>  hire_date >= <span class="str">'2026-01-01'</span>
+  <span class="kw">AND</span>  hire_date <= <span class="str">'2026-12-31'</span>;</pre></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="join-opt">
+        <div class="topic-card-header"><span class="topic-num">7.5</span><div><h3>Join Optimization</h3><p>Ensure linking columns share identical data types and both sides have indexes</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Joining an INT column to a VARCHAR column forces the database to convert data types on the fly for every single row, causing severe slowdowns. Always ensure ON clause columns are the same data type and indexed on both tables.</p></div>
+          <div class="callout danger"><span class="callout-icon">🔴</span><p><strong>Type mismatch:</strong> Joining <code>employees.dept_id (NUMBER)</code> to <code>departments.dept_id (VARCHAR2)</code> silently disables the index and scans every row on at least one side.</p></div>
+          <div class="callout tip"><span class="callout-icon">✅</span><p>Always index foreign key columns used in JOIN ON conditions. This is one of the highest-impact optimizations available.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="query-tuning">
+        <div class="topic-card-header"><span class="topic-num">7.6</span><div><h3>Query Tuning Basics</h3><p>Use EXPLAIN PLAN to visualise Oracle's internal execution roadmap and find bottlenecks</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>EXPLAIN PLAN shows you exactly which operations Oracle will perform — index scans, full table scans, join methods — without actually running the query. It reveals where bottlenecks are hiding.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">explain_plan.sql</span></div>
+          <div class="mac-body"><pre><span class="cm">-- Step 1: Generate the plan (no data returned)</span>
+<span class="kw">EXPLAIN PLAN FOR</span>
+<span class="kw">SELECT</span> emp_name, salary
+<span class="kw">FROM</span>   employees
+<span class="kw">WHERE</span>  department_id = <span class="num">10</span>;
+
+<span class="cm">-- Step 2: Display the plan</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="fn">TABLE</span>(<span class="fn">DBMS_XPLAN.DISPLAY</span>);</pre></div></div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Look for <strong>FULL TABLE SCAN</strong> in the plan output — that is the operation to eliminate. <strong>INDEX RANGE SCAN</strong> or <strong>INDEX UNIQUE SCAN</strong> are what you want to see.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>Prepared by <a href="http://ragulrajportfolio.web.app/" target="_blank" rel="noopener">Ragulraj Dhamodharan</a> &nbsp;·&nbsp; Oracle Developer Track &nbsp;·&nbsp; SQL Core Concepts</p>
+</footer>
+
+</body>
+</html>

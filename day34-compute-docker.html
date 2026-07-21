@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 39 — OCI Compute & Docker Deployment | LTIMindtree OCI GenAI Programme</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#05060c;--surface:#0b0d16;--card:#101320;--card2:#13162a;
+  --border:#181c2e;--border2:#1f2440;--green:#20e5a8;--orange:#ff9d45;
+  --yellow:#fcd34d;--red:#ff7070;--cyan:#38e4ff;--pink:#f97fc8;
+  --blue:#4f9eff;--purple:#b78bfa;--text:#e2eaff;--muted:#8090b8;
+  --faint:#3a4466;--code-bg:#07080f;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;font-size:15px;line-height:1.85;overflow-x:hidden;}
+
+/* HERO */
+.hero{min-height:360px;background:linear-gradient(135deg,#04050e 0%,#07091a 35%,#050310 70%,#030507 100%);border-bottom:1px solid var(--border2);padding:64px 60px 56px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-100px;right:-60px;width:750px;height:750px;background:radial-gradient(circle,rgba(32,229,168,.09),rgba(56,228,255,.05) 40%,transparent 65%);border-radius:50%;pointer-events:none;}
+.hero::after{content:"";position:absolute;bottom:-80px;left:80px;width:500px;height:500px;background:radial-gradient(circle,rgba(79,158,255,.07),rgba(183,139,250,.04) 40%,transparent 65%);border-radius:50%;pointer-events:none;}
+.hero-accent{position:absolute;top:30%;right:30%;width:300px;height:300px;background:radial-gradient(circle,rgba(249,127,200,.05),transparent 65%);border-radius:50%;pointer-events:none;}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;}
+.bd{background:linear-gradient(135deg,rgba(32,229,168,.15),rgba(56,228,255,.08));color:#20e5a8;border:1px solid rgba(32,229,168,.3);box-shadow:0 0 8px rgba(32,229,168,.1);}
+.b1{background:linear-gradient(135deg,rgba(79,158,255,.15),rgba(56,228,255,.08));color:#4f9eff;border:1px solid rgba(79,158,255,.3);}
+.b2{background:linear-gradient(135deg,rgba(183,139,250,.15),rgba(249,127,200,.08));color:#b78bfa;border:1px solid rgba(183,139,250,.3);}
+.b3{background:linear-gradient(135deg,rgba(255,157,69,.15),rgba(252,211,77,.08));color:#ff9d45;border:1px solid rgba(255,157,69,.3);}
+.b4{background:linear-gradient(135deg,rgba(249,127,200,.15),rgba(183,139,250,.08));color:#f97fc8;border:1px solid rgba(249,127,200,.3);}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(30px,5vw,56px);font-weight:800;letter-spacing:-.03em;line-height:1.05;background:linear-gradient(135deg,#ffffff 0%,#a8f8e0 20%,#20e5a8 40%,#4f9eff 65%,#b78bfa 85%,#f97fc8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.hero-sub{color:#6d7fa8;font-size:15px;max-width:640px;line-height:1.75;}
+
+/* NAV */
+.nav-wrap{background:rgba(5,6,12,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 60px;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:13px 15px;font-size:11px;font-weight:600;color:var(--faint);white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:.2s;letter-spacing:.04em;text-transform:uppercase;}
+.nav a:hover{color:var(--text);border-bottom-color:var(--border2);}
+.nav a.active{color:#20e5a8;border-bottom-color:#20e5a8;background:linear-gradient(180deg,transparent,rgba(32,229,168,.04));}
+
+main{max-width:1040px;margin:0 auto;padding:60px 44px;}
+
+/* SESSION HEADERS */
+.sh{display:flex;align-items:center;gap:18px;margin-bottom:38px;padding:20px 26px;border-radius:14px;border-left:4px solid;position:relative;overflow:hidden;}
+.sh::after{content:'';position:absolute;right:0;top:0;bottom:0;width:200px;border-radius:0 14px 14px 0;opacity:.04;}
+.sh.s1{background:linear-gradient(135deg,rgba(32,229,168,.07),rgba(56,228,255,.03));border-color:#20e5a8;}.sh.s1::after{background:linear-gradient(90deg,transparent,#20e5a8);}
+.sh.s2{background:linear-gradient(135deg,rgba(79,158,255,.07),rgba(183,139,250,.03));border-color:#4f9eff;}.sh.s2::after{background:linear-gradient(90deg,transparent,#4f9eff);}
+.sh.s3{background:linear-gradient(135deg,rgba(183,139,250,.07),rgba(249,127,200,.03));border-color:#b78bfa;}.sh.s3::after{background:linear-gradient(90deg,transparent,#b78bfa);}
+.sh.s4{background:linear-gradient(135deg,rgba(255,157,69,.07),rgba(252,211,77,.03));border-color:#ff9d45;}.sh.s4::after{background:linear-gradient(90deg,transparent,#ff9d45);}
+.sh-icon{font-size:30px;position:relative;z-index:1;}
+.sh-title{font-size:18px;font-weight:700;color:#fff;position:relative;z-index:1;}
+.sh-sub{font-size:12px;color:var(--muted);margin-top:3px;position:relative;z-index:1;}
+
+.section{margin-bottom:72px;}
+.ey{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;background:linear-gradient(90deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+h2{font-family:"Syne",sans-serif;font-size:27px;font-weight:800;color:#fff;margin-bottom:16px;letter-spacing:-.025em;}
+h3{font-size:13.5px;font-weight:700;margin:30px 0 10px;letter-spacing:.04em;text-transform:uppercase;background:linear-gradient(90deg,#20e5a8,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+h4{font-size:13.5px;font-weight:600;color:#b78bfa;margin:20px 0 8px;}
+p{color:var(--muted);margin-bottom:12px;line-height:1.85;}
+ul,ol{color:var(--muted);padding-left:22px;margin-bottom:12px;}
+li{margin-bottom:6px;line-height:1.8;}
+li strong{color:var(--text);}
+
+/* STORY BOX */
+.story{background:linear-gradient(135deg,rgba(32,229,168,.04),rgba(79,158,255,.04));border:1px solid rgba(32,229,168,.15);border-radius:14px;padding:24px 28px;margin:20px 0;position:relative;}
+.story::before{content:"📖 BUSINESS STORY";font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#20e5a8;display:block;margin-bottom:14px;}
+.story p{color:var(--text);font-size:14px;margin-bottom:10px;}
+.story p:last-child{margin:0;}
+
+/* CALLOUTS */
+.callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:12px;align-items:flex-start;font-size:13.5px;}
+.ci{font-size:18px;flex-shrink:0;margin-top:1px;}
+.callout p{margin:0;color:var(--text);line-height:1.7;}
+.callout.info{background:rgba(79,158,255,.07);border-left:3px solid #4f9eff;}
+.callout.good{background:rgba(32,229,168,.07);border-left:3px solid #20e5a8;}
+.callout.warn{background:rgba(255,157,69,.07);border-left:3px solid #ff9d45;}
+.callout.danger{background:rgba(255,112,112,.07);border-left:3px solid #ff7070;}
+.callout.purple{background:rgba(183,139,250,.07);border-left:3px solid #b78bfa;}
+.callout.pink{background:rgba(249,127,200,.07);border-left:3px solid #f97fc8;}
+
+/* ANALOGY */
+.analogy{background:linear-gradient(135deg,rgba(32,229,168,.06),rgba(79,158,255,.04));border:1px solid rgba(32,229,168,.16);border-radius:12px;padding:20px 24px;margin:18px 0;position:relative;}
+.analogy::before{content:"💡";position:absolute;top:-13px;left:18px;background:var(--bg);padding:0 7px;font-size:18px;}
+.at{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#20e5a8;margin-bottom:10px;}
+.analogy p{color:var(--text);font-size:13.5px;margin-bottom:8px;}
+.analogy p:last-child{margin:0;}
+
+/* CODE BLOCKS */
+.cw{background:var(--code-bg);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin:18px 0;}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border);}
+.cl{font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dots span{width:9px;height:9px;border-radius:50%;display:block;}
+.dots span:nth-child(1){background:#ff5f57;}.dots span:nth-child(2){background:#febc2e;}.dots span:nth-child(3){background:#28c840;}
+pre{padding:20px 24px;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:2;color:#b0bec5;}
+.kw{color:#f07178;}.fn{color:#82aaff;}.str{color:#c3e88d;}.cm{color:#3f4a66;font-style:italic;}.cls{color:#89ddff;}.num{color:#f78c6c;}.dec{color:#ffcb6b;}
+
+/* OUTPUT BLOCK */
+.output{background:#060810;border:1px solid rgba(32,229,168,.18);border-radius:10px;overflow:hidden;margin:16px 0;}
+.out-h{background:rgba(32,229,168,.06);padding:8px 16px;border-bottom:1px solid rgba(32,229,168,.12);display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#20e5a8;}
+.out-body{padding:16px 22px;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:2;color:#7c8db0;}
+.out-body .ok{color:#20e5a8;}.out-body .hi{color:#4f9eff;}.out-body .warn{color:#ff9d45;}.out-body .ans{color:#b78bfa;}
+
+/* TABLES */
+.tw{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:linear-gradient(135deg,rgba(32,229,168,.06),rgba(56,228,255,.03));color:#40d4b0;font-weight:700;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:11px 16px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;line-height:1.7;}
+td:first-child{color:var(--text);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0;}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;transition:.2s;}
+.gc:hover{transform:translateY(-2px);}
+.gc.ca{border-top:3px solid #4f9eff;background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));}
+.gc.cb{border-top:3px solid #b78bfa;background:linear-gradient(135deg,rgba(183,139,250,.06),var(--card));}
+.gc.cc{border-top:3px solid #20e5a8;background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));}
+.gc.cd{border-top:3px solid #ff9d45;background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));}
+.gc.ce{border-top:3px solid #f97fc8;background:linear-gradient(135deg,rgba(249,127,200,.06),var(--card));}
+.gc.cf{border-top:3px solid #38e4ff;background:linear-gradient(135deg,rgba(56,228,255,.06),var(--card));}
+.gct{font-size:13px;font-weight:700;margin-bottom:8px;}
+.gc.ca .gct{color:#4f9eff;}.gc.cb .gct{color:#b78bfa;}.gc.cc .gct{color:#20e5a8;}.gc.cd .gct{color:#ff9d45;}.gc.ce .gct{color:#f97fc8;}.gc.cf .gct{color:#38e4ff;}
+.gc p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.7;}
+
+/* PIPELINE */
+.pipeline{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin:18px 0;}
+.pipe-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.pipe-row{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;}
+.pipe-step{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;text-align:center;flex:1;min-width:100px;}
+.pipe-step.blue{border-color:rgba(79,158,255,.35);background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(56,228,255,.04));}
+.pipe-step.purple{border-color:rgba(183,139,250,.35);background:linear-gradient(135deg,rgba(183,139,250,.08),rgba(249,127,200,.04));}
+.pipe-step.green{border-color:rgba(32,229,168,.35);background:linear-gradient(135deg,rgba(32,229,168,.08),rgba(56,228,255,.04));}
+.pipe-step.orange{border-color:rgba(255,157,69,.35);background:linear-gradient(135deg,rgba(255,157,69,.08),rgba(252,211,77,.04));}
+.pipe-step.pink{border-color:rgba(249,127,200,.35);background:linear-gradient(135deg,rgba(249,127,200,.08),rgba(183,139,250,.04));}
+.pipe-step.cyan{border-color:rgba(56,228,255,.35);background:linear-gradient(135deg,rgba(56,228,255,.08),rgba(32,229,168,.04));}
+.pipe-icon{font-size:22px;margin-bottom:6px;}
+.pipe-label{font-size:11.5px;font-weight:600;color:var(--text);line-height:1.3;}
+.pipe-sub{font-size:10px;color:var(--faint);margin-top:4px;}
+.pipe-arrow{display:flex;align-items:center;padding:0 8px;color:var(--faint);font-size:18px;flex-shrink:0;}
+
+/* STEP CARDS */
+.steps{margin:16px 0;}
+.step{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;}
+.step-num{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,rgba(32,229,168,.15),rgba(56,228,255,.1));border:1px solid rgba(32,229,168,.3);font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;color:#20e5a8;box-shadow:0 0 12px rgba(32,229,168,.15);}
+.step-body{flex:1;}
+.step-title{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:4px;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* LAB BLOCK */
+.lab{background:linear-gradient(135deg,rgba(32,229,168,.05),rgba(79,158,255,.04),rgba(183,139,250,.02));border:1px solid rgba(32,229,168,.18);border-radius:16px;padding:26px 30px;margin:20px 0;position:relative;overflow:hidden;}
+.lab::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#20e5a8,#4f9eff,#b78bfa,#f97fc8);}
+.lab-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lab-num{background:linear-gradient(135deg,rgba(32,229,168,.18),rgba(56,228,255,.1));border:1px solid rgba(32,229,168,.3);font-size:11px;font-weight:800;padding:4px 13px;border-radius:20px;letter-spacing:.07em;color:#20e5a8;box-shadow:0 0 10px rgba(32,229,168,.12);}
+.lab-title{font-size:15px;font-weight:700;color:#fff;}
+.lab-why{background:linear-gradient(135deg,rgba(32,229,168,.06),rgba(79,158,255,.03));border-left:3px solid #20e5a8;border-radius:0 8px 8px 0;padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--muted);}
+
+/* INTERVIEW */
+.iq{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:10px 0;transition:.2s;}
+.iq:hover{background:var(--card2);}
+.iq-q{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:8px;display:flex;gap:10px;}
+.iq-q::before{content:"Q";background:linear-gradient(135deg,rgba(32,229,168,.2),rgba(56,228,255,.15));color:#20e5a8;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;flex-shrink:0;margin-top:1px;border:1px solid rgba(32,229,168,.25);}
+.iq-a{font-size:13px;color:var(--muted);padding-left:28px;line-height:1.75;}
+
+/* EXERCISE */
+.exercise{background:linear-gradient(135deg,rgba(32,229,168,.03),rgba(79,158,255,.03));border:1px solid rgba(32,229,168,.15);border-radius:12px;padding:20px 24px;margin:16px 0;}
+.ex-head{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#20e5a8;margin-bottom:12px;}
+.ex-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;font-size:13px;color:var(--muted);}
+.ex-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;letter-spacing:.05em;}
+.easy{background:rgba(32,229,168,.12);color:#20e5a8;}.medium{background:rgba(255,157,69,.12);color:#ff9d45;}.hard{background:rgba(255,112,112,.12);color:#ff7070;}
+
+/* CHEATSHEET */
+.cheat{background:linear-gradient(135deg,rgba(32,229,168,.05),rgba(79,158,255,.03));border:1px solid rgba(32,229,168,.2);border-radius:14px;padding:22px 26px;margin:18px 0;}
+.cheat-title{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;background:linear-gradient(90deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cheat-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-size:13px;}
+.cheat-key{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#20e5a8;background:rgba(32,229,168,.07);padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.cheat-val{color:var(--muted);line-height:1.6;}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+@media(max-width:600px){.stat-row{grid-template-columns:1fr;}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;text-align:center;}
+.stat-num{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;}
+.stat-label{font-size:11px;color:var(--faint);letter-spacing:.05em;}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr;}}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;}
+.sum-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.sum-card.s1{background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));border-top:2px solid #20e5a8;}.sum-card.s1 .sum-title{background:linear-gradient(90deg,#20e5a8,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s2{background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));border-top:2px solid #4f9eff;}.sum-card.s2 .sum-title{background:linear-gradient(90deg,#4f9eff,#b78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s3{background:linear-gradient(135deg,rgba(183,139,250,.06),var(--card));border-top:2px solid #b78bfa;}.sum-card.s3 .sum-title{background:linear-gradient(90deg,#b78bfa,#f97fc8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s4{background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));border-top:2px solid #ff9d45;}.sum-card.s4 .sum-title{background:linear-gradient(90deg,#ff9d45,#ff7070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card ul{padding-left:16px;margin:0;}
+.sum-card li{font-size:12.5px;color:var(--muted);margin-bottom:5px;}
+
+/* JOURNEY (Before vs After) */
+.journey{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0;}
+@media(max-width:700px){.journey{grid-template-columns:1fr;}}
+.journey-panel{border-radius:14px;overflow:hidden;}
+.journey-panel.before{border:1px solid rgba(255,112,112,.25);}
+.journey-panel.after{border:1px solid rgba(32,229,168,.25);}
+.journey-head{padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.journey-panel.before .journey-head{background:linear-gradient(135deg,rgba(255,112,112,.12),rgba(255,157,69,.06));}
+.journey-panel.after .journey-head{background:linear-gradient(135deg,rgba(32,229,168,.12),rgba(79,158,255,.06));}
+.journey-head-icon{font-size:20px;}
+.journey-head-title{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.journey-panel.before .journey-head-title{color:#ff7070;}
+.journey-panel.after .journey-head-title{color:#20e5a8;}
+.journey-head-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
+.journey-panel.before .journey-head-badge{background:rgba(255,112,112,.12);color:#ff7070;border:1px solid rgba(255,112,112,.25);}
+.journey-panel.after .journey-head-badge{background:rgba(32,229,168,.12);color:#20e5a8;border:1px solid rgba(32,229,168,.25);}
+.journey-body{background:var(--card);padding:20px;}
+.jstep{display:flex;flex-direction:column;align-items:center;margin-bottom:4px;}
+.jstep-box{width:100%;border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;text-align:left;}
+.journey-panel.before .jstep-box{background:rgba(255,112,112,.06);border:1px solid rgba(255,112,112,.15);}
+.journey-panel.after .jstep-box{background:rgba(32,229,168,.06);border:1px solid rgba(32,229,168,.15);}
+.jstep-icon{font-size:18px;flex-shrink:0;}
+.jstep-text{flex:1;}
+.jstep-label{font-size:12.5px;font-weight:600;line-height:1.3;}
+.journey-panel.before .jstep-label{color:#e8a0a0;}
+.journey-panel.after .jstep-label{color:#a0e8d0;}
+.jstep-sub{font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.4;}
+.jstep-time{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.journey-panel.before .jstep-time{background:rgba(255,112,112,.12);color:#ff7070;}
+.journey-panel.after .jstep-time{background:rgba(32,229,168,.12);color:#20e5a8;}
+.jarrow{font-size:16px;padding:3px 0;line-height:1;}
+.journey-panel.before .jarrow{color:rgba(255,112,112,.4);}
+.journey-panel.after .jarrow{color:rgba(32,229,168,.4);}
+.jresult{border-radius:9px;padding:12px 14px;margin-top:12px;font-size:12px;font-weight:600;text-align:center;line-height:1.5;}
+.journey-panel.before .jresult{background:rgba(255,112,112,.07);border:1px solid rgba(255,112,112,.18);color:#ff8080;}
+.journey-panel.after .jresult{background:rgba(32,229,168,.07);border:1px solid rgba(32,229,168,.18);color:#20e5a8;}
+
+/* COMPUTE OPTION CARDS */
+.compute-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0;}
+@media(max-width:800px){.compute-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.compute-grid{grid-template-columns:1fr;}}
+.compute-card{border-radius:14px;overflow:hidden;transition:.2s;}
+.compute-card:hover{transform:translateY(-3px);}
+.cc-head{padding:16px 18px;}
+.cc-icon{font-size:28px;margin-bottom:8px;}
+.cc-name{font-size:13.5px;font-weight:800;margin-bottom:4px;}
+.cc-tag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.05em;display:inline-block;}
+.cc-body{background:var(--card);padding:14px 18px;}
+.cc-row{font-size:12px;color:var(--muted);margin-bottom:7px;display:flex;align-items:flex-start;gap:6px;line-height:1.5;}
+.cc-row:last-child{margin:0;}
+.cc-key{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;min-width:50px;}
+.cmp1{border:1px solid rgba(32,229,168,.25);}.cmp1 .cc-head{background:linear-gradient(135deg,rgba(32,229,168,.12),rgba(56,228,255,.06));}.cmp1 .cc-name{color:#20e5a8;}.cmp1 .cc-tag{background:rgba(32,229,168,.15);color:#20e5a8;}.cmp1 .cc-key{color:#20e5a8;}
+.cmp2{border:1px solid rgba(79,158,255,.25);}.cmp2 .cc-head{background:linear-gradient(135deg,rgba(79,158,255,.12),rgba(183,139,250,.06));}.cmp2 .cc-name{color:#4f9eff;}.cmp2 .cc-tag{background:rgba(79,158,255,.15);color:#4f9eff;}.cmp2 .cc-key{color:#4f9eff;}
+.cmp3{border:1px solid rgba(183,139,250,.25);}.cmp3 .cc-head{background:linear-gradient(135deg,rgba(183,139,250,.12),rgba(249,127,200,.06));}.cmp3 .cc-name{color:#b78bfa;}.cmp3 .cc-tag{background:rgba(183,139,250,.15);color:#b78bfa;}.cmp3 .cc-key{color:#b78bfa;}
+.cmp4{border:1px solid rgba(255,157,69,.25);}.cmp4 .cc-head{background:linear-gradient(135deg,rgba(255,157,69,.12),rgba(252,211,77,.06));}.cmp4 .cc-name{color:#ff9d45;}.cmp4 .cc-tag{background:rgba(255,157,69,.15);color:#ff9d45;}.cmp4 .cc-key{color:#ff9d45;}
+
+/* DECISION TREE */
+.dtree{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin:18px 0;}
+.dtree-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
+.dt-row{display:flex;align-items:flex-start;gap:16px;margin-bottom:12px;}
+.dt-q{background:rgba(79,158,255,.08);border:1px solid rgba(79,158,255,.2);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;color:#4f9eff;flex-shrink:0;}
+.dt-branch{display:flex;flex-direction:column;gap:8px;flex:1;}
+.dt-yes{background:rgba(32,229,168,.07);border:1px solid rgba(32,229,168,.2);border-radius:8px;padding:8px 14px;font-size:12.5px;}
+.dt-no{background:rgba(255,157,69,.07);border:1px solid rgba(255,157,69,.2);border-radius:8px;padding:8px 14px;font-size:12.5px;}
+.dt-result{background:linear-gradient(135deg,rgba(183,139,250,.1),rgba(249,127,200,.06));border:1px solid rgba(183,139,250,.25);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#b78bfa;display:inline-block;margin-left:8px;}
+.dt-arrow{color:var(--faint);font-size:12px;margin:0 4px;}
+
+/* DOCKERFILE */
+.dockerfile{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:18px 0;}
+.df-head{background:linear-gradient(135deg,rgba(32,229,168,.08),rgba(79,158,255,.05));border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:10px;}
+.df-icon{font-size:16px;}
+.df-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#20e5a8;}
+.df-body{padding:18px 22px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:2.2;}
+.df-instruction{color:#4f9eff;font-weight:700;}
+.df-value{color:#c3e88d;}
+.df-comment{color:#3f4a66;font-style:italic;}
+.df-note{background:rgba(32,229,168,.05);border-left:3px solid rgba(32,229,168,.3);padding:4px 10px;margin:4px 0;border-radius:0 4px 4px 0;font-size:11px;color:rgba(32,229,168,.7);}
+
+/* DOCKER LIFECYCLE */
+.lifecycle{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+.lc-step{display:flex;align-items:center;gap:14px;}
+.lc-box{border-radius:10px;padding:12px 18px;flex:1;display:flex;align-items:center;gap:12px;}
+.lc-icon{font-size:20px;flex-shrink:0;}
+.lc-label{font-size:13px;font-weight:600;}
+.lc-sub{font-size:11px;margin-top:2px;}
+.lc-cmd{font-family:"JetBrains Mono",monospace;font-size:10.5px;margin-top:4px;opacity:.7;}
+.lc1{background:linear-gradient(135deg,rgba(255,157,69,.08),rgba(252,211,77,.04));border:1px solid rgba(255,157,69,.25);}.lc1 .lc-label{color:#ff9d45;}.lc1 .lc-sub{color:rgba(255,157,69,.6);}
+.lc2{background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(56,228,255,.04));border:1px solid rgba(79,158,255,.25);}.lc2 .lc-label{color:#4f9eff;}.lc2 .lc-sub{color:rgba(79,158,255,.6);}
+.lc3{background:linear-gradient(135deg,rgba(183,139,250,.08),rgba(249,127,200,.04));border:1px solid rgba(183,139,250,.25);}.lc3 .lc-label{color:#b78bfa;}.lc3 .lc-sub{color:rgba(183,139,250,.6);}
+.lc4{background:linear-gradient(135deg,rgba(32,229,168,.08),rgba(56,228,255,.04));border:1px solid rgba(32,229,168,.25);}.lc4 .lc-label{color:#20e5a8;}.lc4 .lc-sub{color:rgba(32,229,168,.6);}
+.lc5{background:linear-gradient(135deg,rgba(249,127,200,.08),rgba(183,139,250,.04));border:1px solid rgba(249,127,200,.25);}.lc5 .lc-label{color:#f97fc8;}.lc5 .lc-sub{color:rgba(249,127,200,.6);}
+.lc-arrow{text-align:center;color:var(--faint);font-size:18px;line-height:1;padding:2px 0 2px 26px;}
+
+/* IMAGE VS CONTAINER */
+.ivc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0;}
+@media(max-width:600px){.ivc-grid{grid-template-columns:1fr;}}
+.ivc-card{border-radius:12px;overflow:hidden;text-align:center;}
+.ivc-head{padding:18px;font-size:30px;}
+.ivc-body{background:var(--card);padding:14px 16px;}
+.ivc-name{font-size:13.5px;font-weight:800;margin-bottom:6px;}
+.ivc-eq{font-size:11.5px;font-weight:600;margin-bottom:8px;font-family:"JetBrains Mono",monospace;}
+.ivc-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.ivc1{border:1px solid rgba(255,157,69,.25);}.ivc1 .ivc-head{background:linear-gradient(135deg,rgba(255,157,69,.12),rgba(252,211,77,.06));}.ivc1 .ivc-name{color:#ff9d45;}.ivc1 .ivc-eq{color:rgba(255,157,69,.7);}
+.ivc2{border:1px solid rgba(79,158,255,.25);}.ivc2 .ivc-head{background:linear-gradient(135deg,rgba(79,158,255,.12),rgba(183,139,250,.06));}.ivc2 .ivc-name{color:#4f9eff;}.ivc2 .ivc-eq{color:rgba(79,158,255,.7);}
+.ivc3{border:1px solid rgba(32,229,168,.25);}.ivc3 .ivc-head{background:linear-gradient(135deg,rgba(32,229,168,.12),rgba(56,228,255,.06));}.ivc3 .ivc-name{color:#20e5a8;}.ivc3 .ivc-eq{color:rgba(32,229,168,.7);}
+
+/* ARCH DIAGRAM */
+.arch-box{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin:18px 0;overflow-x:auto;}
+.arch-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:16px;}
+.arch-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.abox{border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid;}
+.abox.green{background:rgba(32,229,168,.08);border-color:rgba(32,229,168,.3);color:#20e5a8;}
+.abox.blue{background:rgba(79,158,255,.08);border-color:rgba(79,158,255,.3);color:#4f9eff;}
+.abox.purple{background:rgba(183,139,250,.08);border-color:rgba(183,139,250,.3);color:#b78bfa;}
+.abox.orange{background:rgba(255,157,69,.08);border-color:rgba(255,157,69,.3);color:#ff9d45;}
+.abox.pink{background:rgba(249,127,200,.08);border-color:rgba(249,127,200,.3);color:#f97fc8;}
+.abox.cyan{background:rgba(56,228,255,.08);border-color:rgba(56,228,255,.3);color:#38e4ff;}
+.arch-arr{color:var(--faint);font-size:16px;}
+.arch-label{font-size:10.5px;color:var(--faint);padding:4px 10px;}
+
+/* CICD PIPELINE */
+.cicd{background:linear-gradient(135deg,rgba(183,139,250,.04),rgba(32,229,168,.03));border:1px solid rgba(183,139,250,.18);border-radius:12px;padding:20px 24px;margin:18px 0;}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:32px 60px;text-align:center;color:var(--faint);font-size:12px;margin-top:20px;background:linear-gradient(135deg,rgba(32,229,168,.02),rgba(79,158,255,.02));}
+.footer strong{background:linear-gradient(90deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-accent"></div>
+  <div class="badges">
+    <span class="badge bd">Day 39</span>
+    <span class="badge b1">OCI Compute</span>
+    <span class="badge b2">Docker</span>
+    <span class="badge b3">OCIR</span>
+    <span class="badge b4">Container Instances</span>
+  </div>
+  <h1>OCI Compute &<br>Docker Deployment</h1>
+  <p class="hero-sub">From Cloud Shell to production. Package your AI agent into a Docker container. Push to OCI Container Registry. Deploy as a service that runs 24/7 — so Ramesh can trigger it from APEX any time.</p>
+</div>
+
+<!-- STICKY NAV -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#story">Business Story</a>
+    <a href="#why-not-shell">Why Not Cloud Shell</a>
+    <a href="#compute-overview">Compute Overview</a>
+    <a href="#functions">OCI Functions</a>
+    <a href="#container-instances">Container Instances</a>
+    <a href="#oke">OKE / Kubernetes</a>
+    <a href="#vms">Compute VMs</a>
+    <a href="#decision">Decision Tree</a>
+    <a href="#stateless">Stateless vs Stateful</a>
+    <a href="#why-docker">Why Docker</a>
+    <a href="#image-vs-container">Image vs Container</a>
+    <a href="#lifecycle">Docker Lifecycle</a>
+    <a href="#dockerfile">Dockerfile</a>
+    <a href="#credentials">Credentials</a>
+    <a href="#ocir">OCIR Workflow</a>
+    <a href="#cicd">CI/CD Overview</a>
+    <a href="#monitoring">Monitoring</a>
+    <a href="#lab1">Lab 1</a>
+    <a href="#lab2">Lab 2</a>
+    <a href="#lab3">Lab 3</a>
+    <a href="#architecture">Production Architecture</a>
+    <a href="#interview">Interview Q&A</a>
+    <a href="#summary">Summary</a>
+  </nav>
+</div>
+
+<main>
+
+<!-- BUSINESS STORY -->
+<section class="section" id="story">
+  <div class="sh s1">
+    <span class="sh-icon">📖</span>
+    <div>
+      <div class="sh-title">The Business Problem</div>
+      <div class="sh-sub">Ramesh wants the agent in production — not just Cloud Shell</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p><strong>Day 35–38 recap:</strong> We built a complete AI agent pipeline. LangChain chains, ReAct agents, RAG reading from OCI Object Storage, reports saved to buckets. The CFO saw a demo and said: <em>"This is exactly what we need. Deploy it properly."</em></p>
+    <p><strong>The current reality:</strong> Everything runs on Ramesh's OCI Cloud Shell — a temporary browser-based terminal that expires after 20 minutes of inactivity. The CFO cannot access it. HR cannot trigger it. There is no URL, no API, no monitoring, no logs in one place.</p>
+    <p><strong>The CFO's exact words:</strong> <em>"I want a button in APEX. I click it on the 1st of every month. The agent runs. The report appears in my inbox. I should not need to know Python or open any terminal."</em></p>
+    <p>That requirement needs three things: <strong>Docker</strong> (package the agent), <strong>OCI Container Registry</strong> (store the packaged agent), and <strong>OCI Compute</strong> (run the packaged agent as a permanent service).</p>
+  </div>
+
+  <!-- JOURNEY BEFORE vs AFTER -->
+  <h3>The Deployment Journey — Before vs After</h3>
+  <div class="journey">
+    <div class="journey-panel before">
+      <div class="journey-head">
+        <span class="journey-head-icon">😓</span>
+        <span class="journey-head-title">Before Deployment</span>
+        <span class="journey-head-badge">Cloud Shell Limitation</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">👔</span>
+            <div class="jstep-text">
+              <div class="jstep-label">CFO wants monthly IT cost report</div>
+              <div class="jstep-sub">1st of every month</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">📧</span>
+            <div class="jstep-text">
+              <div class="jstep-label">CFO emails Ramesh to run the agent</div>
+              <div class="jstep-sub">Manual dependency every month</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">💻</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Ramesh opens Cloud Shell</div>
+              <div class="jstep-sub">Logs in, navigates to folder</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">⌨️</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Manually types python3 main.py</div>
+              <div class="jstep-sub">Waits 10 minutes</div>
+            </div>
+            <span class="jstep-time">Manual</span>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">📋</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Copies output, emails CFO manually</div>
+              <div class="jstep-sub">No monitoring. No logs.</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult">
+          ❌ Human dependency · Session expires · No URL<br>
+          No monitoring · Ramesh on leave = no report
+        </div>
+      </div>
+    </div>
+
+    <div class="journey-panel after">
+      <div class="journey-head">
+        <span class="journey-head-icon">🚀</span>
+        <span class="journey-head-title">After Deployment</span>
+        <span class="journey-head-badge">Production Service</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">👔</span>
+            <div class="jstep-text">
+              <div class="jstep-label">CFO clicks button in APEX</div>
+              <div class="jstep-sub">1st of every month — any device</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">🌐</span>
+            <div class="jstep-text">
+              <div class="jstep-label">OCI API Gateway receives request</div>
+              <div class="jstep-sub">Routes to Container Instance</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">🐳</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Docker container runs agent</div>
+              <div class="jstep-sub">Same code, same environment, always</div>
+            </div>
+            <span class="jstep-time">&lt; 10 min</span>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">💾</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Report saved to OCI Object Storage</div>
+              <div class="jstep-sub">Signed URL emailed to CFO</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">✅</span>
+            <div class="jstep-text">
+              <div class="jstep-label">CFO downloads report directly</div>
+              <div class="jstep-sub">Logs in OCI. Ramesh not involved.</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult">
+          ✅ 24/7 · Ramesh-independent · Full monitoring<br>
+          Logs in OCI · Alerts on failure
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat" style="background:linear-gradient(135deg,rgba(255,112,112,.06),var(--card));border-top:2px solid #ff7070;"><div class="stat-num" style="background:linear-gradient(135deg,#ff7070,#ff9d45);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">20min</div><div class="stat-label">Cloud Shell idle timeout</div></div>
+    <div class="stat" style="background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));border-top:2px solid #20e5a8;"><div class="stat-num" style="background:linear-gradient(135deg,#20e5a8,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">24/7</div><div class="stat-label">Container Instance availability</div></div>
+    <div class="stat" style="background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));border-top:2px solid #4f9eff;"><div class="stat-num" style="background:linear-gradient(135deg,#4f9eff,#b78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div><div class="stat-label">Manual steps after deployment</div></div>
+  </div>
+</section>
+
+<!-- WHY NOT CLOUD SHELL -->
+<section class="section" id="why-not-shell">
+  <div class="ey">Root Cause</div>
+  <h2>Why Cloud Shell Is Not Production</h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Aspect</th><th>Cloud Shell</th><th>OCI Compute</th></tr></thead>
+      <tbody>
+        <tr><td>Session lifetime</td><td>Expires after 20 min idle</td><td>Permanent — runs until you stop it</td></tr>
+        <tr><td>Access</td><td>Only your OCI account</td><td>Shared — callable by APEX, any system</td></tr>
+        <tr><td>Trigger</td><td>Manual — you type commands</td><td>Automated — API call, schedule, event</td></tr>
+        <tr><td>REST endpoint</td><td>None — no URL exists</td><td>Public or private REST API via API Gateway</td></tr>
+        <tr><td>Monitoring</td><td>None — terminal output only</td><td>OCI Logging, Monitoring, Alarms</td></tr>
+        <tr><td>Auto-scaling</td><td>Not possible</td><td>OCI Functions: auto. OKE: auto. VM: manual</td></tr>
+        <tr><td>Cost</td><td>Free</td><td>Pay per use (Functions) or per hour (CI/VM)</td></tr>
+        <tr><td>Environment consistency</td><td>May differ between sessions</td><td>Always identical — Docker guarantees it</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- COMPUTE OVERVIEW -->
+<section class="section" id="compute-overview">
+  <div class="ey">Session 1 — Compute Options</div>
+  <h2>Four OCI Compute Options</h2>
+  <p>OCI provides four ways to run code in the cloud. Choosing the wrong one costs money or degrades performance. Know each one cold.</p>
+
+  <div class="compute-grid">
+    <div class="compute-card cmp1">
+      <div class="cc-head">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-name">OCI Functions</div>
+        <span class="cc-tag">Serverless</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-row"><span class="cc-key">Billing</span>Per invocation — pay per call</div>
+        <div class="cc-row"><span class="cc-key">Starts</span>On demand, stops after run</div>
+        <div class="cc-row"><span class="cc-key">Best for</span>Event-driven, infrequent tasks</div>
+        <div class="cc-row"><span class="cc-key">LTIMindtree</span>Policy ingestion, monthly report</div>
+      </div>
+    </div>
+    <div class="compute-card cmp2">
+      <div class="cc-head">
+        <div class="cc-icon">🐳</div>
+        <div class="cc-name">Container Instances</div>
+        <span class="cc-tag">Always-On</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-row"><span class="cc-key">Billing</span>Per hour — always running</div>
+        <div class="cc-row"><span class="cc-key">Starts</span>Always available, instant response</div>
+        <div class="cc-row"><span class="cc-key">Best for</span>RAG API that must respond instantly</div>
+        <div class="cc-row"><span class="cc-key">LTIMindtree</span>Employee Q&A service</div>
+      </div>
+    </div>
+    <div class="compute-card cmp3">
+      <div class="cc-head">
+        <div class="cc-icon">☸️</div>
+        <div class="cc-name">OKE / Kubernetes</div>
+        <span class="cc-tag">Enterprise Scale</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-row"><span class="cc-key">Billing</span>Per hour (nodes)</div>
+        <div class="cc-row"><span class="cc-key">Starts</span>Auto-scales with traffic load</div>
+        <div class="cc-row"><span class="cc-key">Best for</span>1000+ users, multiple microservices</div>
+        <div class="cc-row"><span class="cc-key">LTIMindtree</span>Future scale — not yet needed</div>
+      </div>
+    </div>
+    <div class="compute-card cmp4">
+      <div class="cc-head">
+        <div class="cc-icon">🖥️</div>
+        <div class="cc-name">Compute VM</div>
+        <span class="cc-tag">Full Control</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-row"><span class="cc-key">Billing</span>Per hour — always running</div>
+        <div class="cc-row"><span class="cc-key">Starts</span>Always on, you manage OS</div>
+        <div class="cc-row"><span class="cc-key">Best for</span>Persistent disk, legacy apps</div>
+        <div class="cc-row"><span class="cc-key">LTIMindtree</span>Persistent ChromaDB on disk</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNCTIONS DEEP DIVE -->
+<section class="section" id="functions">
+  <div class="ey">Deep Dive</div>
+  <h2>OCI Functions — Serverless</h2>
+
+  <p>Serverless means you write code and OCI handles everything else — the server, OS, scaling, patching. You only pay when your code actually runs.</p>
+
+  <div class="analogy">
+    <div class="at">Analogy — Taxi vs Personal Car</div>
+    <p><strong>Personal Car (Compute VM):</strong> Always available in your garage. You pay insurance, fuel, and maintenance 24/7 — even when the car sits parked and unused.</p>
+    <p><strong>Ola/Uber (OCI Functions):</strong> Call when you need it. Arrives in seconds. Pay only for the ride. When you're not traveling, you pay nothing.</p>
+    <p>Ramesh's monthly report runs once a month for 10 minutes. <strong>Functions: pay for 10 minutes. VM: pay for 720 hours (full month).</strong> Functions is 4,320× cheaper for this use case.</p>
+  </div>
+
+  <div class="g2">
+    <div class="gc cc">
+      <div class="gct">✅ Use OCI Functions When</div>
+      <p>Event-driven tasks triggered by file upload or API call. Infrequent tasks: monthly reports, weekly data sync. Short duration: under 5 minutes. Variable load: sometimes 0 calls, sometimes 1,000. Microservices where each function does one thing.</p>
+    </div>
+    <div class="gc" style="border-top:3px solid #ff7070;background:linear-gradient(135deg,rgba(255,112,112,.05),var(--card));">
+      <div class="gct" style="color:#ff7070;">❌ Do NOT Use Functions When</div>
+      <p>Task runs longer than 5 minutes (cold start delays). Always-on services that must respond instantly (use Container Instance). Needs GPU compute (not supported). Persistent connections required. Complex stateful processing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTAINER INSTANCES -->
+<section class="section" id="container-instances">
+  <div class="ey">Deep Dive</div>
+  <h2>OCI Container Instances — Always-On</h2>
+
+  <p>Run a Docker container directly on OCI without Kubernetes. The container is always running — like a mini server you don't have to manage.</p>
+
+  <div class="g2">
+    <div class="gc ca">
+      <div class="gct">Key Characteristics</div>
+      <p><strong>Always running</strong> — no cold start delay. Instant response to every API call. Pay by the hour whether used or not. Deploy with one image URL. Environment variables for config. IAM for security.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">✅ Use Container Instances When</div>
+      <p>Agent must respond instantly — RAG Q&A cannot have 3-second cold start. Always-on REST API accessible by APEX. Medium traffic with steady load. Simple single-container deployment without Kubernetes complexity.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="ci">💡</span>
+    <p><strong>Functions vs Container Instances for RAG Q&A:</strong> OCI Functions has a cold start of 1–3 seconds — the container must start before running your code. For an employee typing a question, that 3-second delay is unacceptable. Container Instance is always running — employee's question is answered instantly. Use <strong>Container Instance for RAG Q&A</strong>. Use <strong>Functions for ingestion and report generation</strong> where a brief delay is acceptable.</p>
+  </div>
+</section>
+
+<!-- OKE -->
+<section class="section" id="oke">
+  <div class="ey">Enterprise Scale</div>
+  <h2>OKE — Oracle Kubernetes Engine</h2>
+  <p>OKE runs many containers across many servers with automatic scaling. When traffic increases, Kubernetes adds more containers. When it drops, containers are removed. Self-healing: crashed container → Kubernetes restarts it automatically.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Feature</th><th>Container Instance</th><th>OKE</th></tr></thead>
+      <tbody>
+        <tr><td>Setup complexity</td><td>Simple — create and deploy</td><td>Complex — clusters, nodes, deployments, services</td></tr>
+        <tr><td>Auto-scaling</td><td>Manual resize only</td><td>Automatic based on CPU/memory/custom metrics</td></tr>
+        <tr><td>Self-healing</td><td>Manual restart</td><td>Kubernetes restarts crashed pods automatically</td></tr>
+        <tr><td>Multiple services</td><td>One container per instance</td><td>Many microservices in one cluster</td></tr>
+        <tr><td>Concurrent users</td><td>Best up to ~100</td><td>Thousands to millions</td></tr>
+        <tr><td>LTIMindtree now</td><td>✅ Right choice today</td><td>Future — when 1000+ users</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- VMs -->
+<section class="section" id="vms">
+  <div class="ey">Full Control</div>
+  <h2>Compute VMs — When You Need Complete Control</h2>
+  <div class="g2">
+    <div class="gc cd">
+      <div class="gct">✅ Use Compute VM When</div>
+      <p>Full OS control needed. Install custom software not available in containers. Long-running 24/7 background processes. Persistent disk storage for stateful data like ChromaDB with persist_directory. Legacy applications that cannot be containerised easily.</p>
+    </div>
+    <div class="gc" style="border-top:3px solid #ff7070;background:linear-gradient(135deg,rgba(255,112,112,.05),var(--card));">
+      <div class="gct" style="color:#ff7070;">❌ Do NOT Use VM When</div>
+      <p>Simple container deployment exists (use Container Instance — simpler). Infrequent tasks (use Functions — cheaper). No DevOps team to manage OS patching and upgrades. Auto-scaling is required (use OKE).</p>
+    </div>
+  </div>
+</section>
+
+<!-- DECISION TREE -->
+<section class="section" id="decision">
+  <div class="ey">Decision Guide</div>
+  <h2>Compute Selection — Decision Tree</h2>
+
+  <div class="dtree">
+    <div class="dtree-title">🌳 Answer these questions to find the right compute service</div>
+
+    <div class="dt-row">
+      <div class="dt-q">Does it need to run continuously?</div>
+      <div class="dt-branch">
+        <div class="dt-no"><strong>NO</strong> → Runs on demand or infrequently <span class="dt-result">→ OCI Functions</span></div>
+        <div class="dt-yes"><strong>YES</strong> → Always needs to be available → continue ↓</div>
+      </div>
+    </div>
+
+    <div class="dt-row">
+      <div class="dt-q">Multiple services / 1000+ users?</div>
+      <div class="dt-branch">
+        <div class="dt-yes"><strong>YES</strong> → Need auto-scaling and orchestration <span class="dt-result">→ OKE</span></div>
+        <div class="dt-no"><strong>NO</strong> → Single service, moderate traffic → continue ↓</div>
+      </div>
+    </div>
+
+    <div class="dt-row">
+      <div class="dt-q">Need full OS control or persistent disk?</div>
+      <div class="dt-branch">
+        <div class="dt-yes"><strong>YES</strong> → Need full server control <span class="dt-result">→ Compute VM</span></div>
+        <div class="dt-no"><strong>NO</strong> → Container is sufficient <span class="dt-result">→ Container Instance</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>LTIMindtree Task</th><th>Compute Choice</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Policy ingestion on PDF upload</td><td style="color:#20e5a8;">OCI Functions</td><td>Event-driven, runs 2–3 min, pay per call</td></tr>
+        <tr><td>Monthly IT cost report</td><td style="color:#20e5a8;">OCI Functions</td><td>Runs once a month, 10 min, pay per call</td></tr>
+        <tr><td>Email notification</td><td style="color:#20e5a8;">OCI Functions</td><td>10 seconds per run, pay per call</td></tr>
+        <tr><td>RAG Q&A API (always on)</td><td style="color:#4f9eff;">Container Instance</td><td>Must respond instantly — no cold start</td></tr>
+        <tr><td>Future: 1000+ users</td><td style="color:#b78bfa;">OKE</td><td>Auto-scaling needed</td></tr>
+        <tr><td>Persistent ChromaDB on disk</td><td style="color:#ff9d45;">Compute VM</td><td>Needs persistent disk</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout good">
+    <span class="ci">💰</span>
+    <p><strong>Cost comparison for monthly report (10 min, 1GB RAM):</strong> OCI Functions ≈ ₹0.50/month · Container Instance (always on, 1 OCPU, 2GB) ≈ ₹2,160/month. For a task that runs once a month for 10 minutes, OCI Functions saves ₹2,159 per month. Always match compute to the workload pattern.</p>
+  </div>
+</section>
+
+<!-- STATELESS VS STATEFUL -->
+<section class="section" id="stateless">
+  <div class="ey">Architecture Principle</div>
+  <h2>Stateless Compute vs Stateful Data</h2>
+
+  <div class="callout purple">
+    <span class="ci">🔑</span>
+    <p><strong>The golden rule of cloud architecture:</strong> Keep your compute stateless. Keep your data in stateful services. This is why Functions and Container Instances can scale — any instance can serve any request because state lives in the database, not in the compute.</p>
+  </div>
+
+  <div class="g2">
+    <div class="gc cb">
+      <div class="gct">Stateless — Compute</div>
+      <p>Does NOT remember previous calls. Every invocation starts fresh — clean slate. No memory between calls. OCI Functions: stateless. Container Instances: stateless. This is intentional — enables horizontal scaling.</p>
+      <p style="margin-top:8px;font-size:12px;color:var(--faint);">Examples: your agent code, API handlers, ingestion pipeline</p>
+    </div>
+    <div class="gc ca">
+      <div class="gct">Stateful — Data Stores</div>
+      <p>Remembers data between calls. Data persists when compute stops. Multiple compute instances all read the same data. ChromaDB: stateful. OCI Object Storage: stateful. This is where the "memory" lives.</p>
+      <p style="margin-top:8px;font-size:12px;color:var(--faint);">Examples: ChromaDB (vectors), Object Storage (PDFs), databases</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="at">Analogy — Waiter and Kitchen</div>
+    <p><strong>Stateless waiter:</strong> A new customer arrives. The waiter has no memory of any previous customer. Takes each order fresh. The waiter can be replaced by any other waiter — all waiters are interchangeable.</p>
+    <p><strong>Stateful kitchen:</strong> Recipes stored in the kitchen. Ingredients in the pantry. Any waiter can serve from the same kitchen. The kitchen holds all the knowledge.</p>
+    <p><strong>In LTIMindtree's RAG system:</strong> The agent (waiter) is stateless — any container instance handles any request. ChromaDB and Object Storage (kitchen) are stateful — store all vectors and documents. 10 Container Instances can run in parallel, all reading from the same ChromaDB. Results are identical regardless of which instance answers.</p>
+  </div>
+</section>
+
+<!-- SESSION 2: WHY DOCKER -->
+<section class="section" id="why-docker">
+  <div class="sh s2">
+    <span class="sh-icon">🐳</span>
+    <div>
+      <div class="sh-title">Session 2 — Containerised Deployment</div>
+      <div class="sh-sub">Package your agent so it runs identically everywhere</div>
+    </div>
+  </div>
+
+  <div class="ey">The Core Problem</div>
+  <h2>Why Containerise AI Agents?</h2>
+
+  <div class="g2">
+    <div class="gc" style="border-top:3px solid #ff7070;background:linear-gradient(135deg,rgba(255,112,112,.05),var(--card));">
+      <div class="gct" style="color:#ff7070;">Without Docker — "Works on My Machine"</div>
+      <p>Cloud Shell: Python 3.11, langchain 0.3.30, chromadb 0.5.0. OCI VM: Python 3.8, no langchain installed.</p>
+      <p style="margin-top:8px;font-family:monospace;font-size:12px;color:#ff7070;">ImportError: No module named 'langchain'</p>
+      <p style="margin-top:8px;">Same code. Different environment. Different result. Breaks in production.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">With Docker — "Works Everywhere"</div>
+      <p>Package together: Python 3.11 (exact version) + all packages at exact versions + your agent code + configuration.</p>
+      <p style="margin-top:8px;">Same container → same behaviour on Cloud Shell, OCI Container Instance, OKE, your Mac. The environment is the container.</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="at">Analogy — Shipping Container</div>
+    <p><strong>Before shipping containers (1950s):</strong> Ships goods loose. Different boxes, different sizes, different handling at every port. Loading takes days. Goods get damaged or lost. Each port needs different equipment.</p>
+    <p><strong>After shipping containers:</strong> Everything packed in a standardised container. Same container → same process at Rotterdam, Dubai, Singapore, Mumbai. Same crane, same truck, same process. Fast. Reliable. Predictable.</p>
+    <p><strong>Docker container = shipping container for software.</strong> Your agent packaged once → runs identically at every destination. Cloud Shell, OCI server, or your colleague's laptop — all identical.</p>
+  </div>
+</section>
+
+<!-- IMAGE VS CONTAINER -->
+<section class="section" id="image-vs-container">
+  <div class="ey">Fundamental Concepts</div>
+  <h2>Dockerfile vs Image vs Container</h2>
+  <p>The most common point of confusion for beginners. Three completely different things that work together.</p>
+
+  <div class="ivc-grid">
+    <div class="ivc-card ivc1">
+      <div class="ivc-head">📋</div>
+      <div class="ivc-body">
+        <div class="ivc-name">Dockerfile</div>
+        <div class="ivc-eq">= Recipe Card</div>
+        <div class="ivc-desc">Written instructions for HOW to build the environment. Not runnable by itself. Tells Docker: use Python 3.11, install these packages, copy this code. One Dockerfile → creates the image.</div>
+      </div>
+    </div>
+    <div class="ivc-card ivc2">
+      <div class="ivc-head">📦</div>
+      <div class="ivc-body">
+        <div class="ivc-name">Docker Image</div>
+        <div class="ivc-eq">= Prepared Meal</div>
+        <div class="ivc-desc">The Dockerfile was executed. Result: a packaged, ready-to-run snapshot of the entire environment. Stored in OCIR. Not yet running. Can create many containers from one image.</div>
+      </div>
+    </div>
+    <div class="ivc-card ivc3">
+      <div class="ivc-head">🚀</div>
+      <div class="ivc-body">
+        <div class="ivc-name">Docker Container</div>
+        <div class="ivc-eq">= Meal Being Served</div>
+        <div class="ivc-desc">The image is now running. An active process on a server. Consuming CPU and memory. Accepting requests. Can stop, start, pause. Many containers can run from one image simultaneously.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="ci">🍽️</span>
+    <p><strong>Restaurant analogy complete:</strong> Recipe card (Dockerfile) → Prepared dish (Image) → Dish served on table (Container). One recipe → many prepared dishes. One image → many running containers. Modifying the recipe means creating a new dish — you don't modify the already-prepared dish.</p>
+  </div>
+</section>
+
+<!-- DOCKER LIFECYCLE -->
+<section class="section" id="lifecycle">
+  <div class="ey">The Full Flow</div>
+  <h2>Docker Lifecycle — Code to Running Container</h2>
+
+  <div class="lifecycle">
+    <div class="lc-step">
+      <div class="lc-box lc1">
+        <span class="lc-icon">💻</span>
+        <div>
+          <div class="lc-label">Source Code</div>
+          <div class="lc-sub">config.py, tools.py, agents.py, main.py, requirements.txt</div>
+        </div>
+      </div>
+    </div>
+    <div class="lc-arrow">↓</div>
+    <div class="lc-step">
+      <div class="lc-box lc2">
+        <span class="lc-icon">📋</span>
+        <div>
+          <div class="lc-label">Dockerfile</div>
+          <div class="lc-sub">Instructions: base image, install packages, copy code, set entry point</div>
+          <div class="lc-cmd">FROM python:3.11-slim</div>
+        </div>
+      </div>
+    </div>
+    <div class="lc-arrow">↓ docker build -t ltimindtree-agent .</div>
+    <div class="lc-step">
+      <div class="lc-box lc3">
+        <span class="lc-icon">📦</span>
+        <div>
+          <div class="lc-label">Docker Image (local)</div>
+          <div class="lc-sub">Python 3.11 + all packages + agent code, packaged as one file</div>
+          <div class="lc-cmd">ltimindtree-agent:latest</div>
+        </div>
+      </div>
+    </div>
+    <div class="lc-arrow">↓ docker tag + docker push</div>
+    <div class="lc-step">
+      <div class="lc-box lc4">
+        <span class="lc-icon">🗄️</span>
+        <div>
+          <div class="lc-label">OCI Container Registry (OCIR)</div>
+          <div class="lc-sub">Image stored securely in OCI cloud — private, fast, IAM-controlled</div>
+          <div class="lc-cmd">ap-hyderabad-1.ocir.io/ocigenai58/ltimindtree-agent:v1</div>
+        </div>
+      </div>
+    </div>
+    <div class="lc-arrow">↓ OCI pulls image, deploys</div>
+    <div class="lc-step">
+      <div class="lc-box lc5">
+        <span class="lc-icon">🚀</span>
+        <div>
+          <div class="lc-label">Running Container</div>
+          <div class="lc-sub">Your agent, alive, accepting API requests 24/7 — same environment every time</div>
+          <div class="lc-cmd">docker run -v ~/.oci:/root/.oci ltimindtree-agent</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCKERFILE -->
+<section class="section" id="dockerfile">
+  <div class="ey">Writing Code</div>
+  <h2>The Dockerfile — Line by Line</h2>
+
+  <div class="dockerfile">
+    <div class="df-head">
+      <span class="df-icon">🐳</span>
+      <span class="df-title">Dockerfile — LTIMindtree Agent</span>
+    </div>
+    <div class="df-body">
+<span class="df-comment"># ── LINE 1: BASE IMAGE ───────────────────────────────────</span><br>
+<span class="df-instruction">FROM</span> <span class="df-value">python:3.11-slim</span><br>
+<span class="df-note">python:3.11-slim = Python 3.11 + minimal Linux OS. "slim" saves ~200MB vs full image.</span><br>
+<span class="df-note">This ensures Python 3.11 everywhere — Cloud Shell, OCI, your Mac — always identical.</span><br><br>
+
+<span class="df-comment"># ── LINE 2: WORKING DIRECTORY ────────────────────────────</span><br>
+<span class="df-instruction">WORKDIR</span> <span class="df-value">/app</span><br>
+<span class="df-note">/app is the folder INSIDE the container. NOT your project folder name on your machine.</span><br>
+<span class="df-note">All subsequent commands run from /app. Standard convention — use /app always.</span><br><br>
+
+<span class="df-comment"># ── LINE 3: COPY REQUIREMENTS FIRST ──────────────────────</span><br>
+<span class="df-instruction">COPY</span> <span class="df-value">requirements.txt .</span><br>
+<span class="df-note">Copy requirements.txt BEFORE your code files. Docker caches each step as a layer.</span><br>
+<span class="df-note">If requirements.txt unchanged → pip install uses cache → rebuild in seconds not minutes.</span><br><br>
+
+<span class="df-comment"># ── LINE 4: INSTALL PACKAGES ──────────────────────────────</span><br>
+<span class="df-instruction">RUN</span> <span class="df-value">pip install --no-cache-dir -r requirements.txt</span><br>
+<span class="df-note">--no-cache-dir: don't save pip's download cache inside the image → smaller image size.</span><br><br>
+
+<span class="df-comment"># ── LINE 5: COPY ALL PROJECT FILES ───────────────────────</span><br>
+<span class="df-instruction">COPY</span> <span class="df-value">. .</span><br>
+<span class="df-note">Copy AFTER pip install. If only code changes (not requirements.txt), Docker skips pip step.</span><br>
+<span class="df-note">Much faster rebuilds during development when you're only changing Python code.</span><br><br>
+
+<span class="df-comment"># ── LINE 6: RUN COMMAND ───────────────────────────────────</span><br>
+<span class="df-instruction">CMD</span> <span class="df-value">["python", "main.py"]</span><br>
+<span class="df-note">What executes when the container starts. python main.py = run your agent.</span><br>
+<span class="df-note">Using ["python", "main.py"] (exec form) is preferred over "python main.py" (shell form).</span>
+    </div>
+  </div>
+
+  <h3>The .dockerignore File — Critical for Security</h3>
+  <div class="cw">
+    <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">.dockerignore — files excluded from Docker image</div></div>
+    <pre>
+<span class="cm"># NEVER put credentials in Docker image</span>
+.oci/              <span class="cm"># ← OCI private keys — NEVER in image!</span>
+.env               <span class="cm"># ← local environment variables</span>
+
+<span class="cm"># Python clutter</span>
+__pycache__/
+*.pyc
+
+<span class="cm"># Version control</span>
+.git/
+
+<span class="cm"># Local virtual environment</span>
+venv/</pre>
+  </div>
+
+  <div class="callout danger">
+    <span class="ci">🚨</span>
+    <p><strong>Security critical:</strong> Without .dockerignore, <code>docker build</code> copies your <code>.oci/</code> folder (containing your OCI private key) into the image. When you push to OCIR, any developer with pull access can extract your private key and access your entire OCI account. Always add .dockerignore before your first docker build.</p>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section class="section" id="credentials">
+  <div class="ey">Security</div>
+  <h2>Credentials — Three Ways to Authenticate</h2>
+
+  <div class="g3">
+    <div class="gc cd">
+      <div class="gct">Dev — Volume Mount</div>
+      <p>Mount your local .oci folder into the container at runtime. Container reads credentials from /root/.oci/config. Good for development and Cloud Shell.</p>
+      <p style="margin-top:8px;font-family:monospace;font-size:11.5px;color:#ff9d45;">docker run -v ~/.oci:/root/.oci agents</p>
+    </div>
+    <div class="gc ca">
+      <div class="gct">Test — Env Variables</div>
+      <p>Pass values as -e flags at runtime. Good for CI/CD pipelines. Secrets managed outside code. Different values for dev, test, and production environments.</p>
+      <p style="margin-top:8px;font-family:monospace;font-size:11.5px;color:#4f9eff;">docker run -e OCI_COMPARTMENT_ID=... agents</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">Prod — Instance Principal ✅</div>
+      <p>OCI resource has its own identity. No keys in code or container. Most secure. Agent authenticates as the compute instance itself using OCI IAM automatically.</p>
+      <p style="margin-top:8px;font-family:monospace;font-size:11.5px;color:#20e5a8;">signer = InstancePrincipalsSecurityTokenSigner()</p>
+    </div>
+  </div>
+
+  <h3>config.py — Production Pattern</h3>
+  <div class="cw">
+    <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">config.py — reads from environment variables</div></div>
+    <pre>
+<span class="kw">import</span> <span class="cls">os</span>
+
+<span class="cm"># All values from environment variables
+# Fallback to development values if env var not set
+# NEVER hardcode in production — use OCI Vault or env vars</span>
+
+<span class="dec">COMPARTMENT_ID</span>   = os.<span class="fn">getenv</span>(<span class="str">"OCI_COMPARTMENT_ID"</span>,
+    <span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>)
+
+<span class="dec">SERVICE_ENDPOINT</span> = os.<span class="fn">getenv</span>(<span class="str">"OCI_ENDPOINT"</span>,
+    <span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>)
+
+<span class="dec">MODEL_ID</span>         = os.<span class="fn">getenv</span>(<span class="str">"OCI_MODEL_ID"</span>, <span class="str">"cohere.command-a-03-2025"</span>)
+<span class="dec">TEMPERATURE</span>      = <span class="fn">float</span>(os.<span class="fn">getenv</span>(<span class="str">"TEMPERATURE"</span>, <span class="str">"0.3"</span>))
+<span class="dec">MAX_TOKENS</span>       = <span class="fn">int</span>(os.<span class="fn">getenv</span>(<span class="str">"MAX_TOKENS"</span>, <span class="str">"600"</span>))
+<span class="dec">BUCKET_NAME</span>      = os.<span class="fn">getenv</span>(<span class="str">"BUCKET_NAME"</span>, <span class="str">"ltimindtree-policies"</span>)
+<span class="dec">OUTPUT_BUCKET</span>    = os.<span class="fn">getenv</span>(<span class="str">"OUTPUT_BUCKET"</span>, <span class="str">"ltimindtree-agent-outputs"</span>)</pre>
+  </div>
+</section>
+
+<!-- OCIR -->
+<section class="section" id="ocir">
+  <div class="ey">Image Registry</div>
+  <h2>OCI Container Registry (OCIR) Workflow</h2>
+
+  <div class="callout info">
+    <span class="ci">🗄️</span>
+    <p><strong>OCIR = OCI Container Registry</strong> — private Docker image registry inside OCI. Like Docker Hub but private, faster (same OCI network as Container Instance), IAM-controlled, and data never leaves OCI. Always push to OCIR instead of Docker Hub for OCI deployments.</p>
+  </div>
+
+  <h3>OCIR Image URL Format</h3>
+  <div class="cw">
+    <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">OCIR image URL anatomy</div></div>
+    <pre>
+ap-hyderabad-1.ocir.io / ocigenai58 / ltimindtree-agent : v1
+│                        │             │                  │
+│                        │             │                  └── version tag
+│                        │             └── image name
+│                        └── namespace (your tenancy)
+└── OCI region registry endpoint</pre>
+  </div>
+
+  <h3>Complete OCIR Workflow — Commands</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Build the Docker image locally</div>
+        <div class="step-desc"><code style="color:#20e5a8;">docker build -t ltimindtree-agent .</code><br>The <code>.</code> means "use current folder for Dockerfile and all files".</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Tag with full OCIR address</div>
+        <div class="step-desc"><code style="color:#20e5a8;">docker tag ltimindtree-agent ap-hyderabad-1.ocir.io/ocigenai58/ltimindtree-agent:v1</code><br>Gives the local image its full registry path for pushing.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Get Auth Token from OCI Console</div>
+        <div class="step-desc">OCI Console → Profile → My Profile → Auth Tokens → Generate Token. Copy immediately — shown only once. This is the password for OCIR login.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Login to OCIR</div>
+        <div class="step-desc"><code style="color:#20e5a8;">docker login ap-hyderabad-1.ocir.io --username ocigenai58/ragulrajdhamodharan@gmail.com</code><br>Enter Auth Token as password when prompted.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Push image to OCIR</div>
+        <div class="step-desc"><code style="color:#20e5a8;">docker push ap-hyderabad-1.ocir.io/ocigenai58/ltimindtree-agent:v1</code><br>Image is now stored in OCI. Any OCI service can pull it.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Deploy from OCIR</div>
+        <div class="step-desc">OCI Console → Developer Services → Container Instances → Create → use OCIR image URL. Or OCI Functions → deploy from container image.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CICD -->
+<section class="section" id="cicd">
+  <div class="ey">DevOps Overview</div>
+  <h2>CI/CD — Automating the Deployment Pipeline</h2>
+
+  <div class="callout purple">
+    <span class="ci">⚙️</span>
+    <p><strong>Without CI/CD:</strong> Developer changes code → manually runs docker build → docker tag → docker push → manually updates Container Instance. 10 steps, 30 minutes, error-prone. If developer forgets one step → wrong version deployed. <strong>With CI/CD:</strong> Developer pushes code to GitHub → pipeline runs automatically → 5 minutes later, new version is live. Zero manual steps.</p>
+  </div>
+
+  <div class="cicd">
+    <div class="pipe-title" style="color:#b78bfa;">🔄 Simple CI/CD Pipeline — Code to Deployment</div>
+    <div class="pipe-row">
+      <div class="pipe-step purple"><div class="pipe-icon">👨‍💻</div><div class="pipe-label">Developer</div><div class="pipe-sub">git push</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step blue"><div class="pipe-icon">🐙</div><div class="pipe-label">GitHub</div><div class="pipe-sub">repository</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step orange"><div class="pipe-icon">⚙️</div><div class="pipe-label">GitHub Actions</div><div class="pipe-sub">auto-triggered</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step green"><div class="pipe-icon">🐳</div><div class="pipe-label">docker build + push</div><div class="pipe-sub">to OCIR</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step cyan"><div class="pipe-icon">🚀</div><div class="pipe-label">OCI Deploy</div><div class="pipe-sub">new version live</div></div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="ci">ℹ️</span>
+    <p><strong>For this programme:</strong> CI/CD is a concept to understand today. Full implementation is a Day 42+ topic. Know the flow: GitHub → Actions → Docker build → OCIR → OCI deploy. This is how real AI applications are maintained in production — every code change automatically rolls out to users.</p>
+  </div>
+</section>
+
+<!-- MONITORING -->
+<section class="section" id="monitoring">
+  <div class="ey">Observability</div>
+  <h2>Monitoring & Scaling Deployed Agents</h2>
+
+  <div class="g3">
+    <div class="gc ca">
+      <div class="gct">OCI Logging</div>
+      <p>Every container instance and OCI Function writes logs here. Search by keyword: "error", "failed", "completed". Your agent's print() and logging.info() all captured here. Essential for debugging production issues.</p>
+      <p style="margin-top:8px;font-size:11.5px;font-family:monospace;color:var(--faint);">Observability → Logging → Log Groups</p>
+    </div>
+    <div class="gc cb">
+      <div class="gct">OCI Monitoring</div>
+      <p>Metrics for compute services: invocations per minute, error rate, CPU %, memory %, execution time (p50/p95/p99). Create dashboards. Set thresholds for automated alerts.</p>
+      <p style="margin-top:8px;font-size:11.5px;font-family:monospace;color:var(--faint);">Observability → Monitoring</p>
+    </div>
+    <div class="gc ce">
+      <div class="gct">OCI Alarms</div>
+      <p>Trigger notifications when metrics cross thresholds. Example: if function errors &gt; 5 in 5 minutes → send email to Arjun. Arjun gets alerted at 3am when agent fails — without anyone watching manually.</p>
+      <p style="margin-top:8px;font-size:11.5px;font-family:monospace;color:var(--faint);">Monitoring → Alarm Definitions</p>
+    </div>
+  </div>
+
+  <h3>Scaling Behaviour</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Service</th><th>Billing</th><th>Scaling</th><th>How to Scale</th></tr></thead>
+      <tbody>
+        <tr><td>OCI Functions</td><td>Per invocation</td><td>Automatic — 0 to 1000 concurrent, no config needed</td><td>Nothing — OCI handles it</td></tr>
+        <tr><td>Container Instance</td><td>Per hour</td><td>Manual resize</td><td>Stop → Edit → Change shape → Start (brief downtime)</td></tr>
+        <tr><td>OKE</td><td>Per hour (nodes)</td><td>Auto with HPA</td><td>kubectl autoscale —min=2 —max=10 —cpu-percent=70</td></tr>
+        <tr><td>Compute VM</td><td>Per hour</td><td>Manual or VM pools</td><td>Add OCI Autoscaling for VM pools</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- LIVE CODING -->
+<section class="section" id="lab1">
+  <div class="sh s3">
+    <span class="sh-icon">🧪</span>
+    <div>
+      <div class="sh-title">Live Coding — Build, Push, Deploy</div>
+      <div class="sh-sub">Three labs: organised project → Docker image → OCI Container Instance</div>
+    </div>
+  </div>
+
+  <div class="lab" id="lab1">
+    <div class="lab-head">
+      <span class="lab-num">LAB 1</span>
+      <span class="lab-title">Organised Project Structure (Stage 2)</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> All our code has been in one file (agent.py). Production code separates concerns: config in one file, tools in another, agent setup in another. Each file has one responsibility. Easier to test, maintain, and replace individual parts.
+    </div>
+
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">Create organised project structure</div></div>
+      <pre>
+<span class="cm"># Create project folder</span>
+<span class="fn">mkdir</span> ~/ltimindtree_agent && <span class="fn">cd</span> ~/ltimindtree_agent
+
+<span class="cm"># ── config.py ─────────────────────────────────────────────</span>
+<span class="fn">cat</span> > config.py << <span class="str">'EOF'</span>
+import os
+COMPARTMENT_ID   = os.getenv("OCI_COMPARTMENT_ID",
+    "ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea")
+SERVICE_ENDPOINT = os.getenv("OCI_ENDPOINT",
+    "https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com")
+MODEL_ID         = os.getenv("OCI_MODEL_ID", "cohere.command-a-03-2025")
+TEMPERATURE      = float(os.getenv("TEMPERATURE", "0.3"))
+MAX_TOKENS       = int(os.getenv("MAX_TOKENS", "600"))
+EOF
+
+<span class="cm"># ── tools.py ──────────────────────────────────────────────</span>
+<span class="fn">cat</span> > tools.py << <span class="str">'EOF'</span>
+def check_hr(project):
+    try:
+        data = {"all": "35 employees", "ProjectA": "12 members", "ProjectB": "8 members"}
+        return data.get(project, f"{project} not found")
+    except Exception as e:
+        return f"HR error: {str(e)}"
+
+def check_budget(project):
+    try:
+        budgets = {"ProjectA": "12 Lakhs", "ProjectB": "8 Lakhs"}
+        return budgets.get(project, "Project not found")
+    except Exception as e:
+        return f"Budget error: {str(e)}"
+EOF
+
+<span class="cm"># ── agents.py ─────────────────────────────────────────────</span>
+<span class="fn">cat</span> > agents.py << <span class="str">'EOF'</span>
+from langchain_community.chat_models.oci_generative_ai import ChatOCIGenAI
+from langchain.agents import initialize_agent, AgentType
+from langchain.tools import Tool
+from langchain.memory import ConversationBufferMemory
+from config import COMPARTMENT_ID, SERVICE_ENDPOINT, MODEL_ID, TEMPERATURE, MAX_TOKENS
+from tools import check_hr, check_budget
+
+llm = ChatOCIGenAI(
+    model_id=MODEL_ID, service_endpoint=SERVICE_ENDPOINT,
+    compartment_id=COMPARTMENT_ID, auth_type="API_KEY",
+    model_kwargs={"temperature": TEMPERATURE, "max_tokens": MAX_TOKENS}
+)
+
+hr_agent = initialize_agent(
+    tools=[Tool(name="HRTool", func=check_hr,
+                description="Employee count. Input: project name or 'all'.")],
+    llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=False, max_iterations=3, handle_parsing_errors=True
+)
+finance_agent = initialize_agent(
+    tools=[Tool(name="BudgetTool", func=check_budget,
+                description="Project budget. Input: project name.")],
+    llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=False, max_iterations=3, handle_parsing_errors=True
+)
+
+def ask_hr(q):      return hr_agent.invoke({"input": q})["output"]
+def ask_finance(q): return finance_agent.invoke({"input": q})["output"]
+
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+orchestrator = initialize_agent(
+    tools=[
+        Tool(name="AskHRAgent",      func=ask_hr,
+             description="Ask HR about employees. Input: your question."),
+        Tool(name="AskFinanceAgent", func=ask_finance,
+             description="Ask Finance about budgets. Input: your question.")
+    ],
+    llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
+    memory=memory, verbose=True, max_iterations=5, handle_parsing_errors=True
+)
+EOF
+
+<span class="cm"># ── main.py ───────────────────────────────────────────────</span>
+<span class="fn">cat</span> > main.py << <span class="str">'EOF'</span>
+from agents import orchestrator
+
+print("\n===== QUESTION 1 =====")
+r1 = orchestrator.invoke({"input": "How many employees in ProjectA?"})
+print(r1["output"])
+
+print("\n===== QUESTION 2 =====")
+r2 = orchestrator.invoke({"input": "What is the budget of ProjectA?"})
+print(r2["output"])
+
+print("\n===== QUESTION 3 =====")
+r3 = orchestrator.invoke({"input": "Which project did I ask about first?"})
+print(r3["output"])
+EOF
+
+<span class="cm"># ── requirements.txt ──────────────────────────────────────</span>
+<span class="fn">cat</span> > requirements.txt << <span class="str">'EOF'</span>
+langchain
+langchain-community
+langchain-core
+oci
+EOF
+
+<span class="fn">echo</span> <span class="str">"Project structure created:"</span>
+<span class="fn">ls</span> -la</pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+Project structure created:
+<span class="ok">config.py
+tools.py
+agents.py
+main.py
+requirements.txt</span>
+
+<span class="hi"># Test it runs correctly before containerising</span>
+<span class="ok">python3 main.py</span>
+<span class="ans">===== QUESTION 1 =====
+ProjectA has 12 members.
+
+===== QUESTION 2 =====
+ProjectA budget is 12 Lakhs.
+
+===== QUESTION 3 =====
+You asked about ProjectA first.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB 2 -->
+  <div class="lab" id="lab2">
+    <div class="lab-head">
+      <span class="lab-num">LAB 2</span>
+      <span class="lab-title">Build Docker Image and Push to OCIR</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> Create the Dockerfile, build the image, and push it to OCI Container Registry. After this lab, the agent is packaged and stored in OCI — ready to deploy anywhere in the OCI ecosystem.
+    </div>
+
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">Create Dockerfile and build + push to OCIR</div></div>
+      <pre>
+<span class="cm"># Create Dockerfile</span>
+<span class="fn">cat</span> > Dockerfile << <span class="str">'EOF'</span>
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "main.py"]
+EOF
+
+<span class="cm"># Create .dockerignore — CRITICAL for security</span>
+<span class="fn">cat</span> > .dockerignore << <span class="str">'EOF'</span>
+.oci/
+.env
+__pycache__/
+*.pyc
+.git/
+venv/
+EOF
+
+<span class="fn">echo</span> <span class="str">"Files ready:"</span>
+<span class="fn">ls</span> -la
+
+<span class="cm"># BUILD the Docker image</span>
+<span class="cm"># -t = tag (name) for the image   .  = use current folder</span>
+<span class="fn">docker build</span> -t ltimindtree-agent .
+<span class="fn">echo</span> <span class="str">"Image built."</span>
+
+<span class="cm"># Test locally first</span>
+<span class="fn">docker run</span> -v ~/.oci:/root/.oci ltimindtree-agent
+<span class="fn">echo</span> <span class="str">"Local test passed."</span>
+
+<span class="cm"># Get namespace</span>
+<span class="dec">NAMESPACE</span>=$(<span class="fn">oci os ns get</span> --query <span class="str">'data'</span> --raw-output)
+<span class="fn">echo</span> <span class="str">"Namespace: $NAMESPACE"</span>
+
+<span class="cm"># TAG with full OCIR address</span>
+<span class="fn">docker tag</span> ltimindtree-agent ap-hyderabad-1.ocir.io/$NAMESPACE/ltimindtree-agent:v1
+<span class="fn">echo</span> <span class="str">"Tagged."</span>
+
+<span class="cm"># LOGIN to OCIR
+# Get Auth Token: OCI Console → Profile → My Profile → Auth Tokens → Generate</span>
+<span class="fn">docker login</span> ap-hyderabad-1.ocir.io \
+  --username $NAMESPACE/ragulrajdhamodharan@gmail.com
+<span class="cm"># Enter Auth Token as password</span>
+
+<span class="cm"># PUSH to OCIR</span>
+<span class="fn">docker push</span> ap-hyderabad-1.ocir.io/$NAMESPACE/ltimindtree-agent:v1
+<span class="fn">echo</span> <span class="str">"Pushed to OCIR."</span>
+
+<span class="fn">docker images</span></pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+<span class="hi">STEP 1/6: FROM python:3.11-slim</span>
+<span class="hi">STEP 2/6: WORKDIR /app</span>
+<span class="hi">STEP 3/6: COPY requirements.txt .</span>
+<span class="hi">STEP 4/6: RUN pip install --no-cache-dir -r requirements.txt</span>
+<span class="ok">Successfully installed langchain oci ...</span>
+<span class="hi">STEP 5/6: COPY . .</span>
+<span class="hi">STEP 6/6: CMD ["python", "main.py"]</span>
+<span class="ok">Successfully tagged localhost/ltimindtree-agent:latest</span>
+
+Image built.
+<span class="ok">Local test passed.</span>
+
+Namespace: <span class="hi">ocigenai58</span>
+Tagged.
+<span class="ok">Login Succeeded</span>
+<span class="ok">Pushed to OCIR.</span>
+
+REPOSITORY                                               TAG    SIZE
+<span class="ans">ap-hyderabad-1.ocir.io/ocigenai58/ltimindtree-agent     v1     520MB</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB 3 -->
+  <div class="lab" id="lab3">
+    <div class="lab-head">
+      <span class="lab-num">LAB 3</span>
+      <span class="lab-title">Deploy to OCI Container Instance</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> Deploy the OCIR image as an always-running OCI Container Instance. This is the agent's permanent home in production — accessible via IP address, callable from APEX, monitored with OCI Logging.
+    </div>
+
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">Deploy to OCI Container Instance via CLI</div></div>
+      <pre>
+<span class="dec">NAMESPACE</span>=$(<span class="fn">oci os ns get</span> --query <span class="str">'data'</span> --raw-output)
+
+<span class="cm"># Get availability domain</span>
+<span class="dec">AD</span>=$(<span class="fn">oci iam availability-domain list</span> \
+  --compartment-id ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea \
+  --query <span class="str">'data[0].name'</span> --raw-output)
+<span class="fn">echo</span> <span class="str">"AD: $AD"</span>
+
+<span class="cm"># Get subnet OCID from OCI Console
+# Networking → VCN → Subnets → Copy OCID</span>
+<span class="dec">SUBNET_OCID</span>=<span class="str">"YOUR_SUBNET_OCID"</span>
+
+<span class="cm"># CREATE Container Instance</span>
+<span class="fn">oci container-instances container-instance create</span> \
+  --compartment-id ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea \
+  --availability-domain $AD \
+  --display-name ltimindtree-agent-service \
+  --shape CI.Standard.A1.Flex \
+  --shape-config <span class="str">'{"ocpus": 1, "memoryInGBs": 2}'</span> \
+  --containers <span class="str">"[{
+    \"displayName\": \"rag-agent\",
+    \"imageUrl\": \"ap-hyderabad-1.ocir.io/$NAMESPACE/ltimindtree-agent:v1\",
+    \"environmentVariables\": {
+      \"OCI_COMPARTMENT_ID\": \"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea\",
+      \"OCI_ENDPOINT\": \"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com\",
+      \"OCI_MODEL_ID\": \"cohere.command-a-03-2025\",
+      \"BUCKET_NAME\": \"ltimindtree-policies\"
+    }
+  }]"</span> \
+  --vnics <span class="str">"[{\"subnetId\": \"$SUBNET_OCID\"}]"</span>
+
+<span class="fn">echo</span> <span class="str">"Container Instance created."</span>
+
+<span class="cm"># VERIFY status</span>
+<span class="fn">oci container-instances container-instance list</span> \
+  --compartment-id ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea \
+  --query <span class="str">'data.items[].{Name:"display-name", State:"lifecycle-state"}'</span></pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+AD: <span class="hi">AP-HYDERABAD-1-AD-1</span>
+<span class="ok">Container Instance created.</span>
+
+[
+  {
+    "Name": <span class="ans">"ltimindtree-agent-service"</span>,
+    "State": <span class="ok">"ACTIVE"</span>
+  }
+]
+
+<span class="hi"># Check OCI Console for logs and IP address:
+# Developer Services → Container Instances → your instance
+# Observability → Logging for agent output logs</span>
+      </div>
+    </div>
+    <div class="callout good">
+      <span class="ci">✅</span>
+      <p><strong>What just happened:</strong> Your agent is now permanently running on OCI. Not on Cloud Shell. Not on your laptop. On OCI's managed infrastructure. It will keep running until you stop it. You can call it via its IP address, add an API Gateway in front, and let APEX trigger it from a button click. Ramesh no longer needs to be involved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTION ARCHITECTURE -->
+<section class="section" id="architecture">
+  <div class="ey">Big Picture</div>
+  <h2>Complete Production Architecture</h2>
+
+  <div class="arch-box">
+    <div class="arch-title">LTIMindtree AI Agent — Production Deployment</div>
+
+    <div class="arch-row">
+      <div class="abox blue">CFO clicks button in APEX</div>
+      <div class="arch-arr">→</div>
+      <div class="abox green">OCI API Gateway (public)</div>
+      <div class="arch-arr">→</div>
+      <div class="abox purple">Container Instance (private subnet)</div>
+    </div>
+
+    <div class="arch-row" style="margin-left:40px;">
+      <div class="arch-label" style="color:var(--faint);">RAG Q&A — always on, instant response</div>
+    </div>
+
+    <div class="arch-row" style="margin-top:12px;">
+      <div class="abox orange">HR uploads PDF</div>
+      <div class="arch-arr">→</div>
+      <div class="abox orange">Object Storage bucket</div>
+      <div class="arch-arr">→</div>
+      <div class="abox cyan">OCI Event fires</div>
+      <div class="arch-arr">→</div>
+      <div class="abox green">OCI Function: ingestion</div>
+    </div>
+
+    <div class="arch-row" style="margin-top:12px;">
+      <div class="abox purple">OCI Scheduler (1st of month)</div>
+      <div class="arch-arr">→</div>
+      <div class="abox green">OCI Function: report generation</div>
+      <div class="arch-arr">→</div>
+      <div class="abox orange">Object Storage: outputs</div>
+      <div class="arch-arr">→</div>
+      <div class="abox pink">Email to CFO</div>
+    </div>
+
+    <div class="arch-row" style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+      <div class="abox blue">OCI Logging</div>
+      <div class="arch-arr">+</div>
+      <div class="abox blue">OCI Monitoring</div>
+      <div class="arch-arr">+</div>
+      <div class="abox blue">OCI Alarms</div>
+      <div class="arch-arr">→</div>
+      <div class="abox green">Arjun gets alerts if anything fails</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <div class="ey">Interview Preparation</div>
+  <h2>Interview Questions — Beginner to Advanced</h2>
+
+  <h3>Beginner Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">Why is Cloud Shell not suitable for production AI agents?</div>
+    <div class="iq-a">Cloud Shell expires after 20 minutes of idle time — the agent stops automatically. It is personal (only your OCI account), so CFO or HR team cannot trigger it. There is no REST endpoint — APEX cannot call it via URL. There is no monitoring, alerting, or centralised logging. Production needs a permanent, shared, monitored service — which requires OCI Compute (Functions, Container Instances, or VMs).</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is the difference between a Dockerfile, Docker Image, and Docker Container?</div>
+    <div class="iq-a">Dockerfile is the recipe — written instructions for building the environment (base image, packages, code). Image is the prepared meal — Dockerfile was executed and result is a packaged, ready-to-run snapshot stored in OCIR. Container is the meal being served — the image is running as an active process on a server. One Dockerfile builds one image. One image can run as many containers simultaneously. You cannot change a running container's image — you modify the Dockerfile, rebuild the image, and redeploy.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is OCIR and why use it instead of Docker Hub?</div>
+    <div class="iq-a">OCIR is OCI Container Registry — a private Docker image registry inside OCI. Advantages over Docker Hub: faster image pulls (same OCI network as Container Instance, no internet transfer), IAM-controlled access (only authorised OCI users can push/pull), data never leaves OCI network (compliance), integrated with OCI services. Always use OCIR for OCI deployments instead of Docker Hub.</div>
+  </div>
+
+  <h3>Intermediate Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">OCI Functions vs Container Instances — when to use each for a RAG system?</div>
+    <div class="iq-a">OCI Functions for ingestion (triggered by file upload event, runs 2–3 minutes, stops — pay per call, very cheap for infrequent task) and for report generation (triggered monthly by scheduler, runs 10 minutes). Container Instance for the RAG Q&A API (must respond to employee questions instantly — Functions has 1–3 second cold start which is unacceptable for interactive Q&A, Container Instance is always running with instant response). The key distinction: cold start matters for user-facing APIs but not for background processing.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">Why put .oci/ in .dockerignore? What happens if you forget?</div>
+    <div class="iq-a">The .oci/ folder contains your OCI private key (oci_api_key.pem) and config file. If you forget .dockerignore, docker build copies this folder into the image layer. When you push to OCIR, anyone with image pull access can extract the image layers and read your private key. With that key, they can authenticate as you and access your entire OCI account, including all resources, data, and services. Always add .dockerignore before your first docker build and verify with docker history that no sensitive files are in the image layers.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is Instance Principal authentication and why is it the best for production?</div>
+    <div class="iq-a">Instance Principal lets an OCI compute resource (Function, Container Instance, VM) authenticate to other OCI services using its own identity — no API keys required. The OCI SDK detects it automatically at runtime. Benefits: no keys to rotate or manage, no risk of key exposure in code or environment variables, automatic credential refresh, and audit logs show the compute resource as the actor rather than a user. In production, use: signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner() and pass it to OCI SDK clients instead of reading from config file.</div>
+  </div>
+
+  <h3>Advanced Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">Explain the stateless compute + stateful data architecture principle.</div>
+    <div class="iq-a">Stateless compute (Functions, Container Instances) does not retain any state between invocations — each call starts fresh. This enables horizontal scaling: add more instances, each handles any request independently. Stateful data (ChromaDB, Object Storage, databases) persists between calls and is shared by all compute instances. The design rule: all shared state lives in managed data services, never in compute. Result: 10 Container Instances can run in parallel, all reading from the same ChromaDB. Any instance handles any request. If one fails, others continue. This is the foundation of cloud-native, scalable AI systems.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">Why does Dockerfile copy requirements.txt before code files? What benefit does this provide?</div>
+    <div class="iq-a">Docker builds images as a series of layers, and it caches each layer. If a layer's input hasn't changed, Docker reuses the cached result instead of rebuilding. By copying requirements.txt first and running pip install before copying code files, we create a cache-friendly layer order: when you only change Python code (agents.py, main.py), Docker's cache hit on the pip install layer means packages are not reinstalled — rebuild takes seconds instead of minutes. If you copy all files first, any code change invalidates the pip layer cache and forces a full package reinstall on every rebuild.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is CI/CD and how does it connect to Docker and OCI?</div>
+    <div class="iq-a">CI/CD = Continuous Integration/Continuous Deployment. A pipeline that automates everything from code commit to production deployment. Developer pushes code to GitHub → GitHub Actions (or OCI DevOps) is triggered → runs automated tests → builds new Docker image → pushes to OCIR → updates Container Instance or deploys new OCI Function version. Without CI/CD: 10 manual steps, 30 minutes, human error risk. With CI/CD: automatic, 5 minutes, consistent, repeatable. For AI agents in production, CI/CD ensures every code change is tested and deployed safely, and a record exists of every deployment and its contents.</div>
+  </div>
+</section>
+
+<!-- EXERCISES -->
+<section class="section">
+  <div class="ey">Practice</div>
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="ex-head">Practice Questions</div>
+    <div class="ex-item"><span class="ex-badge easy">Easy</span><span>Build the Docker image from Lab 1's project structure. Run it locally with docker run. Verify the output matches running python3 main.py directly.</span></div>
+    <div class="ex-item"><span class="ex-badge easy">Easy</span><span>Add a print("Container started successfully") at the top of main.py. Rebuild the image. Observe which Docker steps use cache and which are re-executed. Explain why.</span></div>
+    <div class="ex-item"><span class="ex-badge medium">Medium</span><span>Add a fifth tool to tools.py: check_cloud(month) returning mock OCI cloud costs. Add it to agents.py as a new Finance tool. Rebuild the Docker image and test that the orchestrator can use all tools.</span></div>
+    <div class="ex-item"><span class="ex-badge medium">Medium</span><span>Modify config.py to read all values from environment variables with no hardcoded fallbacks. Use docker run -e OCI_COMPARTMENT_ID=... to pass values. Verify the agent still works.</span></div>
+    <div class="ex-item"><span class="ex-badge hard">Hard</span><span>Create a Dockerfile that uses a multi-stage build: Stage 1 installs packages, Stage 2 copies only the installed packages and code. This creates a smaller production image. Compare image sizes before and after.</span></div>
+    <div class="ex-item"><span class="ex-badge hard">Hard</span><span>Write a shell script (deploy.sh) that: checks if requirements.txt changed, rebuilds image only if needed, tags with git commit hash as version, pushes to OCIR, and prints the deployment URL. Run it twice — second time should skip rebuild.</span></div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="section" id="summary">
+  <div class="ey">Key Takeaways</div>
+  <h2>Day 39 Summary</h2>
+
+  <div class="summary-grid">
+    <div class="sum-card s1">
+      <div class="sum-title">☁️ OCI Compute Options</div>
+      <ul>
+        <li>Functions = serverless, event-driven, pay per call</li>
+        <li>Container Instance = always-on, instant response, per hour</li>
+        <li>OKE = enterprise scale, auto-scaling, microservices</li>
+        <li>VM = full OS control, persistent disk</li>
+        <li>Functions for ingestion + report generation</li>
+        <li>Container Instance for RAG Q&A API</li>
+        <li>Functions cold start = 1–3 sec (unacceptable for Q&A)</li>
+        <li>Container Instance = instant (no cold start)</li>
+      </ul>
+    </div>
+    <div class="sum-card s2">
+      <div class="sum-title">🐳 Docker Essentials</div>
+      <ul>
+        <li>Dockerfile = recipe → Image = prepared meal → Container = serving</li>
+        <li>One image → many containers running simultaneously</li>
+        <li>Copy requirements.txt BEFORE code → faster rebuilds</li>
+        <li>Always create .dockerignore — exclude .oci/ and .env</li>
+        <li>--no-cache-dir → smaller image size</li>
+        <li>CMD ["python", "main.py"] → exec form (not shell form)</li>
+        <li>docker build -t name . → . is mandatory (current folder)</li>
+        <li>Same image → same behaviour everywhere</li>
+      </ul>
+    </div>
+    <div class="sum-card s3">
+      <div class="sum-title">🔐 Security & Architecture</div>
+      <ul>
+        <li>Dev: volume mount (-v ~/.oci:/root/.oci)</li>
+        <li>Prod: Instance Principal (no keys in container)</li>
+        <li>OCIR = private registry inside OCI (not Docker Hub)</li>
+        <li>Stateless compute + stateful data = scalable design</li>
+        <li>IAM Dynamic Group for agent access to OCI services</li>
+        <li>Private subnet for container — API Gateway in front</li>
+        <li>OCI Logging + Monitoring + Alarms = full observability</li>
+        <li>CI/CD: GitHub → Actions → OCIR → OCI deploy</li>
+      </ul>
+    </div>
+    <div class="sum-card s4">
+      <div class="sum-title">⚠️ Common Mistakes</div>
+      <ul>
+        <li>Forgetting .dockerignore → credentials in image</li>
+        <li>Using Cloud Shell for production → sessions expire</li>
+        <li>Forgetting . in docker build → "no context" error</li>
+        <li>Using Docker Hub instead of OCIR for OCI deployments</li>
+        <li>Choosing Container Instance for monthly reports → expensive</li>
+        <li>Choosing Functions for Q&A API → cold start delays</li>
+        <li>Hardcoding secrets in Dockerfile or Python files</li>
+        <li>Not tagging images with versions — using only "latest"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- JOURNEY SUMMARY - STAGES -->
+  <h3>Development to Production — Four Stages</h3>
+  <div class="journey" style="grid-template-columns:1fr 1fr;">
+    <div class="journey-panel before">
+      <div class="journey-head">
+        <span class="journey-head-icon">📦</span>
+        <span class="journey-head-title">Stage 1 & 2 — Dev</span>
+        <span class="journey-head-badge">Done Days 35–38</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box" style="border-color:rgba(255,112,112,.2);">
+            <span class="jstep-icon">💻</span>
+            <div class="jstep-text">
+              <div class="jstep-label" style="color:#e8a0a0;">Stage 1 — Cloud Shell</div>
+              <div class="jstep-sub">Single file, hardcoded values, manual run</div>
+            </div>
+          </div>
+          <span class="jarrow" style="color:rgba(255,112,112,.4);">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box" style="border-color:rgba(255,112,112,.2);">
+            <span class="jstep-icon">📁</span>
+            <div class="jstep-text">
+              <div class="jstep-label" style="color:#e8a0a0;">Stage 2 — Organised Project</div>
+              <div class="jstep-sub">config.py, tools.py, agents.py, main.py</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult" style="background:rgba(255,112,112,.07);border-color:rgba(255,112,112,.18);color:#ff8080;">
+          Runs on Cloud Shell only · Not shareable
+        </div>
+      </div>
+    </div>
+
+    <div class="journey-panel after">
+      <div class="journey-head">
+        <span class="journey-head-icon">🚀</span>
+        <span class="journey-head-title">Stage 3 & 4 — Prod</span>
+        <span class="journey-head-badge">Day 39 Today</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">🐳</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Stage 3 — Docker Container</div>
+              <div class="jstep-sub">Packaged, consistent, runs anywhere</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">☁️</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Stage 4 — OCI Deployment</div>
+              <div class="jstep-sub">OCIR + Container Instance + API Gateway</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult">
+          ✅ 24/7 · Callable from APEX · Monitored<br>
+          CFO triggers directly — no developer needed
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHEATSHEET -->
+<section class="section">
+  <div class="ey">Quick Reference</div>
+  <h2>Docker & OCI Compute Cheat Sheet</h2>
+  <div class="cheat">
+    <div class="cheat-title">Commands & Concepts</div>
+    <div class="cheat-row"><div class="cheat-key">docker build -t name .</div><div class="cheat-val">Build image from Dockerfile in current folder. The . is mandatory — tells Docker where files are.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker run -v ~/.oci:/root/.oci name</div><div class="cheat-val">Run container with OCI credentials mounted. Development and Cloud Shell use this.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker tag name registry/ns/name:v1</div><div class="cheat-val">Give image its full OCIR address before pushing.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker login ap-hyderabad-1.ocir.io</div><div class="cheat-val">Authenticate with OCIR. Username: namespace/email. Password: Auth Token from OCI Console.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker push registry/ns/name:v1</div><div class="cheat-val">Upload image to OCIR. After this, OCI can pull and run it.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker images</div><div class="cheat-val">List all local images with tags, IDs, and sizes.</div></div>
+    <div class="cheat-row"><div class="cheat-key">docker ps -a</div><div class="cheat-val">List all containers (running and stopped). Shows exit codes.</div></div>
+    <div class="cheat-row"><div class="cheat-key">FROM python:3.11-slim</div><div class="cheat-val">Best base for Python agents. "slim" = smaller, production-ready.</div></div>
+    <div class="cheat-row"><div class="cheat-key">WORKDIR /app</div><div class="cheat-val">Standard working directory inside container. Not related to your machine's folder name.</div></div>
+    <div class="cheat-row"><div class="cheat-key">COPY requirements.txt . THEN COPY . .</div><div class="cheat-val">Copy requirements first → Docker caches pip install layer → faster rebuilds.</div></div>
+    <div class="cheat-row"><div class="cheat-key">InstancePrincipalsSecurityTokenSigner()</div><div class="cheat-val">Production authentication. No keys needed. OCI compute authenticates as itself.</div></div>
+    <div class="cheat-row"><div class="cheat-key">CI.Standard.A1.Flex (1 OCPU, 2GB)</div><div class="cheat-val">Recommended Container Instance shape for most AI agents. Adjust based on load.</div></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  <strong>LTIMindtree OCI GenAI Foundation Programme</strong> — Day 39: OCI Compute & Docker Deployment
+</div>
+
+<script>
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + entry.target.id) link.classList.add('active');
+      });
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+navLinks.forEach(link => {
+  link.addEventListener('click', function() {
+    const nav = document.querySelector('.nav');
+    nav.scrollTo({ left: this.offsetLeft - nav.offsetWidth / 2 + this.offsetWidth / 2, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>

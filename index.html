@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LTIMindtree OCI GenAI Programme — Learning Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+:root{--bg:#05060c;--card:#101320;--border:#181c2e;--text:#e2eaff;--muted:#8090b8;--faint:#3a4466;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;font-size:14px;line-height:1.8;overflow-x:hidden;}
+.hero{background:linear-gradient(135deg,#04050e,#07091a,#04050e);border-bottom:1px solid var(--border);padding:52px 60px 44px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-80px;right:-40px;width:600px;height:600px;background:radial-gradient(circle,rgba(32,229,168,.08),rgba(79,158,255,.05) 40%,transparent 65%);border-radius:50%;}
+.hero::after{content:"";position:absolute;bottom:-60px;left:60px;width:400px;height:400px;background:radial-gradient(circle,rgba(183,139,250,.06),transparent 65%);border-radius:50%;}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(24px,4vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;background:linear-gradient(135deg,#fff 0%,#a8f8e0 25%,#20e5a8 50%,#4f9eff 75%,#b78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;position:relative;z-index:1;}
+.hero p{color:#6d7fa8;font-size:13.5px;max-width:560px;position:relative;z-index:1;}
+.hero-meta{display:flex;gap:20px;margin-top:16px;flex-wrap:wrap;}
+.hm{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:6px;position:relative;z-index:1;}
+.hm strong{color:var(--muted);}
+
+main{max-width:1100px;margin:0 auto;padding:40px 44px 60px;}
+.legend{display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.leg-dot.avail{background:#20e5a8;}.leg-dot.soon{background:var(--faint);}
+
+.week-block{margin-bottom:44px;}
+.week-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;}
+
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:.2s;display:block;text-decoration:none;}
+.day-card:hover{transform:translateY(-2px);}
+.day-card.has-file{border-left:3px solid #20e5a8;}
+.day-card.no-file{border-left:3px solid var(--faint);opacity:.65;cursor:default;pointer-events:none;}
+.dc-head{padding:14px 16px 10px;display:flex;align-items:flex-start;gap:10px;}
+.dc-num{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;flex-shrink:0;line-height:1;}
+.day-card.has-file .dc-num{background:linear-gradient(135deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.day-card.no-file .dc-num{color:var(--faint);}
+.dc-info{flex:1;}
+.dc-title{font-size:12.5px;font-weight:600;line-height:1.4;margin-bottom:3px;}
+.day-card.has-file .dc-title{color:#fff;}
+.day-card.no-file .dc-title{color:var(--faint);}
+.dc-skill{font-size:10.5px;color:var(--faint);}
+.dc-body{padding:0 16px 14px;}
+.dc-sessions{font-size:11.5px;color:var(--faint);line-height:1.65;}
+.multi-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(183,139,250,.12);color:#b78bfa;border:1px solid rgba(183,139,250,.25);margin-left:5px;letter-spacing:.04em;vertical-align:middle;}
+.dc-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;font-weight:600;color:#20e5a8;padding:4px 10px;background:rgba(32,229,168,.08);border:1px solid rgba(32,229,168,.2);border-radius:20px;text-decoration:none;}
+.dc-link:hover{background:rgba(32,229,168,.15);}
+.dc-soon{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:var(--faint);padding:4px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:20px;}
+
+footer{border-top:1px solid var(--border);padding:24px 60px;text-align:center;font-size:11.5px;color:var(--faint);}
+footer strong{background:linear-gradient(90deg,#20e5a8,#4f9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+@media(max-width:600px){.hero{padding:36px 24px 32px;}.main{padding:28px 20px 40px;}.week-label,.dc-num{font-size:16px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>LTIMindtree OCI GenAI<br>Learning Portal</h1>
+  <p>53-day corporate training programme — AI, Machine Learning, OCI Cloud, and GenAI. Open any day's guide below.</p>
+  <div class="hero-meta">
+    <span class="hm">📅 <strong>Batch: Kalinga — June 2026</strong></span>
+    <span class="hm">📘 <strong>53 Training Days</strong></span>
+    <span class="hm">🏢 <strong>LTIMindtree × Iamneo</strong></span>
+  </div>
+</div>
+
+<main>
+<div class="legend">
+  <div class="leg"><div class="leg-dot avail"></div> HTML guide available</div>
+  <div class="leg"><div class="leg-dot soon"></div> Coming soon</div>
+</div>
+
+<!-- WEEK 1 -->
+<div class="week-block">
+  <div class="week-label">Week 1 — Days 1–6 · Foundations: AI, Oracle & SQL</div>
+  <div class="day-grid">
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">01</div><div class="dc-info"><div class="dc-title">PLT</div><div class="dc-skill">Platform</div></div></div><div class="dc-body"><div class="dc-sessions">Pre-learning tasks and onboarding</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">02</div><div class="dc-info"><div class="dc-title">Understanding AI and Oracle Applications</div><div class="dc-skill">AI & Oracle Business Processes</div></div></div><div class="dc-body"><div class="dc-sessions">Intro to AI · Oracle ecosystem · EBS, Fusion, Cloud ERP</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">03</div><div class="dc-info"><div class="dc-title">Oracle Business Processes</div><div class="dc-skill">AI & Oracle Business Processes</div></div></div><div class="dc-body"><div class="dc-sessions">P2P · O2C · H2R business flows</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">04</div><div class="dc-info"><div class="dc-title">AI Intervention in Oracle Business Processes</div><div class="dc-skill">AI & Oracle Business Processes</div></div></div><div class="dc-body"><div class="dc-sessions">AI in P2P, O2C, H2R · Case studies</div><span class="dc-soon">Coming soon</span></div></div>
+    <a class="day-card has-file" href="day05-sql-core-concepts.html"><div class="dc-head"><div class="dc-num">05</div><div class="dc-info"><div class="dc-title">Database Fundamentals & SQL Basics</div><div class="dc-skill">SQL & PL/SQL Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">RDBMS · SELECT, WHERE, GROUP BY · Joins · Subqueries · Aggregate functions</div><a class="dc-link" href="day05-sql-core-concepts.html">Open Guide →</a></div></a>
+    <a class="day-card has-file" href="day06-07-sql-plsql-fundamentals.html"><div class="dc-head"><div class="dc-num">06<span class="multi-badge">+ 07</span></div><div class="dc-info"><div class="dc-title">Advanced SQL & PL/SQL Fundamentals</div><div class="dc-skill">SQL & PL/SQL Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">PL/SQL block structure · Variables · Data types · Control flow · Exception handling · Functions · Packages</div><a class="dc-link" href="day06-07-sql-plsql-fundamentals.html">Open Guide →</a></div></a>
+  </div>
+</div>
+
+<!-- WEEK 2 -->
+<div class="week-block">
+  <div class="week-label">Week 2 — Days 7–12 · SQL Reference & Python Fundamentals</div>
+  <div class="day-grid">
+    <a class="day-card has-file" href="day07-part2-sql-complete-reference.html"><div class="dc-head"><div class="dc-num">07<span class="multi-badge">Part 2</span></div><div class="dc-info"><div class="dc-title">SQL Complete Reference</div><div class="dc-skill">SQL & PL/SQL Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">DDL · DML · DQL · DCL · TCL · All command categories with examples</div><a class="dc-link" href="day07-part2-sql-complete-reference.html">Open Reference →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">08</div><div class="dc-info"><div class="dc-title">Getting Started with Python</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">Python syntax · Variables · Data types · Operators</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">09</div><div class="dc-info"><div class="dc-title">Control Flow & Functions</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">If/elif/else · Loops · Functions · Scope</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">10</div><div class="dc-info"><div class="dc-title">Core Data Structures</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">Lists · Tuples · Dicts · Sets · Strings</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">11</div><div class="dc-info"><div class="dc-title">File Handling, Exceptions & Modules</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">open() · try/except · Modules & packages</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">12</div><div class="dc-info"><div class="dc-title">OOP & Introduction to Data Handling</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">Classes · Inheritance · NumPy · Pandas intro</div><span class="dc-soon">Coming soon</span></div></div>
+  </div>
+</div>
+
+<!-- WEEK 3 -->
+<div class="week-block">
+  <div class="week-label">Week 3 — Days 13–18 · Pandas, Machine Learning & Neural Networks</div>
+  <div class="day-grid">
+    <a class="day-card has-file" href="day13-data-manipulation-pandas.html"><div class="dc-head"><div class="dc-num">13</div><div class="dc-info"><div class="dc-title">Data Manipulation with Pandas</div><div class="dc-skill">Python Fundamentals</div></div></div><div class="dc-body"><div class="dc-sessions">NumPy arrays · Pandas DataFrame · CSV/Excel/JSON · Data cleaning · GroupBy · Merge · DateTime</div><a class="dc-link" href="day13-data-manipulation-pandas.html">Open Guide →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">14</div><div class="dc-info"><div class="dc-title">ML Foundations & Supervised Learning</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Regression · Classification · MSE, RMSE · Confusion matrix</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">15</div><div class="dc-info"><div class="dc-title">Model Types & Real-World Use Cases</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Linear, Tree, Ensemble, SVM · Healthcare, Finance use cases</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">16</div><div class="dc-info"><div class="dc-title">Kubernetes Essentials — Containers & Orchestration</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Docker architecture · K8s Pods, Deployments · Services</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">17</div><div class="dc-info"><div class="dc-title">Understanding Neural Networks</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">MLP · Forward/Back prop · Activation functions · Optimizers</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">18</div><div class="dc-info"><div class="dc-title">Deep Learning — Foundations and Building Models</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">ML vs DL · Tensors · AutoGrad · MLP architecture</div><span class="dc-soon">Coming soon</span></div></div>
+  </div>
+</div>
+
+<!-- WEEK 4 -->
+<div class="week-block">
+  <div class="week-label">Week 4 — Days 19–24 · Deep Learning, NLP, LLMs & Deployment</div>
+  <div class="day-grid">
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">19</div><div class="dc-info"><div class="dc-title">Deep Learning — Architectures & Tuning</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">CNN · RNN · LSTM · Hyperparameter tuning</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">20</div><div class="dc-info"><div class="dc-title">NLP Fundamentals & Text Preprocessing</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Tokenization · BoW · TF-IDF · Word2Vec · BLEU, ROUGE</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">21</div><div class="dc-info"><div class="dc-title">Understanding Transformers</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Self-attention · BERT vs GPT vs T5 · PEFT · LoRA</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">22</div><div class="dc-info"><div class="dc-title">Data Engineering and Preprocessing</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">Web scraping · REST APIs · Tokenization pipeline</div><span class="dc-soon">Coming soon</span></div></div>
+    <a class="day-card has-file" href="day23-28-enterprise-genai-llm-guide.html"><div class="dc-head"><div class="dc-num">23<span class="multi-badge">+ 28</span></div><div class="dc-info"><div class="dc-title">LLMs, Model Compression & Enterprise GenAI</div><div class="dc-skill">Machine Learning + GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">LLM types · LoRA · Quantization · Pruning · Distillation · Prompt engineering · RAG · Fine-tuning · OCI AI Services</div><a class="dc-link" href="day23-28-enterprise-genai-llm-guide.html">Open Guide →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">24</div><div class="dc-info"><div class="dc-title">Deploying Models via APIs</div><div class="dc-skill">Machine Learning</div></div></div><div class="dc-body"><div class="dc-sessions">ModelOps · FastAPI · Flask · REST endpoints · CI/CD</div><span class="dc-soon">Coming soon</span></div></div>
+  </div>
+</div>
+
+<!-- WEEK 5 -->
+<div class="week-block">
+  <div class="week-label">Week 5 — Days 25–30 · Project 1 + APEX + Oracle GenAI + LangChain</div>
+  <div class="day-grid">
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">25</div><div class="dc-info"><div class="dc-title">Capstone Project 1</div><div class="dc-skill">Project</div></div></div><div class="dc-body"><div class="dc-sessions">Custom Domain Specific Chat Assistant</div><span class="dc-soon">Coming soon</span></div></div>
+    <a class="day-card has-file" href="day26-apex-fundamentals.html"><div class="dc-head"><div class="dc-num">26</div><div class="dc-info"><div class="dc-title">APEX Fundamentals & Core Components</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">APEX architecture · Pages · Regions · SQL Reports · Session State · Dynamic Actions · Validations</div><a class="dc-link" href="day26-apex-fundamentals.html">Open Guide →</a></div></a>
+    <a class="day-card has-file" href="day26-part2-apex-assignment1.html"><div class="dc-head"><div class="dc-num">26<span class="multi-badge">Part 2</span></div><div class="dc-info"><div class="dc-title">APEX Assignment 1 — Student Management App</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">Student form · IR page · LOV · Validations · Dynamic Actions · REST Data Source walkthroughs</div><a class="dc-link" href="day26-part2-apex-assignment1.html">Open Guide →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">27</div><div class="dc-info"><div class="dc-title">Interactivity, Reporting & Security</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">Interactive Reports · Charts · Authorization · Session State Protection</div><span class="dc-soon">Coming soon</span></div></div>
+    <a class="day-card has-file" href="day28-apex-genai-plsql.html"><div class="dc-head"><div class="dc-num">28</div><div class="dc-info"><div class="dc-title">APEX + OCI Gen AI PL/SQL Reference</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">OCI Gen AI REST calls from PL/SQL · Web Credentials · Prompts · Embeddings · JSON parsing · Chatbot in APEX</div><a class="dc-link" href="day28-apex-genai-plsql.html">Open Reference →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">29</div><div class="dc-info"><div class="dc-title">Oracle Generative AI Services</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">OCI GenAI architecture · Text · Vision · Speech · RAG pipelines</div><span class="dc-soon">Coming soon</span></div></div>
+    <a class="day-card has-file" href="day30-langchain-langgraph.html"><div class="dc-head"><div class="dc-num">30</div><div class="dc-info"><div class="dc-title">LangChain, LangGraph & Semantic Kernel</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">LCEL · Chains · Memory · Tools · ReAct · LangGraph orchestration · Semantic Kernel</div><a class="dc-link" href="day30-langchain-langgraph.html">Open Guide →</a></div></a>
+  </div>
+</div>
+
+<!-- WEEK 6 -->
+<div class="week-block">
+  <div class="week-label">Week 6 — Days 31–35 · AI Agents, RAG, OCI Storage, Compute & Project 2</div>
+  <div class="day-grid">
+    <a class="day-card has-file" href="day31-ai-agents.html"><div class="dc-head"><div class="dc-num">31</div><div class="dc-info"><div class="dc-title">Building & Deploying AI Agents</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">Agent lifecycle · Memory · A2A protocol · Tool invocation · Deployment architecture</div><a class="dc-link" href="day31-ai-agents.html">Open Guide →</a></div></a>
+    <a class="day-card has-file" href="day32-rag.html"><div class="dc-head"><div class="dc-num">32</div><div class="dc-info"><div class="dc-title">RAG — Retrieval-Augmented Generation</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">RAG architecture · Embeddings · Vector stores · Chunking · ChromaDB · OCI Cohere</div><a class="dc-link" href="day32-rag.html">Open Guide →</a></div></a>
+    <a class="day-card has-file" href="day33-object-storage.html"><div class="dc-head"><div class="dc-num">33</div><div class="dc-info"><div class="dc-title">Integration with Cloud Storage & Compute</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">OCI Object Storage · Buckets · SDK · IAM · OCI Events · AI storage patterns</div><a class="dc-link" href="day33-object-storage.html">Open Guide →</a></div></a>
+    <a class="day-card has-file" href="day34-compute-docker.html"><div class="dc-head"><div class="dc-num">34</div><div class="dc-info"><div class="dc-title">OCI Compute — Functions, Containers, VMs</div><div class="dc-skill">Oracle Specific GenAI Services</div></div></div><div class="dc-body"><div class="dc-sessions">OCI Functions · Container Instances · OKE · Docker · OCIR · Stateless vs Stateful</div><a class="dc-link" href="day34-compute-docker.html">Open Guide →</a></div></a>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">35</div><div class="dc-info"><div class="dc-title">Capstone Project 2</div><div class="dc-skill">Project</div></div></div><div class="dc-body"><div class="dc-sessions">Multi-agent AI system for domain-specific tasks</div><span class="dc-soon">Coming soon</span></div></div>
+  </div>
+</div>
+
+<!-- WEEK 7 -->
+<div class="week-block">
+  <div class="week-label">Week 7 — Days 36–39 · MCP + AI Ethics + Final Project</div>
+  <div class="day-grid">
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">36</div><div class="dc-info"><div class="dc-title">MCP Design Concepts & API Block Development</div><div class="dc-skill">MCP Development</div></div></div><div class="dc-body"><div class="dc-sessions">Model Context Protocol · MCP Servers · FastAPI design · Pipeline integration</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">37</div><div class="dc-info"><div class="dc-title">Context Handling, Prompting & MCP Deployment</div><div class="dc-skill">MCP Development</div></div></div><div class="dc-body"><div class="dc-sessions">MCP + GenAI · Prompt templates · Memory chains · Docker for MCP · Orchestration</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">38</div><div class="dc-info"><div class="dc-title">AI Ethics, Responsible AI & Data Privacy</div><div class="dc-skill">AI Ethics</div></div></div><div class="dc-body"><div class="dc-sessions">Bias · Fairness · Governance · Data privacy regulations</div><span class="dc-soon">Coming soon</span></div></div>
+    <div class="day-card no-file"><div class="dc-head"><div class="dc-num">39</div><div class="dc-info"><div class="dc-title">Final Capstone Project 4</div><div class="dc-skill">Project</div></div></div><div class="dc-body"><div class="dc-sessions">Build Enterprise AI Assistant & Automation Platform</div><span class="dc-soon">Coming soon</span></div></div>
+  </div>
+</div>
+
+</main>
+<footer>
+  <strong>LTIMindtree OCI GenAI Foundation Programme</strong> &nbsp;|&nbsp; Batch: Kalinga · June 2026
+</footer>
+</body>
+</html>

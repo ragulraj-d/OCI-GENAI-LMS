@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 36 — AI Agents | LTIMindtree OCI GenAI Programme</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');
+:root{--bg:#08090f;--surface:#0e1018;--card:#13161f;--card2:#181b26;--border:#1e2235;--border2:#262b40;--accent:#4f8ef7;--accent2:#9b7ff4;--green:#2ecc8e;--orange:#f5834a;--yellow:#f5c842;--red:#f56b6b;--cyan:#3dd6f5;--text:#dde3f0;--muted:#8896b3;--faint:#4a5370;--code-bg:#0a0c14;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;font-size:15px;line-height:1.8;overflow-x:hidden;}
+.hero{min-height:320px;background:linear-gradient(135deg,#080b18,#0b0e1c 40%,#0d0a1a);border-bottom:1px solid var(--border2);padding:60px 56px 48px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-100px;right:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(79,142,247,.08),transparent 65%);border-radius:50%;}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.badge{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.bd{background:rgba(245,131,74,.12);color:#f5834a;border:1px solid rgba(245,131,74,.25);}
+.b1{background:rgba(79,142,247,.12);color:#4f8ef7;border:1px solid rgba(79,142,247,.25);}
+.b2{background:rgba(155,127,244,.12);color:#9b7ff4;border:1px solid rgba(155,127,244,.25);}
+.b3{background:rgba(46,204,142,.12);color:#2ecc8e;border:1px solid rgba(46,204,142,.25);}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(28px,5vw,50px);font-weight:800;letter-spacing:-.03em;line-height:1.1;background:linear-gradient(135deg,#fff 30%,#9b7ff4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;}
+.hero-sub{color:#8896b3;font-size:15px;max-width:580px;line-height:1.7;}
+.nav-wrap{background:rgba(8,9,15,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 56px;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:13px 14px;font-size:11px;font-weight:500;color:var(--faint);white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:.2s;letter-spacing:.02em;}
+.nav a:hover{color:var(--text);border-bottom-color:var(--border2);}
+main{max-width:1020px;margin:0 auto;padding:56px 40px;}
+.sh{display:flex;align-items:center;gap:16px;margin-bottom:34px;padding:16px 22px;border-radius:10px;border-left:4px solid;}
+.sh.s1{background:rgba(79,142,247,.06);border-color:#4f8ef7;}
+.sh.s2{background:rgba(155,127,244,.06);border-color:#9b7ff4;}
+.sh.s3{background:rgba(46,204,142,.06);border-color:#2ecc8e;}
+
+
+.sh-title{font-size:17px;font-weight:700;color:#fff;}
+.sh-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.section{margin-bottom:68px;}
+.ey{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#4f8ef7;margin-bottom:8px;}
+h2{font-family:"Syne",sans-serif;font-size:25px;font-weight:700;color:#fff;margin-bottom:14px;letter-spacing:-.02em;}
+h3{font-size:14.5px;font-weight:600;color:#4f8ef7;margin:24px 0 10px;}
+p{color:var(--muted);margin-bottom:10px;}
+hr.div{border:none;border-top:1px solid var(--border);margin:26px 0;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin:14px 0;}
+.ct{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;color:var(--muted);}
+.cw{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border);}
+.cl{font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dots span{width:9px;height:9px;border-radius:50%;display:block;}
+.dots span:nth-child(1){background:#ff5f57;}.dots span:nth-child(2){background:#febc2e;}.dots span:nth-child(3){background:#28c840;}
+pre{padding:18px 22px;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:2;color:#b0bec5;}
+.kw{color:#f07178;}.fn{color:#82aaff;}.str{color:#c3e88d;}.cm{color:#4a5370;font-style:italic;}.cls{color:#89ddff;}.num{color:#f78c6c;}
+.callout{border-radius:8px;padding:13px 17px;margin:14px 0;display:flex;gap:12px;align-items:flex-start;font-size:13.5px;}
+.ci{font-size:18px;flex-shrink:0;margin-top:1px;}
+.callout p{margin:0;color:var(--text);}
+.callout.info{background:rgba(79,142,247,.08);border-left:3px solid #4f8ef7;}
+.callout.good{background:rgba(46,204,142,.08);border-left:3px solid #2ecc8e;}
+.callout.warn{background:rgba(245,131,74,.08);border-left:3px solid #f5834a;}
+.callout.danger{background:rgba(245,107,107,.08);border-left:3px solid #f56b6b;}
+.callout.purple{background:rgba(155,127,244,.08);border-left:3px solid #9b7ff4;}
+.analogy{background:linear-gradient(135deg,rgba(155,127,244,.07),rgba(79,142,247,.04));border:1px solid rgba(155,127,244,.18);border-radius:12px;padding:18px 22px;margin:16px 0;position:relative;}
+.analogy::before{content:"💡";position:absolute;top:-12px;left:18px;background:var(--bg);padding:0 6px;font-size:18px;}
+.at{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9b7ff4;margin-bottom:8px;}
+.analogy p{color:var(--text);font-size:13.5px;margin-bottom:7px;}
+.analogy p:last-child{margin:0;}
+.tw{overflow-x:auto;margin:14px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--surface);color:#4f8ef7;font-weight:600;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:10px 15px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:10px 15px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+td:first-child{color:var(--text);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.018);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+@media(max-width:700px){.g2,.g3{grid-template-columns:1fr;}}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:17px 19px;}
+.gc.ca{border-top:3px solid #4f8ef7;}.gc.cb{border-top:3px solid #9b7ff4;}.gc.cc{border-top:3px solid #2ecc8e;}.gc.cd{border-top:3px solid #f5834a;}
+.gct{font-size:13px;font-weight:700;margin-bottom:8px;}
+.gc.ca .gct{color:#4f8ef7;}.gc.cb .gct{color:#9b7ff4;}.gc.cc .gct{color:#2ecc8e;}.gc.cd .gct{color:#f5834a;}
+.gc p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.7;}
+.cmp{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:17px 20px;}
+.cmp-t{font-size:13px;font-weight:700;margin-bottom:10px;}
+.cmp.bad{border-top:3px solid #f56b6b;}.cmp.bad .cmp-t{color:#f56b6b;}
+.cmp.good{border-top:3px solid #2ecc8e;}.cmp.good .cmp-t{color:#2ecc8e;}
+.cmp p{font-size:13px;color:var(--muted);margin-bottom:6px;}.cmp p:last-child{margin:0;}
+.tl-item{display:flex;gap:16px;margin-bottom:8px;align-items:flex-start;}
+.tl-dot{width:8px;height:8px;background:#4f8ef7;border-radius:50%;flex-shrink:0;margin-top:7px;}
+.tl-time{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#4f8ef7;white-space:nowrap;min-width:110px;margin-top:2px;}
+.tl-label{font-size:13.5px;color:var(--text);font-weight:500;}
+.tl-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.stk{margin:16px 0;max-width:520px;}
+.sr{padding:10px 17px;border-radius:6px;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.sr .lbl{font-size:11px;color:var(--faint);}
+.s-you{background:rgba(79,142,247,.12);color:#4f8ef7;border:1px solid rgba(79,142,247,.2);}
+.s-lc{background:rgba(155,127,244,.12);color:#9b7ff4;border:1px solid rgba(155,127,244,.2);}
+.s-sdk{background:rgba(61,214,245,.12);color:#3dd6f5;border:1px solid rgba(61,214,245,.2);}
+.s-oci{background:rgba(245,131,74,.12);color:#f5834a;border:1px solid rgba(245,131,74,.2);}
+.s-model{background:rgba(46,204,142,.12);color:#2ecc8e;border:1px solid rgba(46,204,142,.2);}
+.sarrow{text-align:center;color:var(--faint);font-size:13px;padding:2px 0;}
+.lh{background:rgba(46,204,142,.06);border:1px solid rgba(46,204,142,.2);border-radius:10px;padding:14px 18px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:600px){.lh{grid-template-columns:1fr;}}
+.lht{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#2ecc8e;margin-bottom:5px;}
+.lhb{font-size:12.5px;color:var(--muted);}
+.err{background:var(--card);border:1px solid var(--border);border-left:3px solid #f56b6b;border-radius:8px;padding:14px 17px;margin:10px 0;}
+.err-c{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#f56b6b;margin-bottom:5px;}
+.err-ca{font-size:13px;color:var(--muted);margin-bottom:5px;}
+.err-f{font-size:13px;color:#2ecc8e;}
+.qa{border-bottom:1px solid var(--border);padding:16px 0;}
+.qa:last-child{border-bottom:none;}
+.qa-q{font-size:14px;font-weight:600;color:#4f8ef7;margin-bottom:7px;}
+.qa-q::before{content:"Q  ";font-family:"JetBrains Mono",monospace;font-size:10px;opacity:.6;}
+.qa-a{font-size:13px;color:var(--muted);}
+.qa-a::before{content:"A  ";font-family:"JetBrains Mono",monospace;font-size:10px;color:#2ecc8e;}
+.vn{background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:16px 20px;margin:16px 0;}
+.vnt{color:#f5c842;font-weight:700;font-size:13px;margin-bottom:7px;}
+.vnb{font-size:13px;color:var(--muted);}
+.cl-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+.cl-item:last-child{border-bottom:none;}
+.cl-c{color:#2ecc8e;flex-shrink:0;margin-top:2px;}
+.cl-t{color:var(--muted);}
+.cl-t strong{color:var(--text);}
+.pill{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;margin:3px;}
+.pb{background:rgba(79,142,247,.12);color:#4f8ef7;border:1px solid rgba(79,142,247,.2);}
+.pp{background:rgba(155,127,244,.12);color:#9b7ff4;border:1px solid rgba(155,127,244,.2);}
+.pg{background:rgba(46,204,142,.12);color:#2ecc8e;border:1px solid rgba(46,204,142,.2);}
+.po{background:rgba(245,131,74,.12);color:#f5834a;border:1px solid rgba(245,131,74,.2);}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+@media(max-width:680px){.sgrid{grid-template-columns:1fr;}}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.sct{font-size:12px;font-weight:700;margin-bottom:7px;}
+.sc p{font-size:12px;color:var(--muted);margin:0;line-height:1.7;}
+footer{border-top:1px solid var(--border);padding:26px 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+footer span{color:var(--faint);font-size:12px;}
+.arch{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:22px;margin:16px 0;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.9;overflow-x:auto;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="badges"><span class="badge bd">Day 36</span></div>
+  <h1>AI Agents</h1>
+  <p class="hero-sub">From giving AI instructions to giving AI goals. Build agents that think, decide, and act — complete with live coding on OCI Cloud Shell.</p>
+</header>
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#journey">Journey</a><a href="#problem">Problem</a><a href="#why">Why Agents</a><a href="#what">What is Agent</a><a href="#ociarch">OCI Architecture</a><a href="#arch">Agent Architecture</a><a href="#lifecycle">Lifecycle</a><a href="#react">ReAct</a><a href="#planning">Planning</a><a href="#toolsel">Tool Selection</a><a href="#types">Types</a><a href="#prompts">Prompts</a><a href="#memory">Memory</a><a href="#a2a">A2A</a><a href="#labs">Live Coding</a><a href="#failures">Failures</a><a href="#deploy">Deploy</a><a href="#ocisvcs">OCI Services</a><a href="#checklist">Checklist</a><a href="#interview">Interview</a><a href="#summary">Summary</a>
+  </nav>
+</div>
+<main>
+
+<!-- SESSION 1 -->
+<div class="sh s1" id="journey">
+  <div><div class="sh-title">Concept Block</div><div class="sh-sub">Journey · Problem · Why Agents · OCI Architecture · Agent Architecture · Lifecycle · ReAct</div></div>
+</div>
+
+<!-- PART 1: JOURNEY -->
+<section class="section">
+  <div class="ey">Part 1</div>
+  <h2>Where Are We in the Journey</h2>
+  <p>Every concept today builds on everything before it. Understand where today fits before learning it.</p>
+  <div class="tl-item"><div class="tl-dot" style="background:var(--faint)"></div><div class="tl-time">Day 31–32</div><div><div class="tl-label">Direct OCI REST API</div><div class="tl-sub">Manual JSON, manual auth, manual parsing. You wrote every line.</div></div></div>
+  <div class="tl-item"><div class="tl-dot" style="background:var(--faint)"></div><div class="tl-time">Day 33–34</div><div><div class="tl-label">APEX + OCI Gen AI</div><div class="tl-sub">PL/SQL calling OCI Gen AI. HR Leave Portal built and working.</div></div></div>
+  <div class="tl-item"><div class="tl-dot" style="background:var(--faint)"></div><div class="tl-time">Day 35</div><div><div class="tl-label">LangChain</div><div class="tl-sub">Templates, Chains, Memory, Tools. AI follows YOUR steps.</div></div></div>
+  <div class="tl-item"><div class="tl-dot" style="background:#4f8ef7;box-shadow:0 0 8px rgba(79,142,247,.5)"></div><div class="tl-time" style="color:#4f8ef7;font-weight:700">TODAY — Day 36</div><div><div class="tl-label" style="color:#fff">AI Agents</div><div class="tl-sub">AI decides its own steps. You give a goal. Agent achieves it.</div></div></div>
+  <div class="tl-item"><div class="tl-dot" style="background:var(--faint)"></div><div class="tl-time">Day 37</div><div><div class="tl-label">RAG</div><div class="tl-sub">Today agent used Python tools. Tomorrow it reads actual documents as another source of knowledge.</div></div></div>
+  <div class="tl-item"><div class="tl-dot" style="background:var(--faint)"></div><div class="tl-time">Day 40–42</div><div><div class="tl-label">Multi-Agent + MCP Protocol</div><div class="tl-sub">Agents coordinating agents. Standardised tool connections across any platform.</div></div></div>
+  <div class="callout info" style="margin-top:18px"><div class="ci">📈</div><p><strong>The progression:</strong> Day 31: AI answers questions → Day 35: AI follows your steps → Day 36: AI achieves your goals. Every day you gave AI more autonomy. Today AI becomes autonomous.</p></div>
+</section>
+
+<!-- PART 2: PROBLEM -->
+<section class="section" id="problem">
+  <div class="ey">Part 2</div>
+  <h2>The Business Problem — Ramesh's Monday</h2>
+  <p>Every concept today traces back to one real person with a real problem. Keep Ramesh in mind all day.</p>
+  <div class="card" style="border-left:3px solid #f5834a">
+    <div class="ct" style="color:#f5834a">CFO Email — Every First Monday</div>
+    <p style="color:var(--text);font-size:14px">"Ramesh, need complete IT cost analysis by 5 PM today. Include team size per project, software license costs, OCI cloud spending, total cost, and three cost-cutting recommendations."</p>
+  </div>
+  <div class="g2">
+    <div class="cmp bad">
+      <div class="cmp-t">❌ What Ramesh Does Manually — 6 Hours</div>
+      <p>9 AM → Opens HR system. Clicks 3 menus. Counts team per project. Writes in notepad.</p>
+      <p>10 AM → Opens Finance portal. Downloads license report. Extracts numbers.</p>
+      <p>11 AM → Opens OCI Console → Cost Management. Gets compute, storage, database costs.</p>
+      <p>12 PM → Opens Excel. Types all numbers. Creates formulas. Calculates totals.</p>
+      <p>1 PM → Writes recommendations paragraph by paragraph.</p>
+      <p>3 PM → Formats report. Reviews. Emails to CFO.</p>
+      <p><strong style="color:#f56b6b">Same task. Every single month. 6 hours gone.</strong></p>
+    </div>
+    <div class="cmp good">
+      <div class="cmp-t">✅ What Ramesh Wants — 10 Minutes</div>
+      <p>9:00 AM → Types one sentence:</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(46,204,142,.08);padding:10px;border-radius:6px;color:#2ecc8e">"Prepare IT cost analysis for October with team data, software costs, cloud spend, and recommendations."</p>
+      <p>9:10 AM → Complete professional report ready.</p>
+      <p>Ramesh reviews. Approves. Emails CFO.</p>
+      <p><strong style="color:#2ecc8e">6 hours → 10 minutes. That is an AI Agent.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- PART 3: WHY -->
+<section class="section" id="why">
+  <div class="ey">Part 3</div>
+  <h2>Why Chain Is Not Enough</h2>
+  <p>Most important question of the day. We have chains from Day 35 — why do we need something more?</p>
+  <div class="g2">
+    <div class="cmp bad">
+      <div class="cmp-t">Chain — The Manual Follower</div>
+      <p>Ramesh writes a step-by-step manual: Step 1 check HR. Step 2 check Finance. Step 3 check OCI. Employee follows exactly. Every time. No thinking.</p>
+      <p>CFO asks: "Just cloud costs. Skip the rest."</p>
+      <p style="color:#f56b6b;font-weight:600">New Joiner: "Manual says HR first. I must follow the manual." Cannot adapt. You must rewrite the manual. That is Chain.</p>
+    </div>
+    <div class="cmp good">
+      <div class="cmp-t">Agent — The Experienced Thinker</div>
+      <p>Ramesh says one sentence: "Prepare cost report for October." Nothing else.</p>
+      <p>Experienced person decides: check HR → check Finance → check OCI → calculate → write report.</p>
+      <p>CFO asks different question? "Just cloud costs." → "Sure, only check OCI." Adapts instantly.</p>
+      <p style="color:#2ecc8e;font-weight:600">No new instructions needed. That is an Agent.</p>
+    </div>
+  </div>
+  <div class="callout good"><div class="ci">✅</div><p><strong>In one line:</strong> Chain = You define the steps. &nbsp; Agent = AI defines the steps.</p></div>
+</section>
+
+<!-- PART 4: WHAT -->
+<section class="section" id="what">
+  <div class="ey">Part 4</div>
+  <h2>What Is an Agent — Three Levels</h2>
+  <div class="g3">
+    <div class="gc ca"><div class="gct">For Common Man</div><p>GPS analogy. Old map: you decide every turn. GPS: you say "Take me to Chennai." GPS plans route, reroutes if blocked. You only said the destination. Agent = GPS for business tasks.</p></div>
+    <div class="gc cb"><div class="gct">For Business Person</div><p>Smart virtual employee. Give it a goal. It checks right systems, collects right data, writes the report. You review and approve. AI handles steps. You handle decisions.</p></div>
+    <div class="gc cc"><div class="gct">For Technical Person</div><p>Agent = LLM + Tools + Loop. LLM decides what to do next. Tools are Python functions that do real work. Loop: Thought → Action → Observe. Repeats until done or max_iterations reached.</p></div>
+  </div>
+  <div class="callout warn"><div class="ci">⚠️</div><p><strong>Critical distinction:</strong> LLM never executes Python code. LLM only decides which code to run. Python actually executes it. LLM reads the string result. Understanding this separation fixes 80% of debugging confusion.</p></div>
+</section>
+
+<!-- PART 5: OCI ARCH -->
+<section class="section" id="ociarch">
+  <div class="ey">Part 5</div>
+  <h2>OCI Architecture — The Layer Students Always Miss</h2>
+  <p>Most tutorials show "Your Code → OCI Gen AI." That is incomplete. There is a critical layer between them.</p>
+  <div class="stk">
+    <div class="sr s-you"><span>Your Code</span><span class="lbl">agent.invoke("goal")</span></div>
+    <div class="sarrow">↓ calls</div>
+    <div class="sr s-lc"><span>LangChain Framework</span><span class="lbl">AgentExecutor · tool registry · ReAct loop</span></div>
+    <div class="sarrow">↓ uses</div>
+    <div class="sr s-sdk"><span>OCI SDK ← Layer Students Miss</span><span class="lbl">RSA signing · authentication · HTTP</span></div>
+    <div class="sarrow">↓ calls</div>
+    <div class="sr s-oci"><span>OCI Gen AI Service</span><span class="lbl">Oracle managed · ap-hyderabad-1</span></div>
+    <div class="sarrow">↓ runs</div>
+    <div class="sr s-model"><span>Cohere command-a-03-2025</span><span class="lbl">Thinks and decides which tool to call</span></div>
+  </div>
+  <div class="callout info"><div class="ci">ℹ️</div><p><strong>OCI SDK explained:</strong> When you run <code>pip install oci</code>, you install Oracle's Python SDK. ChatOCIGenAI in LangChain internally uses this SDK. It reads your ~/.oci/config file, signs every request with RSA, manages authentication, and handles HTTP communication. You never write SDK code directly — LangChain calls it for you. But it is always there between LangChain and OCI Gen AI Service.</p></div>
+  <div class="tw"><table>
+    <tr><th>Layer</th><th>Owner</th><th>What It Does</th></tr>
+    <tr><td>Your tool functions</td><td>You write</td><td>Python functions that get real data from real systems</td></tr>
+    <tr><td>LangChain AgentExecutor</td><td>LangChain</td><td>Manages Thought/Action/Observe loop. Routes tool calls.</td></tr>
+    <tr><td>OCI SDK</td><td>Oracle</td><td>Authentication, RSA signing, HTTP. Invisible but always running.</td></tr>
+    <tr><td>OCI Gen AI Service</td><td>Oracle</td><td>Receives authenticated request, routes to correct model</td></tr>
+    <tr><td>Cohere model</td><td>Oracle hosts</td><td>Thinks, decides which tool, writes final answer</td></tr>
+  </table></div>
+</section>
+
+<!-- PART 6: AGENT ARCH -->
+<section class="section" id="arch">
+  <div class="ey">Part 6</div>
+  <h2>Agent Architecture — The Full Picture</h2>
+  <div class="arch">
+<span style="color:#82aaff">YOUR GOAL: "Prepare IT cost report for October"</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#9b7ff4">┌──────────────────────────────────────────┐
+│  LANGCHAIN AgentExecutor                 │
+│  Manages the entire loop                 │
+└─────────────────┬────────────────────────┘</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#2ecc8e">┌──────────────────────────────────────────┐
+│  COHERE MODEL on OCI                     │
+│  REASONING: "What do I need first?"      │
+│  PLANNING:  "HR → Finance → Cloud → Calc"│
+│  TOOL SEL:  "Use CheckHR with 'all'"     │
+└─────────────────┬────────────────────────┘</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#9b7ff4">LangChain reads LLM decision</span>
+<span style="color:#9b7ff4">Finds CheckHR in tool registry</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#f5c842">PYTHON runs check_hr("all") on Cloud Shell</span>
+<span style="color:#f5c842">Returns string: "35 employees across 3 projects"</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#2ecc8e">┌──────────────────────────────────────────┐
+│  COHERE MODEL on OCI                     │
+│  OBSERVATION: "HR: 35 employees"         │
+│  REASONING:  "Have HR. Need Finance."    │
+└─────────────────┬────────────────────────┘</span>
+               <span style="color:#4a5370">↓ LOOP BACK until enough data ↓</span>
+               <span style="color:#4a5370">↓</span>
+<span style="color:#82aaff">FINAL ANSWER returned to Ramesh</span>
+  </div>
+</section>
+
+<!-- PART 7: LIFECYCLE -->
+<section class="section" id="lifecycle">
+  <div class="ey">Part 7</div>
+  <h2>Agent Lifecycle — Configuration vs Runtime</h2>
+  <div class="callout purple"><div class="ci">🔑</div><p><strong>Key distinction:</strong> <code>initialize_agent()</code> is configuration — happens once at setup. <code>agent.invoke()</code> is runtime — happens every time you call the agent. Like hiring an employee (once) vs them doing work (every day).</p></div>
+  <h3>Configuration — Happens Once at Setup</h3>
+  <div class="analogy"><div class="at">Analogy — Hiring a New Employee</div><p>When you hire someone you give them: appointment letter (system prompt — who they are and what rules), access card (tools — what systems they can use), notepad (memory — what they remember), training (LLM — how they think).</p><p>This happens ONCE when they join. Not every morning when they arrive. <strong>initialize_agent() = the joining process. agent.invoke() = them actually working.</strong></p></div>
+  <h3>Runtime Stage 1 — Planning</h3>
+  <div class="analogy"><div class="at">Analogy — Thinking Before Cooking</div><p>Before touching the stove: "I need onions, chicken, rice, spices. I'll fry onions first, then chicken, then rice." Not cooking yet — just planning the sequence in your head.</p><p>Agent reads goal + all tool descriptions. Creates a mental sequence. Happens inside Cohere LLM on OCI. You don't write the plan. AI creates it from your goal.</p></div>
+  <h3>Runtime Stage 2 — Tool Invocation</h3>
+  <div class="analogy"><div class="at">Analogy — Using PhonePe to Pay Bill</div><p>You need to pay electricity. You don't magically pay by thinking about it. You open PhonePe (the tool), select bill payment, enter amount. PhonePe does the actual work. You invoked the tool.</p><p>Agent does the same: needs HR data → opens CheckHR tool → passes "all" → gets "35 employees" back. Python runs the function. LLM reads the string result.</p></div>
+  <h3>Runtime Stage 3 — Reasoning</h3>
+  <div class="analogy"><div class="at">Analogy — Tasting While Cooking</div><p>After frying onions you taste: "Needs more oil." Add oil. After adding chicken: "Needs salt." You evaluate after every step, not just at the start.</p><p>Agent after every tool result: "Have HR. Need Finance still." → "Have Finance. Need Cloud still." → "Have everything. Ready to write final answer." This is the Reasoning in ReAct.</p></div>
+  <h3>Runtime Stage 4 — Output</h3>
+  <p>Agent has all tool results collected. Cohere LLM on OCI writes the final structured answer. LangChain returns it to you.</p>
+  <div class="callout danger"><div class="ci">🛑</div><p><strong>Always set max_iterations=7 or 8.</strong> Without it, agent can loop forever calling tools without stopping. With it, agent stops after N steps and returns what it has. This is not optional. Always set it. No exceptions.</p></div>
+</section>
+
+<!-- PART 8: REACT -->
+<section class="section" id="react">
+  <div class="ey">Part 8</div>
+  <h2>ReAct Pattern — One Complete Diagram</h2>
+  <p>ReAct = Reasoning + Acting. The most important diagram of Day 36. Shows exactly who does what at every step.</p>
+  <div class="tw"><table>
+    <tr><th>Step</th><th>Name</th><th>Who Does It</th><th>What Happens</th></tr>
+    <tr><td>1</td><td>Thought</td><td style="color:#4f8ef7">Cohere on OCI</td><td>LLM decides which tool is needed and what input to pass to it</td></tr>
+    <tr><td>2</td><td>Action Decision</td><td style="color:#9b7ff4">LangChain</td><td>Reads LLM output, finds the tool in registry, prepares the call</td></tr>
+    <tr><td>3</td><td>Execution</td><td style="color:#f5c842">Python on Cloud Shell</td><td>Your function actually runs with real data and returns a string</td></tr>
+    <tr><td>4</td><td>Observation</td><td style="color:#4f8ef7">Cohere on OCI</td><td>LLM reads tool result, decides if it has enough or needs more</td></tr>
+    <tr><td>5</td><td>Final Answer</td><td style="color:#2ecc8e">Cohere on OCI writes it</td><td>LLM writes the complete response when it has all needed data</td></tr>
+  </table></div>
+  <div class="cw">
+    <div class="ch"><span class="cl">ReAct Loop — Example with Ramesh's Report</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><span class="cm">GOAL: "Get team size, software costs, cloud costs for October. Calculate total."</span>
+
+<span class="cm">--- LOOP ITERATION 1 ---</span>
+Thought:     <span class="str">"I need team size first. Use CheckHR with input 'all'."</span>
+             <span class="cm">[Cohere LLM on OCI decides this]</span>
+Action:      CheckHR
+             <span class="cm">[LangChain reads LLM output, finds CheckHR in registry]</span>
+Execution:   check_hr(<span class="str">"all"</span>) runs in Python on Cloud Shell
+Observation: <span class="str">"35 employees across 3 projects"</span>
+             <span class="cm">[Python returns string → LLM reads it]</span>
+
+<span class="cm">--- LOOP ITERATION 2 ---</span>
+Thought:     <span class="str">"Have HR data. Need software costs. Use CheckLicenses."</span>
+Action:      CheckLicenses
+Execution:   check_licenses(<span class="str">"october"</span>) runs
+Observation: <span class="str">"Software october: Total=65000 INR"</span>
+
+<span class="cm">--- LOOP ITERATION 3 ---</span>
+Thought:     <span class="str">"Have HR and licenses. Need cloud. Use CheckCloud."</span>
+Action:      CheckCloud
+Execution:   check_cloud(<span class="str">"october"</span>) runs
+Observation: <span class="str">"OCI cloud october: Total=48000 INR"</span>
+
+<span class="cm">--- LOOP ITERATION 4 ---</span>
+Thought:     <span class="str">"Have all individual costs. Calculate total now."</span>
+Action:      CalculateTotal
+Execution:   calculate_total(<span class="str">""</span>) runs
+Observation: <span class="str">"Grand Total=113000 INR. Per employee=3228 INR"</span>
+
+Thought:     <span class="str">"I have everything needed. Writing final answer now."</span>
+Final Answer: <span class="str">"IT Cost Analysis — October: Team 35 people...</span>
+<span class="str">              Software 65000 + Cloud 48000 = Total 113000 INR..."</span></pre>
+  </div>
+</section>
+
+<!-- SESSION 2 -->
+<div class="sh s2" id="planning">
+  <div><div class="sh-title">Implementation Block</div><div class="sh-sub">Planning vs Reasoning · Tool Selection · Types · Prompts · Memory · A2A · Failures</div></div>
+</div>
+
+<!-- PART 9: PLANNING -->
+<section class="section">
+  <div class="ey">Part 9</div>
+  <h2>Planning vs Reasoning — The Difference</h2>
+  <div class="g2">
+    <div class="card" style="border-top:3px solid #4f8ef7">
+      <div class="ct" style="color:#4f8ef7">Planning</div>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">When:</strong> Once. Before any tool is called.</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">What:</strong> "I will check HR, then Finance, then Cloud, then calculate total."</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">Where:</strong> Inside Cohere LLM on OCI.</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">Analogy:</strong> Deciding the full recipe before touching the stove. Not cooking yet — just planning the sequence ahead of time.</p>
+    </div>
+    <div class="card" style="border-top:3px solid #2ecc8e">
+      <div class="ct" style="color:#2ecc8e">Reasoning</div>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">When:</strong> After EVERY tool result. Multiple times.</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">What:</strong> "Have HR now. Still need Finance." / "Have everything. Ready to answer."</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">Where:</strong> Inside Cohere LLM on OCI.</p>
+      <p style="font-size:13.5px"><strong style="color:var(--text)">Analogy:</strong> Tasting the curry after every step. "Needs salt." Add salt. Taste again. "Good now." Continuous evaluation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PART 10: TOOL SELECTION -->
+<section class="section" id="toolsel">
+  <div class="ey">Part 10</div>
+  <h2>Tool Selection — How AI Picks the Right Tool</h2>
+  <div class="callout info"><div class="ci">ℹ️</div><p><strong>Tool description is the most important signal — but not the only one.</strong> LLM also considers: tool name, user query, system prompt, previous observations, and conversation context. Write excellent descriptions and the rest follows.</p></div>
+  <div class="g2">
+    <div class="cmp bad">
+      <div class="cmp-t">❌ Poor Description</div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11.5px">Tool(name="GetData",<br>&nbsp; description="gets data",<br>&nbsp; func=check_hr)</p>
+      <p>Too vague. LLM confused. May pick this tool for any question. Wrong results. Hard to debug.</p>
+    </div>
+    <div class="cmp good">
+      <div class="cmp-t">✅ Good Description</div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11.5px">Tool(name="CheckHR",<br>&nbsp; description="""Get employee<br>&nbsp; count and team size.<br>&nbsp; Input: project name or 'all'.<br>&nbsp; Use for headcount questions.<br>&nbsp; NOT for costs or cloud data.""",<br>&nbsp; func=check_hr)</p>
+    </div>
+  </div>
+  <p>When goal says <em>"How many people in ProjectA?"</em> — LLM reads all descriptions. CheckHR says "employee count and team size" → MATCH → picked. CheckLicenses says "software costs" → no match → not picked. Correct every time.</p>
+</section>
+
+<!-- PART 11: TYPES -->
+<section class="section" id="types">
+  <div class="ey">Part 11</div>
+  <h2>Types of Agents</h2>
+  <div class="g2">
+    <div class="gc ca"><div class="gct">Task Agent</div><p>One specific job repeated many times. Like a specialist doctor who only treats one condition. Example: Resume screener — JD + resume in, fit score out. Use when: one well-defined repeated task.</p></div>
+    <div class="gc cb"><div class="gct">Tool-Calling Agent</div><p>Many tools, AI picks right one per question. Like a general physician — you come with any problem, doctor decides what examination to run. Example: Ramesh's IT cost agent. Use when: questions vary.</p></div>
+    <div class="gc cc"><div class="gct">Orchestration Agent</div><p>Coordinates OTHER agents. Like a hospital CEO who coordinates cardiologist, neurologist, surgeon. Does not do work itself — delegates and combines results. Use when: complex workflow with many specialists.</p></div>
+    <div class="gc cd"><div class="gct">Multi-Step Planner</div><p>Plans ALL steps first, then executes. Like an architect drawing the full blueprint before construction starts. You see the complete plan before anything runs. Use when: long tasks need full visibility upfront.</p></div>
+  </div>
+</section>
+
+<!-- PART 12: PROMPTS -->
+<section class="section" id="prompts">
+  <div class="ey">Part 12</div>
+  <h2>Prompt Engineering for Agents</h2>
+  <div class="analogy"><div class="at">Analogy — Three Documents for a New Employee</div>
+    <p><strong>System Prompt = Appointment Letter.</strong> Who agent is. What rules it follows. Permanent. Included in every single call. Example: "You are IT Cost Analyst for LTIMindtree. Only use data from tools. Never make up numbers. If tool did not return it, say you don't know."</p>
+    <p><strong>Developer Prompt = Technical Manual.</strong> How to use tools. What format to return. Edge cases to handle. Written by the person who built the tools.</p>
+    <p><strong>User Prompt = Today's Task.</strong> What Ramesh types. Changes every time. Drives what agent does today.</p>
+  </div>
+  <h3>Dynamic Context Injection — Ramesh Never Repeats Himself</h3>
+  <div class="cw">
+    <div class="ch"><span class="cl">System Prompt with Auto-Injected Context</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><span class="cm"># Every call — these values fill in automatically</span>
+system_prompt = <span class="str">"""You are IT Cost Analyst for LTIMindtree.
+Today is {current_date}.
+User is {user_name} from {department}.
+Region: ap-hyderabad-1.
+Only use data returned by tools.
+If tool did not return it, say you don't know.
+Never make up numbers."""</span>
+
+<span class="cm"># Ramesh never types his name or department</span>
+<span class="cm"># These are injected automatically every time</span>
+<span class="cm"># Agent always knows who it is working for</span></pre>
+  </div>
+</section>
+
+<!-- PART 13: MEMORY -->
+<section class="section" id="memory">
+  <div class="ey">Part 13</div>
+  <h2>Memory — Why First, Then Types</h2>
+  <h3>Why Does an Agent Need Memory?</h3>
+  <div class="g2">
+    <div class="cmp bad">
+      <div class="cmp-t">❌ Without Memory</div>
+      <p><strong>Turn 1:</strong> "I manage ProjectA with 12 people."</p>
+      <p><strong>Turn 2:</strong> "What is cost per person at 120000 budget?"</p>
+      <p><strong>Agent:</strong> "Which project? How many people? Please clarify."</p>
+      <p>Forgot Turn 1 entirely. Customer must repeat everything. Frustrating. Unprofessional.</p>
+    </div>
+    <div class="cmp good">
+      <div class="cmp-t">✅ With Memory</div>
+      <p><strong>Turn 1:</strong> "I manage ProjectA with 12 people." — stored in memory.</p>
+      <p><strong>Turn 2:</strong> "What is cost per person at 120000 budget?"</p>
+      <p><strong>Agent:</strong> "For your ProjectA team of 12: 120000 ÷ 12 = 10000 INR per person."</p>
+      <p>Remembered without being told again. Natural professional conversation.</p>
+    </div>
+  </div>
+  <h3>What Should Be Stored?</h3>
+  <p>Facts (names, numbers, decisions), context (what topic we are discussing), history (what was said before), entities (specific things like ProjectA, Ramesh, October budget).</p>
+  <h3>How Long Should It Be Stored?</h3>
+  <p>Short conversation → store everything. Long conversation → store compressed summary. Years of history → store as searchable vectors and retrieve only what is relevant.</p>
+  <hr class="div">
+  <h3>The Four Memory Types</h3>
+  <div class="tw"><table>
+    <tr><th>Type</th><th>Stores</th><th>Best For</th><th>Problem</th><th>Analogy</th></tr>
+    <tr><td>Buffer Memory</td><td>Every message exactly as said</td><td>Short chats, 3–10 turns</td><td>Gets expensive for long chats</td><td>CCTV — records every second</td></tr>
+    <tr><td>Summary Memory</td><td>Compressed summary of older messages</td><td>Medium chats, 10–50 turns</td><td>"Keyboard" becomes "electronic device"</td><td>Meeting minutes — key points only</td></tr>
+    <tr><td>Entity Memory</td><td>Facts about specific named things</td><td>Multiple people and projects</td><td>Poor for general conversation flow</td><td>Phone contacts — facts per person</td></tr>
+    <tr><td>Vector Memory</td><td>All conversations as searchable vectors</td><td>Thousands of past chats</td><td>Complex setup required</td><td>Google search for your memories</td></tr>
+  </table></div>
+  <div class="callout info"><div class="ci">ℹ️</div><p><strong>Decision guide:</strong> Under 10 turns → Buffer. 10–50 turns → Summary. Many named things to track → Entity. Years of history → Vector. For assessments: Buffer Memory is the right choice for short customer service conversations where every detail matters.</p></div>
+</section>
+
+<!-- PART 14: A2A -->
+<section class="section" id="a2a">
+  <div class="ey">Part 14</div>
+  <h2>A2A — Agent to Agent Communication</h2>
+  <div class="analogy"><div class="at">Analogy — Building a Hospital</div>
+    <p>One doctor cannot do cardiology, neurology, orthopaedics, and manage the hospital all at once. You need specialists and a coordinator. Cardiologist → heart problems. Neurologist → brain problems. Hospital CEO → coordinates all of them.</p>
+    <p>Complex AI tasks work the same way: HR Agent (employee expert) + Finance Agent (cost expert) + Report Agent (writing expert) + Orchestrator (coordinates all three). A2A = these agents talking to each other through the orchestrator.</p>
+  </div>
+  <div class="tw"><table>
+    <tr><th>Pattern</th><th>How It Works</th><th>Analogy</th><th>Best For</th></tr>
+    <tr><td>Request-Response</td><td>Agent A asks → Agent B answers → A continues with result</td><td>Email with reply</td><td>Simple data requests between agents</td></tr>
+    <tr><td>Broadcast</td><td>One agent sends to all simultaneously. All work in parallel.</td><td>WhatsApp group message</td><td>Collect data from multiple sources fast</td></tr>
+    <tr><td>Direct Message</td><td>Two agents talk directly. No orchestrator in the middle.</td><td>DM between two colleagues</td><td>Agents that always work closely together</td></tr>
+    <tr><td>Event-Driven</td><td>Event fires → subscribed agents react automatically</td><td>Doorbell → you open door</td><td>Automatic reactions to system changes</td></tr>
+  </table></div>
+  <h3>Safety Rules Between Agents</h3>
+  <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Each agent has only its own tools.</strong> HR agent cannot access Finance tools. Like office access cards — you only enter floors you are authorised for.</span></div>
+  <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Agents cannot read each other's memory.</strong> Separate memory per agent. Shared data only through defined channels.</span></div>
+  <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Human approves critical actions.</strong> Agent cannot email CFO automatically. Agent cannot delete data. Agent cannot make payments. Always pause. Human reviews. Then proceed.</span></div>
+  <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Validate before passing between agents.</strong> Bad output from one should not corrupt others. Quality check at every handoff point.</span></div>
+</section>
+
+
+<!-- SESSION 3 -->
+<div class="sh s3" id="labs">
+  <div><div class="sh-title">Live Coding + Production</div><div class="sh-sub">7 Labs building one growing system · Deployment · OCI Services · Checklist · Interview Prep</div></div>
+</div>
+
+<!-- VERSION NOTE -->
+<section class="section">
+  <div class="ey">Before Labs</div>
+  <h2>LangChain Version Note — Read Before Any Lab</h2>
+  <div class="vn">
+    <div class="vnt">⚠️ We Use Classic LangChain API in This Programme</div>
+    <div class="vnb">
+      <p style="margin-bottom:8px">We use: <code>initialize_agent()</code>, <code>AgentType.ZERO_SHOT_REACT_DESCRIPTION</code>, <code>ConversationChain</code>, <code>ConversationBufferMemory</code></p>
+      <p style="margin-bottom:8px"><strong style="color:#f5c842">Why:</strong> Easier to learn. Clearer to read. Shows concepts without extra complexity. Industry still uses this widely.</p>
+      <p style="margin-bottom:8px"><strong style="color:#f5c842">You may see online:</strong> LangGraph style (newer approach) with different imports and syntax. Some classic APIs have deprecation notices.</p>
+      <p><strong style="color:#2ecc8e">Deprecation warnings in terminal are OK.</strong> Code runs perfectly. Warning says "a newer way exists" — not that your code is broken. We learn classic first. LangGraph comes in Day 40+.</p>
+    </div>
+  </div>
+  <div class="callout good"><div class="ci">✅</div><p><strong>Setup — Run Once in Cloud Shell:</strong><br><code>pip install langchain langchain-community oci langchain-core --break-system-packages</code></p></div>
+  <div class="cw"><div class="ch"><span class="cl">Verify Setup</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre>python3 -c <span class="str">"from langchain_community.chat_models.oci_generative_ai import ChatOCIGenAI; print('Ready')"</span></pre></div>
+</section>
+
+<!-- LAB 1 -->
+<section class="section">
+  
+  <h2>LAB 1 — Test OCI Connection</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Test Cloud Shell can talk to OCI Gen AI. Foundation for all labs. If this works, everything works.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">OCI connected successfully</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">Error 401 → wrong compartment_id. Error 404 → wrong model_id spelling. ModuleNotFoundError → run pip install again.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab1.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">50</span>}
+)
+response = llm.invoke(<span class="str">"Say: OCI connected successfully"</span>)
+<span class="fn">print</span>(response.content)</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab1.py</pre></div>
+</section>
+
+<!-- LAB 2 -->
+<section class="section">
+  
+  <h2>LAB 2 — Build Tools and Test Each Alone</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Build tool functions agent will use. Test each alone before connecting to agent. Professional approach: isolate problems early.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">HR all: 35 employees. HR ProjectA: 12 members. Licenses: 65000 INR. Cloud: 48000 INR. All tools working.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">Tool raises exception → agent crashes entirely. Always return error string. Never raise inside a tool function.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab2.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="cm"># Normal Python functions</span>
+<span class="cm"># LLM DECIDES which to call</span>
+<span class="cm"># Python EXECUTES them</span>
+<span class="cm"># LLM READS the string result</span>
+
+<span class="kw">def</span> <span class="fn">check_hr</span>(project):
+    <span class="kw">try</span>:
+        data = {<span class="str">"all"</span>: <span class="str">"35 employees across 3 projects"</span>,
+                <span class="str">"ProjectA"</span>: <span class="str">"12 members"</span>, <span class="str">"ProjectB"</span>: <span class="str">"8 members"</span>, <span class="str">"ProjectC"</span>: <span class="str">"15 members"</span>}
+        <span class="kw">return</span> data.get(project, <span class="str">f"{project} not found"</span>)
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">return</span> <span class="str">f"HR error: {str(e)}"</span>  <span class="cm"># never raise — always return string</span>
+
+<span class="kw">def</span> <span class="fn">check_licenses</span>(month):
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="str">f"Software {month}: Microsoft365=45000, Jira=12000, Total=65000 INR"</span>
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">return</span> <span class="str">f"License error: {str(e)}"</span>
+
+<span class="kw">def</span> <span class="fn">check_cloud</span>(month):
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="str">f"OCI cloud {month}: Compute=28000, Storage=8000, Total=48000 INR"</span>
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">return</span> <span class="str">f"Cloud error: {str(e)}"</span>
+
+<span class="kw">def</span> <span class="fn">calculate_total</span>(x):
+    <span class="kw">return</span> <span class="str">"Grand Total: 65000 + 48000 = 113000 INR. Per employee: 3228 INR"</span>
+
+<span class="cm"># Test each tool independently before connecting to agent</span>
+<span class="fn">print</span>(<span class="str">"HR all:"</span>,       check_hr(<span class="str">"all"</span>))
+<span class="fn">print</span>(<span class="str">"HR ProjectA:"</span>, check_hr(<span class="str">"ProjectA"</span>))
+<span class="fn">print</span>(<span class="str">"Licenses:"</span>,    check_licenses(<span class="str">"october"</span>))
+<span class="fn">print</span>(<span class="str">"Cloud:"</span>,       check_cloud(<span class="str">"october"</span>))
+<span class="fn">print</span>(<span class="str">"Total:"</span>,       calculate_total(<span class="str">""</span>))
+<span class="fn">print</span>(<span class="str">"All tools working. Ready for LAB 3."</span>)</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab2.py</pre></div>
+</section>
+
+<!-- LAB 3 -->
+<section class="section">
+  
+  <h2>LAB 3 — Build Agent, See ReAct Live</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Connect tools to agent. See Thought/Action/Observation loop live in terminal. verbose=True shows every decision.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">Thought → Action: CheckHR → Observation → Thought → Action: CheckLicenses → ... → Final Answer with complete report.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">max_iterations not set → infinite loop. handle_parsing_errors=False → one bad response crashes everything. verbose=False → cannot see agent thinking.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab3.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+<span class="kw">from</span> langchain.tools <span class="kw">import</span> Tool
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">600</span>}
+)
+
+<span class="kw">def</span> <span class="fn">check_hr</span>(p):
+    <span class="kw">return</span> {<span class="str">"all"</span>:<span class="str">"35 employees"</span>,<span class="str">"ProjectA"</span>:<span class="str">"12 members"</span>,<span class="str">"ProjectB"</span>:<span class="str">"8 members"</span>}.get(p, <span class="str">"not found"</span>)
+<span class="kw">def</span> <span class="fn">check_licenses</span>(m): <span class="kw">return</span> <span class="str">f"Software {m}: Total=65000 INR"</span>
+<span class="kw">def</span> <span class="fn">check_cloud</span>(m):   <span class="kw">return</span> <span class="str">f"OCI cloud {m}: Total=48000 INR"</span>
+<span class="kw">def</span> <span class="fn">calculate_total</span>(x): <span class="kw">return</span> <span class="str">"Grand Total=113000 INR. Per employee=3228 INR"</span>
+
+<span class="cm"># Description is the most important signal for tool selection</span>
+tools = [
+    <span class="cls">Tool</span>(name=<span class="str">"CheckHR"</span>,
+         description=<span class="str">"Get employee count. Input: project name or 'all'."</span>,
+         func=check_hr),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckLicenses"</span>,
+         description=<span class="str">"Get software license costs. Input: month like 'october'."</span>,
+         func=check_licenses),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckCloud"</span>,
+         description=<span class="str">"Get OCI cloud spending. Input: month like 'october'."</span>,
+         func=check_cloud),
+    <span class="cls">Tool</span>(name=<span class="str">"CalculateTotal"</span>,
+         description=<span class="str">"Get grand total. Use after getting all individual costs."</span>,
+         func=calculate_total)
+]
+
+agent = initialize_agent(
+    tools=tools, llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="kw">True</span>,              <span class="cm"># shows Thought/Action/Observation live</span>
+    max_iterations=<span class="num">8</span>,           <span class="cm"># safety: stop after 8 steps maximum</span>
+    handle_parsing_errors=<span class="kw">True</span>  <span class="cm"># bad LLM format: retry not crash</span>
+)
+
+<span class="fn">print</span>(<span class="str">"="*55 + "\nRAMESH TYPES ONE GOAL:\n" + "="*55</span>)
+result = agent.invoke({<span class="str">"input"</span>: <span class="str">"Get team size, software costs, cloud costs for October. Calculate total."</span>})
+<span class="fn">print</span>(<span class="str">"\n=== FINAL ANSWER ==="</span>)
+<span class="fn">print</span>(result[<span class="str">"output"</span>])</pre></div>
+  <div class="callout good"><div class="ci">👁️</div><p><strong>Point out to students during demo:</strong> Count the steps in the verbose output. Agent decided 4 steps — CheckHR, CheckLicenses, CheckCloud, CalculateTotal. YOU wrote zero steps in the goal. Agent decided all of them. That is the fundamental difference from Chain.</p></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab3.py</pre></div>
+</section>
+
+<!-- LAB 4 -->
+<section class="section">
+  
+  <h2>LAB 4 — See Tool Selection Live</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Same agent. 3 different questions. Different tool selected each time. Proves description drives tool selection.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">Q1: Only CheckHR called. Q2: Only CheckCloud called. Q3: Only CheckLicenses called. No other tools touched.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">Wrong tool selected → improve description. Add "Do NOT use for..." to make exclusions explicit and clear.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab4.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+<span class="kw">from</span> langchain.tools <span class="kw">import</span> Tool
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">200</span>}
+)
+
+<span class="kw">def</span> <span class="fn">check_hr</span>(p):      <span class="kw">return</span> {<span class="str">"all"</span>:<span class="str">"35 employees"</span>,<span class="str">"ProjectA"</span>:<span class="str">"12"</span>,<span class="str">"ProjectB"</span>:<span class="str">"8"</span>}.get(p,<span class="str">"not found"</span>)
+<span class="kw">def</span> <span class="fn">check_licenses</span>(m): <span class="kw">return</span> <span class="str">f"Software {m}: Total=65000 INR"</span>
+<span class="kw">def</span> <span class="fn">check_cloud</span>(m):    <span class="kw">return</span> <span class="str">f"OCI cloud {m}: Total=48000 INR"</span>
+
+tools = [
+    <span class="cls">Tool</span>(name=<span class="str">"CheckHR"</span>,       description=<span class="str">"Get employee count. Input: project name or 'all'."</span>,    func=check_hr),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckLicenses"</span>,  description=<span class="str">"Get software license costs. Input: month name."</span>,      func=check_licenses),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckCloud"</span>,     description=<span class="str">"Get OCI cloud spending. Input: month name."</span>,          func=check_cloud)
+]
+
+agent = initialize_agent(tools=tools, llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="kw">True</span>, max_iterations=<span class="num">4</span>, handle_parsing_errors=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="str">"\n=== Q1: Team question — watch which tool is called ==="</span>)
+r1 = agent.invoke({<span class="str">"input"</span>: <span class="str">"How many people are in ProjectB?"</span>})
+<span class="fn">print</span>(<span class="str">"Answer:"</span>, r1[<span class="str">"output"</span>])
+
+<span class="fn">print</span>(<span class="str">"\n=== Q2: Cloud question — watch which tool is called ==="</span>)
+r2 = agent.invoke({<span class="str">"input"</span>: <span class="str">"What is our OCI cloud spend for October?"</span>})
+<span class="fn">print</span>(<span class="str">"Answer:"</span>, r2[<span class="str">"output"</span>])
+
+<span class="fn">print</span>(<span class="str">"\n=== Q3: Software question — watch which tool is called ==="</span>)
+r3 = agent.invoke({<span class="str">"input"</span>: <span class="str">"How much did we spend on software licenses in October?"</span>})
+<span class="fn">print</span>(<span class="str">"Answer:"</span>, r3[<span class="str">"output"</span>])</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab4.py</pre></div>
+</section>
+
+<!-- LAB 5 -->
+<section class="section">
+  
+  <h2>LAB 5 — Add Memory</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Agent remembers across multiple turns. Customer never repeats themselves. Buffer memory for short conversations.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">Turn 4 asks what was original team size. Agent says 12 — remembered from Turn 1. Never told again.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">Not resetting memory between separate conversations. Using buffer for very long chats — use summary memory instead.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab5.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+<span class="kw">from</span> langchain.memory <span class="kw">import</span> ConversationBufferMemory
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> ConversationChain
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">200</span>}
+)
+
+<span class="cm"># Buffer Memory — stores ALL turns completely</span>
+<span class="cm"># Best for short conversations where every detail matters</span>
+memory = <span class="cls">ConversationBufferMemory</span>()
+chat   = <span class="cls">ConversationChain</span>(llm=llm, memory=memory)
+
+<span class="fn">print</span>(<span class="str">"=== MEMORY DEMO — Watch agent remember across turns ==="</span>)
+turns = [
+    <span class="str">"My name is Ramesh. I manage ProjectA with 12 people."</span>,
+    <span class="str">"What is cost per person if our budget is 120000 INR?"</span>,
+    <span class="str">"What if we add 3 more people to my team?"</span>,
+    <span class="str">"What was the original team size I mentioned?"</span>
+]
+<span class="kw">for</span> i, q <span class="kw">in</span> <span class="fn">enumerate</span>(turns, <span class="num">1</span>):
+    <span class="fn">print</span>(<span class="str">f"\nTurn {i}: {q}"</span>)
+    <span class="fn">print</span>(<span class="str">f"Agent: {chat.predict(input=q)}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\n=== WHAT MEMORY STORED ==="</span>)
+<span class="kw">for</span> msg <span class="kw">in</span> memory.chat_memory.messages:
+    <span class="fn">print</span>(<span class="str">f"{msg.type.upper()}: {msg.content[:60]}..."</span>)</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab5.py</pre></div>
+</section>
+
+<!-- LAB 6 -->
+<section class="section">
+  
+  <h2>LAB 6 — Two Agents Talking (A2A)</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Orchestrator coordinates HR and Finance specialist agents. Each does what it knows best. Orchestrator combines results.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">Orchestrator asks HR Agent, gets team data. Asks Finance Agent, gets costs. Combines both into cost per employee answer.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">Specialist tools leaking into orchestrator. Each agent must only have its own tools. Permission isolation is essential.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab6.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+<span class="kw">from</span> langchain.tools <span class="kw">import</span> Tool
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">400</span>}
+)
+
+<span class="cm"># Specialist 1: HR Agent — only knows HR data</span>
+<span class="kw">def</span> <span class="fn">ask_hr</span>(question):
+    <span class="kw">if</span> <span class="str">"team"</span> <span class="kw">in</span> question.lower() <span class="kw">or</span> <span class="str">"employee"</span> <span class="kw">in</span> question.lower():
+        <span class="kw">return</span> <span class="str">"HR Agent: Total 35 employees. ProjectA=12, ProjectB=8, ProjectC=15."</span>
+    <span class="kw">return</span> <span class="str">"HR Agent: Ask me about team size or employee count."</span>
+
+<span class="cm"># Specialist 2: Finance Agent — only knows cost data</span>
+<span class="kw">def</span> <span class="fn">ask_finance</span>(question):
+    <span class="kw">return</span> <span class="str">"Finance Agent: Software=65000 INR, Cloud=48000 INR, Total=113000 INR for October."</span>
+
+<span class="cm"># Orchestrator: coordinates both specialists — this is A2A</span>
+orchestrator = initialize_agent(
+    tools=[
+        <span class="cls">Tool</span>(name=<span class="str">"AskHRAgent"</span>,
+             description=<span class="str">"Ask HR specialist about employees and team size. Input: your question."</span>,
+             func=ask_hr),
+        <span class="cls">Tool</span>(name=<span class="str">"AskFinanceAgent"</span>,
+             description=<span class="str">"Ask Finance specialist about costs and budget. Input: your question."</span>,
+             func=ask_finance)
+    ],
+    llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="kw">True</span>, max_iterations=<span class="num">5</span>, handle_parsing_errors=<span class="kw">True</span>
+)
+
+<span class="fn">print</span>(<span class="str">"=== A2A DEMO — Orchestrator coordinates 2 specialist agents ==="</span>)
+result = orchestrator.invoke({
+    <span class="str">"input"</span>: <span class="str">"Get team size from HR agent and costs from Finance agent. Calculate cost per employee."</span>
+})
+<span class="fn">print</span>(<span class="str">"\n=== ORCHESTRATOR FINAL ANSWER ==="</span>)
+<span class="fn">print</span>(result[<span class="str">"output"</span>])</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab6.py</pre></div>
+</section>
+
+<!-- LAB 7 -->
+<section class="section">
+  
+  <h2>LAB 7 — Add Logging, Production Ready</h2>
+  <div class="lh">
+    <div><div class="lht">What We Learn</div><div class="lhb">Log every tool call with timestamp and duration. Handle failures gracefully. This is what production agents look like.</div></div>
+    <div><div class="lht">Expected Output</div><div class="lhb">Timestamps on every line. Tool calls logged with duration. Agent completion time shown. Report printed at end.</div></div>
+    <div><div class="lht">Common Mistakes</div><div class="lhb">No logging → cannot debug production failures. Not catching exceptions → silent agent failures at 3 AM.</div></div>
+  </div>
+  <div class="cw"><div class="ch"><span class="cl">lab7.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+  <pre><span class="kw">import</span> logging, time
+<span class="kw">from</span> langchain_community.chat_models.oci_generative_ai <span class="kw">import</span> <span class="cls">ChatOCIGenAI</span>
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+<span class="kw">from</span> langchain.tools <span class="kw">import</span> Tool
+
+logging.basicConfig(format=<span class="str">"%(asctime)s | %(levelname)s | %(message)s"</span>, level=logging.INFO)
+log = logging.getLogger(<span class="str">"ITAgent"</span>)
+log.info(<span class="str">"Agent starting"</span>)
+
+llm = <span class="cls">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">600</span>}
+)
+
+<span class="kw">def</span> <span class="fn">check_hr</span>(project):
+    log.info(<span class="str">f"CheckHR | input: {project}"</span>); t = time.time()
+    <span class="kw">try</span>:
+        data = {<span class="str">"all"</span>:<span class="str">"35 employees"</span>,<span class="str">"ProjectA"</span>:<span class="str">"12 members"</span>,<span class="str">"ProjectB"</span>:<span class="str">"8 members"</span>}
+        r = data.get(project, <span class="str">"not found"</span>)
+        log.info(<span class="str">f"CheckHR done | {time.time()-t:.2f}s"</span>); <span class="kw">return</span> r
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        log.error(<span class="str">f"CheckHR failed | {e}"</span>); <span class="kw">return</span> <span class="str">f"HR unavailable: {e}"</span>
+
+<span class="kw">def</span> <span class="fn">check_licenses</span>(month):
+    log.info(<span class="str">f"CheckLicenses | input: {month}"</span>); t = time.time()
+    <span class="kw">try</span>:
+        r = <span class="str">f"Software {month}: Total=65000 INR"</span>
+        log.info(<span class="str">f"CheckLicenses done | {time.time()-t:.2f}s"</span>); <span class="kw">return</span> r
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        log.error(<span class="str">f"CheckLicenses failed | {e}"</span>); <span class="kw">return</span> <span class="str">f"Finance unavailable: {e}"</span>
+
+<span class="kw">def</span> <span class="fn">check_cloud</span>(month):
+    log.info(<span class="str">f"CheckCloud | input: {month}"</span>); t = time.time()
+    <span class="kw">try</span>:
+        r = <span class="str">f"OCI cloud {month}: Total=48000 INR"</span>
+        log.info(<span class="str">f"CheckCloud done | {time.time()-t:.2f}s"</span>); <span class="kw">return</span> r
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        log.error(<span class="str">f"CheckCloud failed | {e}"</span>); <span class="kw">return</span> <span class="str">f"OCI unavailable: {e}"</span>
+
+<span class="kw">def</span> <span class="fn">calculate_total</span>(x):
+    log.info(<span class="str">"CalculateTotal called"</span>)
+    <span class="kw">return</span> <span class="str">"Grand Total=113000 INR. Per employee=3228 INR"</span>
+
+tools = [
+    <span class="cls">Tool</span>(name=<span class="str">"CheckHR"</span>,       description=<span class="str">"Get employee count. Input: project name or 'all'."</span>,    func=check_hr),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckLicenses"</span>,  description=<span class="str">"Get software license costs. Input: month name."</span>,      func=check_licenses),
+    <span class="cls">Tool</span>(name=<span class="str">"CheckCloud"</span>,     description=<span class="str">"Get OCI cloud spending. Input: month name."</span>,          func=check_cloud),
+    <span class="cls">Tool</span>(name=<span class="str">"CalculateTotal"</span>, description=<span class="str">"Calculate grand total. Use after all individual costs."</span>, func=calculate_total)
+]
+
+agent = initialize_agent(tools=tools, llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="kw">True</span>, max_iterations=<span class="num">8</span>, handle_parsing_errors=<span class="kw">True</span>)
+
+goal = <span class="str">"Get team size, software costs, cloud costs for October. Calculate total."</span>
+log.info(<span class="str">f"Invoking | goal: {goal[:50]}"</span>)
+start = time.time()
+<span class="kw">try</span>:
+    result = agent.invoke({<span class="str">"input"</span>: goal})
+    log.info(<span class="str">f"Completed | time: {time.time()-start:.1f}s | success: True"</span>)
+    <span class="fn">print</span>(<span class="str">"\n=== FINAL REPORT ==="</span>); <span class="fn">print</span>(result[<span class="str">"output"</span>])
+<span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+    log.error(<span class="str">f"Failed | time: {time.time()-start:.1f}s | error: {e}"</span>)
+    <span class="fn">print</span>(<span class="str">f"Agent failed: {e}"</span>)</pre></div>
+  <div class="cw"><div class="ch"><span class="cl">Run</span><div class="dots"><span></span><span></span><span></span></div></div><pre>python3 lab7.py</pre></div>
+</section>
+
+<!-- FAILURES -->
+<section class="section" id="failures">
+  <div class="ey">Part 17 — Real OCI Errors</div>
+  <h2>Why Agents Fail — OCI Specific Errors</h2>
+  <p>These are real errors you will see in Cloud Shell. Know them. Fix them quickly. Never be surprised.</p>
+  <div class="err"><div class="err-c">oci.exceptions.ServiceError: status 401 — NotAuthenticated</div><div class="err-ca">Cause: API key wrong, expired, or revoked. Compartment ID incorrect for this tenancy.</div><div class="err-f">Fix: Check ~/.oci/config file exists and is complete. Verify fingerprint matches OCI Console → Profile → API Keys. Check compartment_id value.</div></div>
+  <div class="err"><div class="err-c">oci.exceptions.ServiceError: status 429 — TooManyRequests</div><div class="err-ca">Cause: Too many calls per minute to OCI Gen AI service. Rate limit exceeded.</div><div class="err-f">Fix: import time; time.sleep(60) then retry. Reduce max_iterations to make fewer calls per agent run.</div></div>
+  <div class="err"><div class="err-c">oci.exceptions.ServiceError: status 503 — ServiceUnavailable</div><div class="err-ca">Cause: OCI Gen AI service temporarily down or overloaded.</div><div class="err-f">Fix: Wait 2-3 minutes. Check OCI Status page. handle_parsing_errors=True handles some 503 cases automatically.</div></div>
+  <div class="err"><div class="err-c">Agent stopped — max iterations reached without Final Answer</div><div class="err-ca">Cause: max_iterations not set, or tool descriptions too vague causing LLM to loop.</div><div class="err-f">Fix: Always set max_iterations=7 or 8. Improve tool descriptions. Add "Do NOT use for X" statements.</div></div>
+  <div class="err"><div class="err-c">Exception in tool function — crashed entire agent</div><div class="err-ca">Cause: Tool function raised an exception instead of returning an error string.</div><div class="err-f">Fix: Wrap every tool in try/except. Return error string. Never raise inside a tool. Agent reads string and handles gracefully.</div></div>
+  <div class="err"><div class="err-c">Agent hallucination — numbers not from any tool</div><div class="err-ca">Cause: LLM filled gaps from training data when tool did not return the needed info.</div><div class="err-f">Fix: Add to system prompt: "Only use data from tools. If tool did not return it, say you don't know. Never make up numbers."</div></div>
+</section>
+
+<!-- DEPLOY -->
+<section class="section" id="deploy">
+  <div class="ey">Part 15 — </div>
+  <h2>Deployment — Cloud Shell to Production</h2>
+  <div class="tw"><table>
+    <tr><th>Stage</th><th>Where</th><th>What</th><th>Good For</th></tr>
+    <tr><td>Development</td><td>Cloud Shell</td><td>Single Python file. Hardcoded values. Run manually.</td><td>Learning, testing labs today</td></tr>
+    <tr><td>Organised Project</td><td>Cloud Shell or local</td><td>tools.py + agent.py + config.py. No secrets in code.</td><td>Team development</td></tr>
+    <tr><td>Docker Container</td><td>Any machine</td><td>Code + Python + packages all packaged together. Same result everywhere.</td><td>Consistent, reproducible deployment</td></tr>
+    <tr><td>OCI Functions</td><td>OCI</td><td>Serverless. Runs when called. Sleeps otherwise. Pay per invocation only.</td><td>Ramesh's monthly report — perfect fit</td></tr>
+    <tr><td>OCI Container Instances</td><td>OCI</td><td>Always running. Ready instantly.</td><td>Agents needed 24/7 constantly</td></tr>
+    <tr><td>OCI Kubernetes (OKE)</td><td>OCI</td><td>Auto-scales with load. Multiple agents in parallel.</td><td>Enterprise at massive scale</td></tr>
+  </table></div>
+  <div class="callout info"><div class="ci">ℹ️</div><p><strong>For Ramesh's use case specifically:</strong> OCI Functions is perfect. Agent runs once a month when CFO asks. Sleeps the rest of the time. Pay only for that one monthly run. Cost: almost zero. No server to manage. No idle charges.</p></div>
+</section>
+
+<!-- OCI SERVICES -->
+<section class="section" id="ocisvcs">
+  <div class="ey">Part 16</div>
+  <h2>OCI Services in a Complete Agent Solution</h2>
+  <div class="tw"><table>
+    <tr><th>OCI Service</th><th>Role in Agent</th><th>When You Need It</th></tr>
+    <tr><td>OCI Gen AI</td><td>The brain. Cohere model runs here. Every agent.invoke() calls this service.</td><td>Always — foundation of everything</td></tr>
+    <tr><td>OCI SDK</td><td>RSA signing, authentication, HTTP. Sits between LangChain and OCI Gen AI.</td><td>Always — installed with pip install oci</td></tr>
+    <tr><td>OCI IAM</td><td>Controls who can call Gen AI. Without correct policy → 401 error immediately.</td><td>Setup — admin configures once per compartment</td></tr>
+    <tr><td>OCI Vault</td><td>Stores secrets securely in production. Never use .env files in production.</td><td>Production — replaces all hardcoded values</td></tr>
+    <tr><td>OCI Logging</td><td>Stores all log messages from production. Search when agent fails at 3 AM.</td><td>Production — Lab 7 logs go here</td></tr>
+    <tr><td>OCI Object Storage</td><td>Store agent output reports. Store documents for RAG (Day 37).</td><td>When agent produces files or reads documents</td></tr>
+    <tr><td>OCI Functions</td><td>Run agent as serverless. Trigger via event or API call.</td><td>Production deployment for Ramesh's monthly report</td></tr>
+    <tr><td>OCI API Gateway</td><td>Expose agent as REST API endpoint. APEX or other systems call it.</td><td>When other apps need to trigger the agent</td></tr>
+    <tr><td>OCI Monitoring</td><td>Dashboards showing success rate, response time, cost per call.</td><td>Production — know if agents are healthy</td></tr>
+    <tr><td>OCI Notifications</td><td>Alert Ramesh via email or SMS if agent fails at 3 AM.</td><td>Production — instant failure alerts</td></tr>
+  </table></div>
+</section>
+
+<!-- CHECKLIST -->
+<section class="section" id="checklist">
+  <div class="ey">Part 18</div>
+  <h2>Production Checklist — Before Going Live</h2>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Security</div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>No secrets in code.</strong> Compartment ID and API keys come from environment variables or OCI Vault.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>OCI Vault in production.</strong> Never use .env files in production. Use OCI Vault for all secrets.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>IAM least privilege.</strong> Agent has only the access it needs. Not full admin access.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Compartment isolation.</strong> Agent resources in dedicated compartment. Separate from other workloads.</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Reliability</div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>max_iterations set to 7–10.</strong> No exceptions. Always. Prevents infinite loops.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>handle_parsing_errors=True.</strong> Bad LLM response → retry not crash.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>try/except in every tool.</strong> Return error string. Never raise inside tool function.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Retry for 429 and 503.</strong> Wait 60 seconds then retry. OCI can be temporarily busy.</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Observability</div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Logging enabled.</strong> Every tool call logged with timestamp, input, output, duration.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>OCI Logging configured.</strong> Production logs go to OCI. Not just terminal output.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>OCI Monitoring dashboards.</strong> Success rate, response time, token usage all visible.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>OCI Notifications set up.</strong> Alert Ramesh immediately when agent fails.</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Quality</div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Tool descriptions tested</strong> with multiple different questions to verify correct selection every time.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>System prompt prevents hallucination.</strong> "Only use data from tools. Never make up numbers."</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>Human approval for critical actions.</strong> Agent cannot email, delete data, or make payments automatically.</span></div>
+      <div class="cl-item"><span class="cl-c">✓</span><span class="cl-t"><strong>max_tokens set per use case.</strong> 600 for reports, 200 for short answers. Not always maximum — costs money.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <div class="ey">Part 19 — </div>
+  <h2>Interview Questions</h2>
+  <div class="qa"><div class="qa-q">What is the difference between Chain and Agent?</div><div class="qa-a">Chain = you define the steps. AI follows your steps in fixed order. Agent = you give a goal. AI defines and executes the steps dynamically at runtime to achieve it.</div></div>
+  <div class="qa"><div class="qa-q">When NOT to use an Agent?</div><div class="qa-a">When steps are fixed and known in advance. Use Chain instead — simpler, faster, more predictable, easier to debug. Agent adds value only when AI needs to decide steps dynamically. Over-engineering with agents adds unnecessary cost and unpredictability.</div></div>
+  <div class="qa"><div class="qa-q">What is the ReAct pattern and who does each step?</div><div class="qa-a">Reasoning + Acting. Thought → Cohere on OCI decides which tool. Action decision → LangChain reads LLM output, finds tool in registry. Execution → Python on Cloud Shell runs the function. Observation → Cohere reads the result. Repeat until done.</div></div>
+  <div class="qa"><div class="qa-q">How does AI pick the right tool?</div><div class="qa-a">Tool description is the most important signal, but not the only one. LLM also considers tool name, user query, system prompt, previous observations, and conversation context. Write clear descriptions including what NOT to use the tool for.</div></div>
+  <div class="qa"><div class="qa-q">What is the difference between Planning and Reasoning?</div><div class="qa-a">Planning = before any tool is called, happens once at start, decides the sequence. Reasoning = after every single tool result, happens multiple times, decides whether to continue or write the final answer. Both happen inside Cohere LLM on OCI.</div></div>
+  <div class="qa"><div class="qa-q">Who actually executes the Python tool function?</div><div class="qa-a">Python on your machine or Cloud Shell. Not the LLM. LLM decides WHICH function to call. LangChain finds it in the tool registry. Python executes it. LLM reads the string result. This separation explains most debugging confusion.</div></div>
+  <div class="qa"><div class="qa-q">Why return string from tool instead of raising exception?</div><div class="qa-a">Exception crashes the entire agent immediately. Error string lets the agent read it as an observation, handle gracefully, and try another approach or give a partial answer. Always wrap tools in try/except. Always return string.</div></div>
+  <div class="qa"><div class="qa-q">Which memory type for a 5-turn customer service conversation?</div><div class="qa-a">ConversationBufferMemory. Short conversation — every detail matters. "Wireless keyboard" must not become "electronic device." Buffer stores everything exactly as said. Summary would compress details. Window memory is unnecessary for only 5 turns.</div></div>
+  <div class="qa"><div class="qa-q">What is A2A?</div><div class="qa-a">Agent to Agent communication. Specialist agents coordinated by an orchestrator. HR Agent + Finance Agent + Report Agent, all coordinated by Orchestrator. Each specialist has only its own tools. Like a hospital with specialists and a CEO who coordinates them all.</div></div>
+  <div class="qa"><div class="qa-q">What is max_iterations for and why always set it?</div><div class="qa-a">Safety net. Stops agent after N steps regardless of whether goal was achieved. Prevents infinite loops where agent keeps calling tools without ever reaching Final Answer. Always set 7–10. No exceptions to this rule.</div></div>
+  <div class="qa"><div class="qa-q">What is the difference between Tool and API?</div><div class="qa-a">API = external service endpoint (OCI Gen AI, a database, LinkedIn). Tool = Python function that wraps an API call. Agent never calls APIs directly — agent calls tools. Inside the tool, you call whatever API or system you need.</div></div>
+  <div class="qa"><div class="qa-q">Why verbose=True? When to use False?</div><div class="qa-a">verbose=True shows every Thought/Action/Observation live in terminal. Essential for learning, debugging, and assessment screenshots. In production: set verbose=False and use structured logging (Lab 7 pattern) instead. Verbose output creates noise in production logs.</div></div>
+  <div class="qa"><div class="qa-q">What OCI error means authentication failed?</div><div class="qa-a">oci.exceptions.ServiceError: status 401 — NotAuthenticated. Check ~/.oci/config file. Verify the fingerprint matches OCI Console → Profile → API Keys. Check compartment_id is correct for your tenancy.</div></div>
+  <div class="qa"><div class="qa-q">What is the OCI SDK layer and why do students miss it?</div><div class="qa-a">The OCI Python SDK (pip install oci) sits between LangChain and OCI Gen AI Service. It handles RSA signing, authentication, and HTTP. ChatOCIGenAI uses it internally. Most diagrams show "LangChain → OCI Gen AI" directly and skip this critical layer.</div></div>
+</section>
+
+<!-- SUMMARY -->
+<section class="section" id="summary">
+  <div class="ey">Part 20</div>
+  <h2>Day 36 — Complete Summary</h2>
+  <div class="sgrid">
+    <div class="sc" style="border-top:3px solid #4f8ef7"><div class="sct" style="color:#4f8ef7">For Common Man</div><p>Agent is like GPS. You say where to go. It plans the route. Changes route if blocked. Ramesh types one sentence. Agent does 6 hours of work in 10 minutes. You review. You approve.</p></div>
+    <div class="sc" style="border-top:3px solid #9b7ff4"><div class="sct" style="color:#9b7ff4">For Business Person</div><p>Before: Ramesh 6 hours per report every month. After: 10 minutes. AI handles steps. Ramesh handles decisions. Full audit trail in OCI Logging. Human approves before CFO gets email. Cost: few rupees per report.</p></div>
+    <div class="sc" style="border-top:3px solid #2ecc8e"><div class="sct" style="color:#2ecc8e">For Technical Person</div><p>Agent = OCI LLM + LangChain AgentExecutor + Python tools. OCI SDK handles auth. Cohere decides which Python function runs. Python executes. LLM reads string result. Loop until done or max_iterations reached.</p></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="ct">Files Built Today — One Growing System</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+      <span class="pill pg">lab1.py — OCI connection</span>
+      <span class="pill pg">lab2.py — tools tested alone</span>
+      <span class="pill pg">lab3.py — agent with ReAct visible</span>
+      <span class="pill pg">lab4.py — tool selection proved</span>
+      <span class="pill pg">lab5.py — memory across turns</span>
+      <span class="pill pg">lab6.py — A2A two agents</span>
+      <span class="pill pg">lab7.py — logging, production ready</span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="ct">What Comes Next</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+      <span class="pill pb">Day 37 → RAG: agent reads actual PDF documents</span>
+      <span class="pill pp">Day 40 → Multi-Agent Systems at scale</span>
+      <span class="pill po">Day 41-42 → MCP: standard tool protocol</span>
+    </div>
+    <p style="margin-top:12px;font-size:13px">Today agent used Python tools to get data from systems. Tomorrow it will use actual documents as another source of knowledge — reading real LTIMindtree HR policy PDF instead of guessing from training data.</p>
+  </div>
+</section>
+</main>
+<footer>
+  <span>LTIMindtree OCI GenAI Foundation Programme</span>
+  <span>AI Agents — Complete Guide</span>
+</footer>
+</body>
+</html>

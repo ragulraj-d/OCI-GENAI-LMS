@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PL/SQL Fundamentals</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7faf9;
+    --surface: #ffffff;
+    --surface-alt: #f0f5f3;
+    --border: #dde8e4;
+    --text-primary: #0f1f1a;
+    --text-secondary: #4a6460;
+    --text-muted: #7a9490;
+    --accent: #0d9488;
+    --accent-soft: #f0fdfa;
+    --accent-mid: #99e6df;
+    --accent-dark: #0f766e;
+    --green: #16a34a;
+    --green-soft: #f0fdf4;
+    --red: #dc2626;
+    --red-soft: #fef2f2;
+    --yellow: #ca8a04;
+    --yellow-soft: #fefce8;
+    --purple: #7c3aed;
+    --purple-soft: #f5f3ff;
+    --mac-bar: #2d2d2d;
+    --mac-bg: #1a1e2e;
+    --mac-text: #cdd6f4;
+    --mac-comment: #6c7086;
+    --mac-keyword: #cba6f7;
+    --mac-string: #a6e3a1;
+    --mac-number: #fab387;
+    --mac-func: #89dceb;
+    --mac-type: #f38ba8;
+    --mac-operator: #89b4fa;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 1280px; margin: 0 auto;
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px;
+    color: var(--text-primary); text-decoration: none;
+  }
+  .header-logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #042f2e 0%, #0f4f47 50%, #134e4a 100%);
+    padding: 64px 2rem 56px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(13,148,136,0.35) 0%, transparent 70%);
+  }
+  .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #5eead4; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Sora', sans-serif; font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .hero h1 em { font-style: normal; color: #5eead4; }
+  .hero-sub { font-size: 15px; color: #99f6e4; margin-bottom: 36px; opacity: 0.8; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .hero-pill {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    color: #ccfbf1; font-size: 12px; font-weight: 500; padding: 5px 12px;
+    border-radius: 20px; backdrop-filter: blur(4px);
+  }
+
+  /* ── LAYOUT ── */
+  .page-body {
+    max-width: 1280px; margin: 0 auto; padding: 44px 2rem 80px;
+    display: grid; grid-template-columns: 220px minmax(0,1fr);
+    gap: 32px; align-items: start; overflow: hidden;
+  }
+
+  /* ── SIDEBAR TOC ── */
+  .toc {
+    position: sticky; top: 56px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow);
+    max-height: calc(100vh - 72px); overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    width: 220px; flex-shrink: 0;
+  }
+  .toc::-webkit-scrollbar { width: 4px; }
+  .toc::-webkit-scrollbar-track { background: transparent; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .toc::-webkit-scrollbar-thumb:hover { background: var(--accent-mid); }
+
+  .toc-title {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
+  }
+  .toc-section { margin-bottom: 16px; }
+  .toc-section-label {
+    font-size: 11px; font-weight: 600; color: var(--accent);
+    margin-bottom: 6px; display: block;
+  }
+  .toc a {
+    display: block; font-size: 12px; color: var(--text-secondary);
+    text-decoration: none; padding: 3px 8px; border-radius: 4px; transition: all 0.15s; line-height: 1.5;
+  }
+  .toc a:hover { background: var(--accent-soft); color: var(--accent); }
+
+  /* ── CONTENT ── */
+  .content { min-width: 0; max-width: 100%; overflow: hidden; }
+
+  /* ── SESSION BLOCK ── */
+  .session-block { margin-bottom: 64px; }
+  .session-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid var(--border);
+  }
+  .session-icon {
+    width: 44px; height: 44px; background: var(--accent); border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .session-header h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; }
+  .session-header p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ── TOPIC CARD ── */
+  .topic-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin-bottom: 24px; overflow: hidden; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s; max-width: 100%;
+  }
+  .topic-card:hover { box-shadow: var(--shadow-md); }
+  .topic-card-header {
+    padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .topic-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-mid);
+    padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  }
+  .topic-card-header h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; line-height: 1.35; }
+  .topic-card-header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+  .topic-body { padding: 22px; }
+
+  /* ── PROSE ── */
+  .prose p { font-size: 14.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 14px; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { color: var(--text-primary); font-weight: 600; }
+
+  /* ── SUBSECTION ── */
+  .subsection { margin-bottom: 26px; }
+  .subsection:last-child { margin-bottom: 0; }
+  .subsection-title {
+    font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text-primary); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .subsection-title::before {
+    content: ''; display: inline-block; width: 3px; height: 14px;
+    background: var(--accent); border-radius: 2px; flex-shrink: 0;
+  }
+
+  /* ── OUTPUT BOX ── */
+  .output-box {
+    background: #f7fdfb; border: 1px solid var(--accent-mid);
+    border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-top: 10px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--accent-dark);
+  }
+  .output-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 5px;
+  }
+
+  /* ── MAC CODE BLOCK ── */
+  .mac-window {
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.12);
+    margin-bottom: 10px; font-family: 'JetBrains Mono', monospace;
+    max-width: 100%; width: 100%;
+  }
+  .mac-titlebar {
+    background: var(--mac-bar); padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mac-btn { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .mac-btn.close { background: #ff5f57; }
+  .mac-btn.min   { background: #febc2e; }
+  .mac-btn.max   { background: #28c840; }
+  .mac-file-label { flex: 1; text-align: center; font-size: 11px; color: #8a8a8a; letter-spacing: 0.3px; }
+  .mac-body { background: var(--mac-bg); padding: 18px 20px; overflow-x: auto; max-width: 100%; }
+  .mac-body pre {
+    margin: 0; font-size: 12.5px; line-height: 1.75;
+    color: var(--mac-text); tab-size: 4; white-space: pre; min-width: 0;
+  }
+  .kw  { color: var(--mac-keyword); }
+  .str { color: var(--mac-string); }
+  .num { color: var(--mac-number); }
+  .fn  { color: var(--mac-func); }
+  .cm  { color: var(--mac-comment); font-style: italic; }
+  .op  { color: var(--mac-operator); }
+  .tp  { color: var(--mac-type); }
+  .ok  { color: #a6e3a1; font-weight: 600; }
+  .bad { color: #f38ba8; font-weight: 600; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--radius-sm);
+    margin-bottom: 16px; font-size: 13.5px; line-height: 1.65;
+  }
+  .callout-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .callout p { margin: 0; }
+  .callout.tip  { background: var(--green-soft); border-left: 3px solid var(--green); color: #166534; }
+  .callout.warn { background: var(--yellow-soft); border-left: 3px solid var(--yellow); color: #713f12; }
+  .callout.info { background: var(--accent-soft); border-left: 3px solid var(--accent); color: var(--accent-dark); }
+  .callout.danger { background: var(--red-soft); border-left: 3px solid var(--red); color: #991b1b; }
+  .callout.purple { background: var(--purple-soft); border-left: 3px solid var(--purple); color: #5b21b6; }
+
+  /* ── ANALOGY CARD ── */
+  .analogy-card {
+    background: linear-gradient(135deg, #f0fdfa 0%, #f0fdf4 100%);
+    border: 1px solid var(--accent-mid); border-radius: var(--radius); padding: 16px 20px; margin-top: 14px;
+  }
+  .analogy-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .analogy-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .analogy-list li { font-size: 13px; color: #0f4f47; padding-left: 20px; position: relative; line-height: 1.55; }
+  .analogy-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-weight: 600; }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;
+    border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);
+  }
+  .data-table th {
+    background: var(--surface-alt); font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);
+    padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; line-height: 1.55; }
+  .data-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--surface-alt); }
+
+  /* ── BLOCK DIAGRAM ── */
+  .block-diagram { margin: 16px 0; display: flex; flex-direction: column; gap: 0; }
+  .block-row {
+    border: 1.5px solid var(--border); border-top: none; padding: 14px 18px;
+    background: var(--surface);
+  }
+  .block-row:first-child { border-top: 1.5px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+  .block-row:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+  .block-row-label {
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 4px;
+  }
+  .block-row-desc { font-size: 12.5px; color: var(--text-secondary); }
+  .block-row.mandatory { border-left: 4px solid var(--accent); }
+  .block-row.optional  { border-left: 4px solid var(--border); }
+  .block-tag {
+    display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px;
+    border-radius: 4px; margin-left: 8px; vertical-align: middle;
+  }
+  .block-tag.req { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-mid); }
+  .block-tag.opt { background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* ── COMPARE GRID ── */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; overflow: hidden;
+  }
+  @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-grid .mac-window { margin-bottom: 0; }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    border-top: 1px solid var(--border); padding: 28px 2rem; text-align: center; background: var(--surface);
+  }
+  .site-footer p { font-size: 13px; color: var(--text-muted); }
+  .site-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .site-footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; }
+    .toc { position: static; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#" class="header-logo"><span class="dot"></span>Oracle Developer Track</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">PL/SQL Fundamentals</span>
+    <h1>PL/SQL <em>Foundation</em><br>Complete Reference</h1>
+    <p class="hero-sub">Blocks · Variables · Data Types · Literals · Control Structures · Loops · Exceptions · SELECT INTO</p>
+    <div class="hero-pills">
+      <span class="hero-pill">PL/SQL Introduction</span>
+      <span class="hero-pill">Block Structure</span>
+      <span class="hero-pill">Variables &amp; Constants</span>
+      <span class="hero-pill">Data Types</span>
+      <span class="hero-pill">%TYPE &amp; %ROWTYPE</span>
+      <span class="hero-pill">Literals</span>
+      <span class="hero-pill">Control Structures</span>
+      <span class="hero-pill">All Loop Types</span>
+      <span class="hero-pill">Exception Handling</span>
+      <span class="hero-pill">SELECT INTO</span>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- SIDEBAR -->
+  <aside class="toc">
+    <div class="toc-title">On this page</div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">1. Introduction</span>
+      <a href="#what-is-plsql">What is PL/SQL</a>
+      <a href="#sql-vs-plsql">SQL vs PL/SQL</a>
+      <a href="#advantages">Advantages</a>
+      <a href="#architecture">Architecture</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">2. Block Structure</span>
+      <a href="#block-overview">Block Overview</a>
+      <a href="#declare">DECLARE</a>
+      <a href="#begin">BEGIN</a>
+      <a href="#exception-block">EXCEPTION</a>
+      <a href="#end">END</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">3. Variables</span>
+      <a href="#declaration">Declaration</a>
+      <a href="#initialization">Initialization</a>
+      <a href="#scope">Scope</a>
+      <a href="#constants">Constants</a>
+      <a href="#type-anchor">%TYPE Anchor</a>
+      <a href="#rowtype-anchor">%ROWTYPE Anchor</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">4. Data Types</span>
+      <a href="#number">NUMBER</a>
+      <a href="#varchar2">VARCHAR2</a>
+      <a href="#char">CHAR</a>
+      <a href="#date">DATE</a>
+      <a href="#boolean">BOOLEAN</a>
+      <a href="#lob-types">CLOB / BLOB</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">5. Literals</span>
+      <a href="#numeric-lit">Numeric</a>
+      <a href="#char-lit">Character</a>
+      <a href="#date-lit">Date</a>
+      <a href="#bool-lit">Boolean</a>
+      <a href="#null-lit">NULL</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">6. Control Structures</span>
+      <a href="#if">IF</a>
+      <a href="#if-else">IF-ELSE</a>
+      <a href="#if-elsif">IF-ELSIF</a>
+      <a href="#case-simple">CASE (Simple)</a>
+      <a href="#case-searched">CASE (Searched)</a>
+      <a href="#nested-if">Nested IF</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">7. Loops</span>
+      <a href="#basic-loop">Basic LOOP</a>
+      <a href="#while-loop">WHILE LOOP</a>
+      <a href="#for-loop">FOR LOOP</a>
+      <a href="#reverse-for">REVERSE FOR</a>
+      <a href="#exit">EXIT</a>
+      <a href="#exit-when">EXIT WHEN</a>
+      <a href="#continue">CONTINUE</a>
+      <a href="#nested-loops">Nested Loops</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">8. Exceptions</span>
+      <a href="#what-exception">What is Exception</a>
+      <a href="#predefined">Predefined</a>
+      <a href="#user-defined">User-Defined</a>
+      <a href="#raise">RAISE</a>
+      <a href="#when-others">WHEN OTHERS</a>
+      <a href="#sqlcode-sqlerrm">SQLCODE / SQLERRM</a>
+      <a href="#pragma">PRAGMA EXCEPTION_INIT</a>
+      <a href="#raise-app-error">RAISE_APPLICATION_ERROR</a>
+    </div>
+
+    <div class="toc-section">
+      <span class="toc-section-label">9. SELECT INTO</span>
+      <a href="#select-into-basic">Basic Usage</a>
+      <a href="#select-into-errors">Error Handling</a>
+      <a href="#select-into-patterns">Safe Patterns</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ═══════ SECTION 1: INTRODUCTION ═══════ -->
+    <div class="session-block" id="intro">
+      <div class="session-header">
+        <div class="session-icon">🔷</div>
+        <div>
+          <h2>Introduction to PL/SQL</h2>
+          <p>What PL/SQL is, how it differs from SQL, its advantages, and internal architecture</p>
+        </div>
+      </div>
+
+      <!-- What is PL/SQL -->
+      <div class="topic-card" id="what-is-plsql">
+        <div class="topic-card-header">
+          <span class="topic-num">1.1</span>
+          <div>
+            <h3>What is PL/SQL?</h3>
+            <p>Oracle's procedural extension to standard SQL — runs entire code blocks directly on the database server</p>
+          </div>
+        </div>
+        <div class="topic-body">
+          <div class="prose"><p>PL/SQL stands for <strong>Procedural Language / Structured Query Language</strong>. It is Oracle Corporation's proprietary extension to standard SQL that adds procedural constructs — loops, conditional statements, variables, and exception handling — to create powerful database programs.</p><p>Instead of sending individual SQL statements one at a time, a PL/SQL block is sent as a single unit, compiled once, and executed entirely on the database server — eliminating repeated network round-trips.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">hello_plsql.sql</span></div>
+            <div class="mac-body"><pre><span class="cm">-- Enable script output display</span>
+<span class="kw">SET SERVEROUTPUT ON</span>;
+
+<span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Hello, PL/SQL!'</span>);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Hello, PL/SQL!</div>
+          <div class="analogy-card">
+            <div class="analogy-title">💡 Real-world Example</div>
+            <ul class="analogy-list">
+              <li>Writing an automated script that loops through late payments and calculates interest penalties for each invoice — all inside a single PL/SQL block</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SQL vs PL/SQL -->
+      <div class="topic-card" id="sql-vs-plsql">
+        <div class="topic-card-header">
+          <span class="topic-num">1.2</span>
+          <div>
+            <h3>SQL vs PL/SQL</h3>
+            <p>Declarative set-based retrieval vs procedural row-by-row processing</p>
+          </div>
+        </div>
+        <div class="topic-body">
+          <table class="data-table">
+            <thead><tr><th>Feature</th><th>SQL</th><th>PL/SQL</th></tr></thead>
+            <tbody>
+              <tr><td>Paradigm</td><td>Declarative — say WHAT you want</td><td>Procedural — say HOW to process it</td></tr>
+              <tr><td>Execution</td><td>One statement at a time</td><td>Entire block at once</td></tr>
+              <tr><td>Variables</td><td>Not supported</td><td>Fully supported</td></tr>
+              <tr><td>Conditionals</td><td>CASE expression only</td><td>IF / ELSIF / CASE statements</td></tr>
+              <tr><td>Loops</td><td>Not supported</td><td>LOOP / WHILE / FOR</td></tr>
+              <tr><td>Error Handling</td><td>Error terminates statement</td><td>Full EXCEPTION block</td></tr>
+              <tr><td>Best For</td><td>Simple data retrieval</td><td>Business logic &amp; complex processing</td></tr>
+            </tbody>
+          </table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>SQL fetches an employee row. PL/SQL uses that row's data to decide whether to trigger an email or run a secondary bonus calculation.</p></div>
+        </div>
+      </div>
+
+      <!-- Advantages -->
+      <div class="topic-card" id="advantages">
+        <div class="topic-card-header">
+          <span class="topic-num">1.3</span>
+          <div>
+            <h3>Advantages of PL/SQL</h3>
+            <p>Performance, security, modularity, and exception safety</p>
+          </div>
+        </div>
+        <div class="topic-body">
+          <table class="data-table">
+            <thead><tr><th>Advantage</th><th>How it Helps</th></tr></thead>
+            <tbody>
+              <tr><td>Performance</td><td>One network trip instead of 100 — entire block executes on the server</td></tr>
+              <tr><td>Security</td><td>Users interact with stored procedures, never directly with base tables</td></tr>
+              <tr><td>Modularity</td><td>Code reuse through procedures, functions, and packages</td></tr>
+              <tr><td>Exception Safety</td><td>Runtime errors caught and handled gracefully without crashing</td></tr>
+              <tr><td>Portability</td><td>Runs identically on any Oracle database regardless of client platform</td></tr>
+            </tbody>
+          </table>
+          <div class="callout info"><span class="callout-icon">💡</span><p>An e-commerce app checks inventory, creates an invoice, and updates a ledger inside <strong>one</strong> PL/SQL routine instead of making three separate slow server trips.</p></div>
+        </div>
+      </div>
+
+      <!-- Architecture -->
+      <div class="topic-card" id="architecture">
+        <div class="topic-card-header">
+          <span class="topic-num">1.4</span>
+          <div>
+            <h3>PL/SQL Architecture</h3>
+            <p>How Oracle splits procedural code from SQL and routes each to the right engine</p>
+          </div>
+        </div>
+        <div class="topic-body">
+          <table class="data-table">
+            <thead><tr><th>Step</th><th>What Happens</th><th>Engine</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Application sends the full PL/SQL block</td><td>Application Layer</td></tr>
+              <tr><td>2</td><td>PL/SQL Engine receives and parses the block</td><td>PL/SQL Engine</td></tr>
+              <tr><td>3</td><td>Procedural code (IF, LOOP, :=) executes locally</td><td>PL/SQL Engine</td></tr>
+              <tr><td>4</td><td>SQL statements are extracted and forwarded</td><td>PL/SQL Engine → SQL Engine</td></tr>
+              <tr><td>5</td><td>SQL Engine optimises and executes the query</td><td>SQL Statement Executor</td></tr>
+              <tr><td>6</td><td>Result returned to PL/SQL Engine to continue</td><td>PL/SQL Engine</td></tr>
+            </tbody>
+          </table>
+          <div class="callout tip"><span class="callout-icon">💡</span><p>A loop that repeats an INSERT five times is controlled by the PL/SQL engine, but each actual INSERT is pushed to the SQL engine for execution.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 2: BLOCK STRUCTURE ═══════ -->
+    <div class="session-block" id="block-section">
+      <div class="session-header">
+        <div class="session-icon">🧱</div>
+        <div>
+          <h2>PL/SQL Block Structure</h2>
+          <p>Every PL/SQL program is organised into structured sections: DECLARE, BEGIN, EXCEPTION, END</p>
+        </div>
+      </div>
+
+      <!-- Block Overview -->
+      <div class="topic-card" id="block-overview">
+        <div class="topic-card-header">
+          <span class="topic-num">2.0</span>
+          <div><h3>Block Overview</h3><p>Visual structure of all four sections with mandatory vs optional labels</p></div>
+        </div>
+        <div class="topic-body">
+          <div class="block-diagram">
+            <div class="block-row optional">
+              <div class="block-row-label">DECLARE <span class="block-tag opt">Optional</span></div>
+              <div class="block-row-desc">Define variables, constants, cursors, and data types before execution begins</div>
+            </div>
+            <div class="block-row mandatory">
+              <div class="block-row-label">BEGIN <span class="block-tag req">Mandatory</span></div>
+              <div class="block-row-desc">Core SQL statements, business logic, calculations, and procedural instructions</div>
+            </div>
+            <div class="block-row optional">
+              <div class="block-row-label">EXCEPTION <span class="block-tag opt">Optional</span></div>
+              <div class="block-row-desc">Intercept runtime errors — run fallback code or log bugs instead of crashing</div>
+            </div>
+            <div class="block-row mandatory">
+              <div class="block-row-label">END; <span class="block-tag req">Mandatory</span></div>
+              <div class="block-row-desc">Marks the final boundary of the logical code unit. Always followed by /</div>
+            </div>
+          </div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Only <strong>BEGIN</strong> and <strong>END</strong> are mandatory. DECLARE and EXCEPTION are optional but almost always used in real-world code.</p></div>
+        </div>
+      </div>
+
+      <!-- DECLARE -->
+      <div class="topic-card" id="declare">
+        <div class="topic-card-header">
+          <span class="topic-num">2.1</span>
+          <div><h3>DECLARE Section</h3><p>Set up variables, data types, and constants before any execution begins</p></div>
+        </div>
+        <div class="topic-body">
+          <div class="prose"><p>The optional entry segment of a block. Everything defined here is available throughout the BEGIN and EXCEPTION sections of the same block. Variables declared in a nested block are local to that nested block only.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">declare_section.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_test <span class="tp">VARCHAR2</span>(<span class="num">20</span>) := <span class="str">'Testing Declare'</span>;
+<span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_test);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Testing Declare</div>
+        </div>
+      </div>
+
+      <!-- BEGIN -->
+      <div class="topic-card" id="begin">
+        <div class="topic-card-header">
+          <span class="topic-num">2.2</span>
+          <div><h3>BEGIN Section</h3><p>The mandatory execution section containing all actual logic and SQL statements</p></div>
+        </div>
+        <div class="topic-body">
+          <div class="prose"><p>The mandatory execution segment that contains all actual query statements, business logic, calculations, and instructions. At least one executable statement must exist between BEGIN and END.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">begin_section.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="num">10</span> + <span class="num">20</span>);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>30</div>
+        </div>
+      </div>
+
+      <!-- EXCEPTION -->
+      <div class="topic-card" id="exception-block">
+        <div class="topic-card-header">
+          <span class="topic-num">2.3</span>
+          <div><h3>EXCEPTION Section</h3><p>The safety net — intercepts runtime errors so the program doesn't crash</p></div>
+        </div>
+        <div class="topic-body">
+          <div class="prose"><p>The optional safety segment dedicated to intercepting runtime errors. When an error occurs in BEGIN, execution jumps immediately to the matching EXCEPTION handler. Without this section, any runtime error would terminate the entire block abruptly.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">exception_section.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_num <span class="tp">NUMBER</span> := <span class="num">10</span>;
+<span class="kw">BEGIN</span>
+    v_num := v_num / <span class="num">0</span>;  <span class="cm">-- Fails immediately</span>
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN ZERO_DIVIDE THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Error: Cannot divide by zero.'</span>);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Error: Cannot divide by zero.</div>
+        </div>
+      </div>
+
+      <!-- END -->
+      <div class="topic-card" id="end">
+        <div class="topic-card-header">
+          <span class="topic-num">2.4</span>
+          <div><h3>END Statement</h3><p>Mandatory keyword that marks the final boundary of the code block</p></div>
+        </div>
+        <div class="topic-body">
+          <div class="prose"><p>The mandatory closing keyword that indicates the end of the current logical code unit. In SQL*Plus and SQL Developer, the forward slash <code>/</code> on the next line submits the block for execution.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">end_statement.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Done'</span>);
+<span class="kw">END</span>;  <span class="cm">-- Mandatory end marker</span>
+/     <span class="cm">-- Submits block for execution</span></pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Done</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 3: VARIABLES ═══════ -->
+    <div class="session-block" id="variables-section">
+      <div class="session-header">
+        <div class="session-icon">📦</div>
+        <div>
+          <h2>Variables</h2>
+          <p>Declaration, initialization, scope, constants, %TYPE and %ROWTYPE anchors</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="declaration">
+        <div class="topic-card-header"><span class="topic-num">3.1</span><div><h3>Variable Declaration</h3><p>Creating a named storage container with a specific data type in DECLARE</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">declaration.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_count  <span class="tp">NUMBER</span>;           <span class="cm">-- declared, starts as NULL</span>
+    v_name   <span class="tp">VARCHAR2</span>(<span class="num">50</span>);     <span class="cm">-- text variable, max 50 chars</span>
+    v_active <span class="tp">BOOLEAN</span>;          <span class="cm">-- logical flag</span>
+<span class="kw">BEGIN</span>
+    v_count := <span class="num">5</span>;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_count);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>5</div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Syntax: <code>variable_name  datatype [NOT NULL] [:= value];</code> — All variables start as NULL unless explicitly initialized.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="initialization">
+        <div class="topic-card-header"><span class="topic-num">3.2</span><div><h3>Initialization</h3><p>Assigning a starting value at declaration using := or the DEFAULT keyword</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">initialization.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_points   <span class="tp">NUMBER</span>      := <span class="num">100</span>;              <span class="cm">-- using :=</span>
+    v_status   <span class="tp">VARCHAR2</span>(<span class="num">10</span>) <span class="kw">DEFAULT</span> <span class="str">'ACTIVE'</span>;  <span class="cm">-- using DEFAULT</span>
+    v_required <span class="tp">NUMBER</span>      <span class="kw">NOT NULL</span> := <span class="num">0</span>;      <span class="cm">-- NOT NULL must have value</span>
+<span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_points || <span class="str">' - '</span> || v_status);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>100 - ACTIVE</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="scope">
+        <div class="topic-card-header"><span class="topic-num">3.3</span><div><h3>Scope of Variables</h3><p>Outer block variables are visible inside; inner block variables are private</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">scope.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_global <span class="tp">VARCHAR2</span>(<span class="num">20</span>) := <span class="str">'Global'</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">DECLARE</span>
+        v_local <span class="tp">VARCHAR2</span>(<span class="num">20</span>) := <span class="str">'Local'</span>;  <span class="cm">-- only visible here</span>
+    <span class="kw">BEGIN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_global || <span class="str">' and '</span> || v_local);
+    <span class="kw">END</span>;
+    <span class="cm">-- v_local is invisible here — would cause compile error</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_global);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Global and Local<br>Global</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="constants">
+        <div class="topic-card-header"><span class="topic-num">3.4</span><div><h3>Constants</h3><p>Values locked at declaration — cannot be changed anywhere in the code</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">constants.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    co_tax_rate <span class="kw">CONSTANT</span> <span class="tp">NUMBER</span>      := <span class="num">0.05</span>;
+    co_company  <span class="kw">CONSTANT</span> <span class="tp">VARCHAR2</span>(<span class="num">50</span>) := <span class="str">'Oracle Corp'</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- co_tax_rate := 0.08;  -- ERROR: cannot modify a constant</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Tax rate: '</span> || co_tax_rate);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Company : '</span> || co_company);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Tax rate: .05<br>Company : Oracle Corp</div>
+          <div class="callout tip"><span class="callout-icon">💡</span><p>Naming convention: prefix constants with <code>co_</code> or <code>c_</code> to distinguish them from regular variables at a glance.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="type-anchor">
+        <div class="topic-card-header"><span class="topic-num">3.5</span><div><h3>%TYPE Anchor</h3><p>Automatically match a variable's type to a specific table column — adapts if the column changes</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Instead of hardcoding <code>VARCHAR2(50)</code>, anchor the variable directly to the column it will receive data from. If the column type changes, the variable adapts automatically — no code changes needed.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">type_anchor.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    <span class="cm">-- Without %TYPE (fragile — breaks if column changes)</span>
+    v_name_bad  <span class="tp">VARCHAR2</span>(<span class="num">50</span>);
+
+    <span class="cm">-- With %TYPE (robust — auto-matches column definition)</span>
+    v_emp_name  employees.first_name<span class="op">%TYPE</span>;
+    v_salary    employees.salary<span class="op">%TYPE</span>;
+    v_dept_id   employees.department_id<span class="op">%TYPE</span>;
+
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> first_name, salary, department_id
+    <span class="kw">INTO</span>   v_emp_name, v_salary, v_dept_id
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  employee_id = <span class="num">101</span>;
+
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_emp_name || <span class="str">' | $'</span> || v_salary);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="callout tip"><span class="callout-icon">✅</span><p><strong>Best practice:</strong> Always use <code>%TYPE</code> for variables that will hold column data. It prevents truncation errors and makes code maintainable across schema changes.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="rowtype-anchor">
+        <div class="topic-card-header"><span class="topic-num">3.6</span><div><h3>%ROWTYPE Anchor</h3><p>One variable that holds all columns of an entire table row</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p><code>%ROWTYPE</code> declares a record variable that matches the structure of an entire table row — one variable instead of fifteen. Access individual fields using dot notation.</p></div>
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">rowtype_anchor.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_emp employees<span class="op">%ROWTYPE</span>;  <span class="cm">-- one variable = all columns</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> * <span class="kw">INTO</span> v_emp
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  employee_id = <span class="num">101</span>;
+
+    <span class="cm">-- Access fields with dot notation</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Name : '</span> || v_emp.first_name || <span class="str">' '</span> || v_emp.last_name);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Salary: $'</span> || v_emp.salary);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Dept  : '</span> || v_emp.department_id);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="callout tip"><span class="callout-icon">💡</span><p><strong>%TYPE vs %ROWTYPE:</strong> Use <code>%TYPE</code> for individual column variables. Use <code>%ROWTYPE</code> when you need all (or most) columns from a row — it simplifies SELECT * INTO statements significantly.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 4: DATA TYPES ═══════ -->
+    <div class="session-block" id="datatypes-section">
+      <div class="session-header">
+        <div class="session-icon">🗂️</div>
+        <div>
+          <h2>Data Types</h2>
+          <p>NUMBER, VARCHAR2, CHAR, DATE, BOOLEAN, CLOB/BLOB — with examples and output</p>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <div class="topic-card-header"><span class="topic-num">4.0</span><div><h3>Data Type Quick Reference</h3><p>All scalar PL/SQL types at a glance</p></div></div>
+        <div class="topic-body">
+          <table class="data-table">
+            <thead><tr><th>Type</th><th>Stores</th><th>Example Declaration</th></tr></thead>
+            <tbody>
+              <tr><td>NUMBER(p,s)</td><td>Integers and decimals</td><td>NUMBER(8,2) → 123456.78</td></tr>
+              <tr><td>VARCHAR2(n)</td><td>Variable-length text</td><td>VARCHAR2(100) — uses only needed space</td></tr>
+              <tr><td>CHAR(n)</td><td>Fixed-length text (padded)</td><td>CHAR(5) — always 5 chars</td></tr>
+              <tr><td>DATE</td><td>Date + time to the second</td><td>SYSDATE, DATE '2025-01-15'</td></tr>
+              <tr><td>TIMESTAMP</td><td>Date with fractional seconds</td><td>SYSTIMESTAMP (9 decimal places)</td></tr>
+              <tr><td>BOOLEAN</td><td>TRUE / FALSE / NULL</td><td>PL/SQL only — not in SQL tables</td></tr>
+              <tr><td>CLOB</td><td>Character text up to 4GB</td><td>JSON, XML, large documents</td></tr>
+              <tr><td>BLOB</td><td>Binary data up to 4GB</td><td>Images, PDFs, videos</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="topic-card" id="number">
+        <div class="topic-card-header"><span class="topic-num">4.1</span><div><h3>NUMBER</h3><p>Whole integers and precise fractional decimals — NUMBER(precision, scale)</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">number_type.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_price    <span class="tp">NUMBER</span>(<span class="num">5</span>,<span class="num">2</span>) := <span class="num">19.95</span>;   <span class="cm">-- 5 digits total, 2 after decimal</span>
+    v_qty      <span class="tp">NUMBER</span>(<span class="num">4</span>)   := <span class="num">1000</span>;    <span class="cm">-- integer, max 9999</span>
+    v_total    <span class="tp">NUMBER</span>;              <span class="cm">-- unlimited precision</span>
+<span class="kw">BEGIN</span>
+    v_total := v_price * v_qty;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Total: $'</span> || v_total);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Total: $19950</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="varchar2">
+        <div class="topic-card-header"><span class="topic-num">4.2</span><div><h3>VARCHAR2</h3><p>Variable-length text — occupies only as much space as the actual content</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">varchar2_type.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_name  <span class="tp">VARCHAR2</span>(<span class="num">30</span>) := <span class="str">'Alice Smith'</span>;
+    v_email <span class="tp">VARCHAR2</span>(<span class="num">100</span>);
+<span class="kw">BEGIN</span>
+    v_email := <span class="fn">LOWER</span>(v_name) || <span class="str">'@company.com'</span>;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_name);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_email);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Alice Smith<br>alice smith@company.com</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="char">
+        <div class="topic-card-header"><span class="topic-num">4.3</span><div><h3>CHAR</h3><p>Fixed-length text — Oracle pads shorter values with spaces to fill the defined size</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">char_type.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_code <span class="tp">CHAR</span>(<span class="num">5</span>) := <span class="str">'IN'</span>;  <span class="cm">-- stored as 'IN   ' (3 trailing spaces)</span>
+<span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_code || <span class="str">'X'</span>);  <span class="cm">-- 'IN   X'</span>
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>IN   X</div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>Use CHAR only for truly fixed-size codes (country codes, status flags). For general text, VARCHAR2 is almost always the right choice.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="date">
+        <div class="topic-card-header"><span class="topic-num">4.4</span><div><h3>DATE</h3><p>Stores century, year, month, day, hour, minute, and second — no timezone</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">date_type.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_today    <span class="tp">DATE</span> := <span class="fn">SYSDATE</span>;
+    v_deadline <span class="tp">DATE</span> := <span class="kw">DATE</span> <span class="str">'2026-12-31'</span>;
+    v_diff     <span class="tp">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    v_diff := v_deadline - v_today;   <span class="cm">-- difference in days</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Today   : '</span> || <span class="fn">TO_CHAR</span>(v_today, <span class="str">'DD-MON-YYYY'</span>));
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Deadline: '</span> || <span class="fn">TO_CHAR</span>(v_deadline, <span class="str">'DD-MON-YYYY'</span>));
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Days left: '</span> || <span class="fn">FLOOR</span>(v_diff));
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Today   : 14-JUN-2026<br>Deadline: 31-DEC-2026<br>Days left: 200</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="boolean">
+        <div class="topic-card-header"><span class="topic-num">4.5</span><div><h3>BOOLEAN</h3><p>Stores TRUE, FALSE, or NULL — exists only in PL/SQL, not in SQL table columns</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">boolean_type.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_is_active <span class="tp">BOOLEAN</span> := <span class="kw">TRUE</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- Cannot print BOOLEAN directly — must use IF</span>
+    <span class="kw">IF</span> v_is_active <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'User is active'</span>);
+    <span class="kw">ELSE</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'User is inactive'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>User is active</div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>BOOLEAN cannot be passed to DBMS_OUTPUT.PUT_LINE directly. Always wrap it in an IF statement to convert to a printable string.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="lob-types">
+        <div class="topic-card-header"><span class="topic-num">4.6</span><div><h3>CLOB &amp; BLOB</h3><p>Large object types for storing massive text documents or binary files up to 4GB</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">lob_types.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_document <span class="tp">CLOB</span>;   <span class="cm">-- Character Large Object — text, JSON, XML</span>
+    v_image    <span class="tp">BLOB</span>;   <span class="cm">-- Binary Large Object — images, PDFs, videos</span>
+<span class="kw">BEGIN</span>
+    v_document := <span class="str">'This is a very long text document...'</span>;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Length: '</span> || <span class="fn">DBMS_LOB.GETLENGTH</span>(v_document));
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Type</th><th>Content</th><th>Max Size</th><th>Use Case</th></tr></thead>
+            <tbody>
+              <tr><td>CLOB</td><td>Character text</td><td>4GB</td><td>JSON, XML, large descriptions</td></tr>
+              <tr><td>BLOB</td><td>Binary data</td><td>4GB</td><td>Images, PDFs, videos, audio</td></tr>
+              <tr><td>BFILE</td><td>OS file pointer</td><td>OS limit</td><td>Read-only external files</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 5: LITERALS ═══════ -->
+    <div class="session-block" id="literals-section">
+      <div class="session-header">
+        <div class="session-icon">✏️</div>
+        <div>
+          <h2>Literals</h2>
+          <p>Explicit fixed values written directly in code — numeric, character, date, boolean, and NULL</p>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <div class="topic-card-header"><span class="topic-num">5.0</span><div><h3>All Literal Types at a Glance</h3></div></div>
+        <div class="topic-body">
+          <table class="data-table">
+            <thead><tr><th>Type</th><th>Format</th><th>Example</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Numeric</td><td>Digits</td><td>100, 3.14, -5</td><td>No quotes. Scientific: 1.5e3</td></tr>
+              <tr><td>Character</td><td>'text'</td><td>'Hello', 'IN'</td><td>Single quotes only</td></tr>
+              <tr><td>Date</td><td>DATE 'YYYY-MM-DD'</td><td>DATE '2026-12-31'</td><td>ANSI standard format</td></tr>
+              <tr><td>Boolean</td><td>TRUE / FALSE</td><td>TRUE, FALSE</td><td>No quotes, PL/SQL only</td></tr>
+              <tr><td>NULL</td><td>NULL</td><td>NULL</td><td>Not zero, not empty string — means unknown</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="topic-card" id="numeric-lit">
+        <div class="topic-card-header"><span class="topic-num">5.1</span><div><h3>Numeric Literals</h3><p>Raw number values — integers, decimals, or scientific notation</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">numeric_literals.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="num">500</span>);       <span class="cm">-- integer literal</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="num">3.14</span>);     <span class="cm">-- decimal literal</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(-<span class="num">10</span>);      <span class="cm">-- negative literal</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="num">1.5e3</span>);   <span class="cm">-- scientific: 1500</span>
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>500<br>3.14<br>-10<br>1500</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="char-lit">
+        <div class="topic-card-header"><span class="topic-num">5.2</span><div><h3>Character Literals</h3><p>Explicit text wrapped in single quotes — double quotes are NOT for strings in Oracle</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">char_literals.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Hello World'</span>);          <span class="cm">-- simple string</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'O''Connor'</span>);             <span class="cm">-- embedded quote (doubled)</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(q'[It's a beautiful day]'); <span class="cm">-- Q-quote alternative</span>
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Hello World<br>O'Connor<br>It's a beautiful day</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="date-lit">
+        <div class="topic-card-header"><span class="topic-num">5.3</span><div><h3>Date Literals</h3><p>Use the ANSI DATE 'YYYY-MM-DD' format for explicit, unambiguous date values</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">date_literals.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_deadline <span class="tp">DATE</span> := <span class="kw">DATE</span> <span class="str">'2026-12-31'</span>;  <span class="cm">-- ANSI date literal</span>
+<span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_deadline);
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>31-DEC-26</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="bool-lit">
+        <div class="topic-card-header"><span class="topic-num">5.4</span><div><h3>Boolean Literals</h3><p>The unquoted keywords TRUE and FALSE — only in PL/SQL, not in SQL</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">boolean_literals.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_flag <span class="tp">BOOLEAN</span> := <span class="kw">FALSE</span>;  <span class="cm">-- Boolean literal</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">IF NOT</span> v_flag <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Flag is false'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Flag is false</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="null-lit">
+        <div class="topic-card-header"><span class="topic-num">5.5</span><div><h3>NULL Literal</h3><p>NULL means unknown or missing — it is NOT zero, NOT empty string, NOT false</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window">
+            <div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">null_literal.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_bonus <span class="tp">NUMBER</span>;             <span class="cm">-- starts as NULL by default</span>
+    v_total <span class="tp">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    v_total := <span class="num">1000</span> + v_bonus;  <span class="cm">-- NULL arithmetic = NULL!</span>
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Total: '</span> || <span class="fn">NVL</span>(v_total, <span class="num">0</span>));
+
+    <span class="cm">-- Correct way to check NULL</span>
+    <span class="kw">IF</span> v_bonus <span class="kw">IS NULL THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'No bonus assigned'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Total: 0<br>No bonus assigned</div>
+          <div class="callout danger"><span class="callout-icon">🚫</span><p><strong>NULL traps:</strong> <code>NULL = NULL</code> is never TRUE. <code>10 + NULL = NULL</code>. <code>v_bonus = NULL</code> never matches. Always use <code>IS NULL</code> and <code>NVL()</code>.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 6: CONTROL STRUCTURES ═══════ -->
+    <div class="session-block" id="control-section">
+      <div class="session-header">
+        <div class="session-icon">🔀</div>
+        <div>
+          <h2>Control Structures</h2>
+          <p>IF, IF-ELSE, IF-ELSIF, CASE (simple &amp; searched), Nested IF</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="if">
+        <div class="topic-card-header"><span class="topic-num">6.1</span><div><h3>IF</h3><p>Execute a block only when a condition is TRUE</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">if_stmt.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_score <span class="tp">NUMBER</span> := <span class="num">85</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span> v_score >= <span class="num">50</span> <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Passed'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Passed</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="if-else">
+        <div class="topic-card-header"><span class="topic-num">6.2</span><div><h3>IF-ELSE</h3><p>Two-path branching — one block when TRUE, another when FALSE or NULL</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">if_else.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_speed <span class="tp">NUMBER</span> := <span class="num">40</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span> v_speed > <span class="num">60</span> <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Fast'</span>);
+    <span class="kw">ELSE</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Normal'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Normal</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="if-elsif">
+        <div class="topic-card-header"><span class="topic-num">6.3</span><div><h3>IF-ELSIF</h3><p>Check multiple conditions in sequence — executes first TRUE branch, skips the rest</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">if_elsif.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_marks <span class="tp">NUMBER</span> := <span class="num">75</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span>     v_marks >= <span class="num">90</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Grade A'</span>);
+    <span class="kw">ELSIF</span>  v_marks >= <span class="num">70</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Grade B'</span>);  <span class="cm">-- stops here</span>
+    <span class="kw">ELSIF</span>  v_marks >= <span class="num">50</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Grade C'</span>);
+    <span class="kw">ELSE</span>                      <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Fail'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Grade B</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="case-simple">
+        <div class="topic-card-header"><span class="topic-num">6.4</span><div><h3>CASE — Simple (Selector)</h3><p>Evaluates a specific variable against exact values — cleaner than long IF-ELSIF chains</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">case_simple.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_tier <span class="tp">CHAR</span>(<span class="num">1</span>) := <span class="str">'G'</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">CASE</span> v_tier
+        <span class="kw">WHEN</span> <span class="str">'G'</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Gold Tier'</span>);
+        <span class="kw">WHEN</span> <span class="str">'S'</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Silver Tier'</span>);
+        <span class="kw">WHEN</span> <span class="str">'B'</span> <span class="kw">THEN</span> <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Bronze Tier'</span>);
+        <span class="kw">ELSE</span>          <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Standard Tier'</span>);
+    <span class="kw">END CASE</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Gold Tier</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="case-searched">
+        <div class="topic-card-header"><span class="topic-num">6.5</span><div><h3>CASE — Searched (Condition-Based)</h3><p>No selector variable — each WHEN has its own full condition expression</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Unlike simple CASE which matches one variable to values, searched CASE evaluates a completely independent condition in each WHEN clause — allowing ranges, multi-column conditions, and complex expressions.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">case_searched.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_salary <span class="tp">NUMBER</span> := <span class="num">75000</span>;
+    v_grade  <span class="tp">VARCHAR2</span>(<span class="num">10</span>);
+<span class="kw">BEGIN</span>
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN</span> v_salary >= <span class="num">100000</span> <span class="kw">THEN</span> v_grade := <span class="str">'Executive'</span>;
+        <span class="kw">WHEN</span> v_salary >=  <span class="num">70000</span> <span class="kw">THEN</span> v_grade := <span class="str">'Senior'</span>;    <span class="cm">-- matches</span>
+        <span class="kw">WHEN</span> v_salary >=  <span class="num">40000</span> <span class="kw">THEN</span> v_grade := <span class="str">'Mid-level'</span>;
+        <span class="kw">ELSE</span>                         v_grade := <span class="str">'Junior'</span>;
+    <span class="kw">END CASE</span>;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Grade: '</span> || v_grade);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Grade: Senior</div>
+          <div class="callout tip"><span class="callout-icon">💡</span><p><strong>Simple CASE</strong> matches one selector to fixed values (like a switch statement). <strong>Searched CASE</strong> evaluates independent conditions in each WHEN — use it for ranges and complex logic.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="nested-if">
+        <div class="topic-card-header"><span class="topic-num">6.6</span><div><h3>Nested IF</h3><p>An IF inside another IF — secondary conditions checked only after primary conditions pass</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">nested_if.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_is_open <span class="tp">BOOLEAN</span> := <span class="kw">TRUE</span>;
+    v_stock   <span class="tp">NUMBER</span>  := <span class="num">2</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span> v_is_open <span class="kw">THEN</span>              <span class="cm">-- Gate 1: is store open?</span>
+        <span class="kw">IF</span> v_stock > <span class="num">0</span> <span class="kw">THEN</span>         <span class="cm">-- Gate 2: is item in stock?</span>
+            <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Buy Item'</span>);
+        <span class="kw">ELSE</span>
+            <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Out of stock'</span>);
+        <span class="kw">END IF</span>;
+    <span class="kw">ELSE</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Store is closed'</span>);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Buy Item</div>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><p>Keep nesting to a maximum of 3–4 levels. Deeper nesting becomes hard to read and debug — consider combining conditions with AND/OR or using a CASE statement instead.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 7: LOOPS ═══════ -->
+    <div class="session-block" id="loops-section">
+      <div class="session-header">
+        <div class="session-icon">🔄</div>
+        <div>
+          <h2>Loops</h2>
+          <p>Basic LOOP, WHILE, FOR, REVERSE FOR, EXIT, EXIT WHEN, CONTINUE, Nested Loops</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="basic-loop">
+        <div class="topic-card-header"><span class="topic-num">7.1</span><div><h3>Basic LOOP</h3><p>Runs indefinitely until an explicit EXIT command is encountered</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">basic_loop.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_counter <span class="tp">NUMBER</span> := <span class="num">1</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">LOOP</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_counter);
+        v_counter := v_counter + <span class="num">1</span>;
+        <span class="kw">EXIT WHEN</span> v_counter > <span class="num">3</span>;    <span class="cm">-- explicit break rule</span>
+    <span class="kw">END LOOP</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>1<br>2<br>3</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="while-loop">
+        <div class="topic-card-header"><span class="topic-num">7.2</span><div><h3>WHILE LOOP</h3><p>Checks condition before each iteration — skips entirely if condition is false from the start</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">while_loop.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_num <span class="tp">NUMBER</span> := <span class="num">1</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">WHILE</span> v_num <= <span class="num">3</span> <span class="kw">LOOP</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_num);
+        v_num := v_num + <span class="num">1</span>;
+    <span class="kw">END LOOP</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>1<br>2<br>3</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="for-loop">
+        <div class="topic-card-header"><span class="topic-num">7.3</span><div><h3>FOR LOOP</h3><p>Fixed iterations over a numeric range — loop variable declared and incremented automatically</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">for_loop.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">3</span> <span class="kw">LOOP</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Iteration: '</span> || i);
+    <span class="kw">END LOOP</span>;
+    <span class="cm">-- Note: 'i' is read-only and invisible outside the loop</span>
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Iteration: 1<br>Iteration: 2<br>Iteration: 3</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="reverse-for">
+        <div class="topic-card-header"><span class="topic-num">7.4</span><div><h3>REVERSE FOR LOOP</h3><p>Counts down from upper bound to lower bound automatically</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">reverse_for.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="kw">FOR</span> i <span class="kw">IN REVERSE</span> <span class="num">1</span>..<span class="num">5</span> <span class="kw">LOOP</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(i);
+    <span class="kw">END LOOP</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>5<br>4<br>3<br>2<br>1</div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>The range is still written low..high — Oracle reverses the iteration automatically. <code>REVERSE 5..1</code> would cause an error.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="exit">
+        <div class="topic-card-header"><span class="topic-num">7.5</span><div><h3>EXIT</h3><p>Immediately terminates the loop and jumps to the statement after END LOOP</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">exit_stmt.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">10</span> <span class="kw">LOOP</span>
+        <span class="kw">IF</span> i = <span class="num">3</span> <span class="kw">THEN</span>
+            <span class="kw">EXIT</span>;  <span class="cm">-- breaks out immediately at i=3</span>
+        <span class="kw">END IF</span>;
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(i);
+    <span class="kw">END LOOP</span>;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'After loop'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>1<br>2<br>After loop</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="exit-when">
+        <div class="topic-card-header"><span class="topic-num">7.6</span><div><h3>EXIT WHEN</h3><p>Concise single-line exit — checks condition and exits if TRUE</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">exit_when.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_cnt <span class="tp">NUMBER</span> := <span class="num">1</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">LOOP</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_cnt);
+        <span class="kw">EXIT WHEN</span> v_cnt = <span class="num">5</span>;   <span class="cm">-- exits when v_cnt reaches 5</span>
+        v_cnt := v_cnt + <span class="num">1</span>;
+    <span class="kw">END LOOP</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>1<br>2<br>3<br>4<br>5</div>
+          <div class="callout info"><span class="callout-icon">💡</span><p><code>EXIT WHEN condition;</code> is equivalent to <code>IF condition THEN EXIT; END IF;</code> — more concise and preferred in practice.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="continue">
+        <div class="topic-card-header"><span class="topic-num">7.7</span><div><h3>CONTINUE</h3><p>Skips the remaining code in the current iteration and jumps to the next loop pass</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">continue_stmt.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">4</span> <span class="kw">LOOP</span>
+        <span class="kw">CONTINUE WHEN</span> i = <span class="num">2</span>;   <span class="cm">-- skips i=2 entirely</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(i);
+    <span class="kw">END LOOP</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>1<br>3<br>4</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="nested-loops">
+        <div class="topic-card-header"><span class="topic-num">7.8</span><div><h3>Nested Loops with Labels</h3><p>Loop labels let you EXIT or CONTINUE a specific outer loop from inside an inner loop</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">nested_loops.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="op">&lt;&lt;outer_loop&gt;&gt;</span>
+    <span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">3</span> <span class="kw">LOOP</span>
+        <span class="op">&lt;&lt;inner_loop&gt;&gt;</span>
+        <span class="kw">FOR</span> j <span class="kw">IN</span> <span class="num">1</span>..<span class="num">3</span> <span class="kw">LOOP</span>
+            <span class="kw">EXIT</span> outer_loop <span class="kw">WHEN</span> i = <span class="num">2</span> <span class="kw">AND</span> j = <span class="num">2</span>;  <span class="cm">-- exits BOTH loops</span>
+            <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'i='</span> || i || <span class="str">' j='</span> || j);
+        <span class="kw">END LOOP</span> inner_loop;
+    <span class="kw">END LOOP</span> outer_loop;
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'After both loops'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>i=1 j=1<br>i=1 j=2<br>i=1 j=3<br>i=2 j=1<br>After both loops</div>
+          <div class="callout info"><span class="callout-icon">💡</span><p>Without labels, <code>EXIT</code> only exits the innermost loop. Labels allow you to target any enclosing loop directly.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 8: EXCEPTION HANDLING ═══════ -->
+    <div class="session-block" id="exception-section">
+      <div class="session-header">
+        <div class="session-icon">🛡️</div>
+        <div>
+          <h2>Exception Handling</h2>
+          <p>Predefined, user-defined, RAISE, WHEN OTHERS, SQLCODE/SQLERRM, PRAGMA, RAISE_APPLICATION_ERROR</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="what-exception">
+        <div class="topic-card-header"><span class="topic-num">8.1</span><div><h3>What is an Exception?</h3><p>A runtime error event that halts normal execution and transfers control to the EXCEPTION section</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>An exception is a runtime warning or error triggered when an operation fails during execution. When raised, Oracle immediately halts the current statement, skips the remaining BEGIN code, and transfers control to the matching handler in the EXCEPTION section.</p></div>
+          <table class="data-table">
+            <thead><tr><th>Exception</th><th>ORA Error</th><th>When Raised</th></tr></thead>
+            <tbody>
+              <tr><td>NO_DATA_FOUND</td><td>ORA-01403</td><td>SELECT INTO returns 0 rows</td></tr>
+              <tr><td>TOO_MANY_ROWS</td><td>ORA-01422</td><td>SELECT INTO returns more than 1 row</td></tr>
+              <tr><td>ZERO_DIVIDE</td><td>ORA-01476</td><td>Division by zero</td></tr>
+              <tr><td>DUP_VAL_ON_INDEX</td><td>ORA-00001</td><td>Insert duplicate unique value</td></tr>
+              <tr><td>VALUE_ERROR</td><td>ORA-06502</td><td>Variable too small for the data</td></tr>
+              <tr><td>INVALID_NUMBER</td><td>ORA-01722</td><td>String to number conversion fails</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="topic-card" id="predefined">
+        <div class="topic-card-header"><span class="topic-num">8.2</span><div><h3>Predefined Exceptions</h3><p>Built-in Oracle exceptions with ready-made names — catch them directly by name</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">predefined_exc.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_name <span class="tp">VARCHAR2</span>(<span class="num">50</span>);
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> emp_name <span class="kw">INTO</span> v_name
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  emp_id = -<span class="num">999</span>;            <span class="cm">-- ID that doesn't exist</span>
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN NO_DATA_FOUND THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'No record found for that ID.'</span>);
+    <span class="kw">WHEN TOO_MANY_ROWS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Multiple rows returned — use a cursor.'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>No record found for that ID.</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="user-defined">
+        <div class="topic-card-header"><span class="topic-num">8.3</span><div><h3>User-Defined Exceptions</h3><p>Custom exceptions that enforce business rules — declared in DECLARE, raised with RAISE</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">user_defined_exc.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    ex_insufficient_funds <span class="kw">EXCEPTION</span>;   <span class="cm">-- custom business rule</span>
+    v_balance <span class="tp">NUMBER</span> := <span class="num">30</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span> v_balance &lt; <span class="num">50</span> <span class="kw">THEN</span>
+        <span class="kw">RAISE</span> ex_insufficient_funds;    <span class="cm">-- manually trigger</span>
+    <span class="kw">END IF</span>;
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN</span> ex_insufficient_funds <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Transaction Denied: Balance too low.'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Transaction Denied: Balance too low.</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="raise">
+        <div class="topic-card-header"><span class="topic-num">8.4</span><div><h3>RAISE Statement</h3><p>Explicitly triggers an exception — user-defined, predefined, or re-raises current error</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">raise_stmt.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">BEGIN</span>
+    <span class="kw">RAISE INVALID_NUMBER</span>;   <span class="cm">-- raise a predefined system exception</span>
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN INVALID_NUMBER THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Caught an invalid number event.'</span>);
+        <span class="kw">RAISE</span>;   <span class="cm">-- re-raise to propagate to caller</span>
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Caught an invalid number event.</div>
+          <table class="data-table">
+            <thead><tr><th>Form</th><th>Syntax</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td>Raise user exception</td><td>RAISE e_my_error;</td><td>Jumps to named WHEN handler</td></tr>
+              <tr><td>Raise predefined</td><td>RAISE NO_DATA_FOUND;</td><td>Triggers Oracle's built-in exception</td></tr>
+              <tr><td>Re-raise</td><td>RAISE; (no name)</td><td>Propagates the current active exception up to the caller</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="topic-card" id="when-others">
+        <div class="topic-card-header"><span class="topic-num">8.5</span><div><h3>WHEN OTHERS</h3><p>Catch-all handler — intercepts any error not matched by earlier WHEN clauses</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">when_others.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_num <span class="tp">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    v_num := <span class="str">'This is text, not a number'</span>;  <span class="cm">-- VALUE_ERROR</span>
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN NO_DATA_FOUND THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Found no data.'</span>);
+    <span class="kw">WHEN OTHERS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Unexpected error occurred.'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Unexpected error occurred.</div>
+          <div class="callout danger"><span class="callout-icon">🚫</span><p>Never write <code>WHEN OTHERS THEN NULL;</code> — this silently swallows the error. Always log SQLERRM or re-raise.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="sqlcode-sqlerrm">
+        <div class="topic-card-header"><span class="topic-num">8.6</span><div><h3>SQLCODE &amp; SQLERRM</h3><p>Built-in functions that return the error number and message of the current exception</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p><code>SQLCODE</code> returns the numeric error code (negative for most Oracle errors). <code>SQLERRM</code> returns the full human-readable error message. Both are only meaningful inside an EXCEPTION handler.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">sqlcode_sqlerrm.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_num <span class="tp">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    v_num := <span class="num">10</span> / <span class="num">0</span>;               <span class="cm">-- ZERO_DIVIDE error</span>
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN OTHERS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Error Code   : '</span> || <span class="fn">SQLCODE</span>);
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Error Message: '</span> || <span class="fn">SQLERRM</span>);
+
+        <span class="cm">-- Log to error table</span>
+        <span class="kw">INSERT INTO</span> error_log (err_code, err_msg, err_date)
+        <span class="kw">VALUES</span> (<span class="fn">SQLCODE</span>, <span class="fn">SQLERRM</span>, <span class="fn">SYSDATE</span>);
+        <span class="kw">COMMIT</span>;
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Error Code   : -1476<br>Error Message: ORA-01476: divisor is equal to zero</div>
+          <div class="callout tip"><span class="callout-icon">💡</span><p>Use SQLCODE and SQLERRM together in WHEN OTHERS to log unexpected errors. Insert them into an error_log table for production monitoring.</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="pragma">
+        <div class="topic-card-header"><span class="topic-num">8.7</span><div><h3>PRAGMA EXCEPTION_INIT</h3><p>Associates a user-defined exception name with a specific Oracle error number</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>By default, user-defined exceptions have no error number. <code>PRAGMA EXCEPTION_INIT</code> binds a named exception to a specific ORA- error code, allowing you to catch Oracle system errors by a meaningful business name.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">pragma_init.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    e_child_records  <span class="kw">EXCEPTION</span>;
+    <span class="kw">PRAGMA EXCEPTION_INIT</span>(e_child_records, -<span class="num">2292</span>);  <span class="cm">-- ORA-02292</span>
+
+    e_dup_value      <span class="kw">EXCEPTION</span>;
+    <span class="kw">PRAGMA EXCEPTION_INIT</span>(e_dup_value, -<span class="num">1</span>);          <span class="cm">-- ORA-00001</span>
+
+<span class="kw">BEGIN</span>
+    <span class="kw">DELETE FROM</span> departments <span class="kw">WHERE</span> department_id = <span class="num">10</span>;
+    <span class="kw">COMMIT</span>;
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN</span> e_child_records <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Cannot delete: employee records exist in this department.'</span>);
+        <span class="kw">ROLLBACK</span>;
+    <span class="kw">WHEN</span> e_dup_value <span class="kw">THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Duplicate value — record already exists.'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Cannot delete: employee records exist in this department.</div>
+          <div class="callout tip"><span class="callout-icon">💡</span><p>PRAGMA must be in the DECLARE section. The error number is always negative (e.g., -2292 for ORA-02292).</p></div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="raise-app-error">
+        <div class="topic-card-header"><span class="topic-num">8.8</span><div><h3>RAISE_APPLICATION_ERROR</h3><p>Create a custom error number (-20000 to -20999) with a descriptive message visible to calling applications</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>Unlike RAISE which only works within PL/SQL, <code>RAISE_APPLICATION_ERROR</code> surfaces the error to the calling application — Java, Python, APEX — with a custom error code and message, making it the standard for business rule enforcement in stored procedures.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">raise_app_error.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_salary    <span class="tp">NUMBER</span> := <span class="num">260000</span>;
+    v_hire_date <span class="tp">DATE</span>   := <span class="kw">DATE</span> <span class="str">'2028-01-01'</span>;
+    c_max_sal   <span class="kw">CONSTANT</span> <span class="tp">NUMBER</span> := <span class="num">250000</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- Validate hire date</span>
+    <span class="kw">IF</span> v_hire_date > <span class="fn">SYSDATE</span> <span class="kw">THEN</span>
+        <span class="fn">RAISE_APPLICATION_ERROR</span>(-<span class="num">20001</span>,
+            <span class="str">'Hire date cannot be in the future: '</span>
+            || <span class="fn">TO_CHAR</span>(v_hire_date, <span class="str">'DD-MON-YYYY'</span>));
+    <span class="kw">END IF</span>;
+
+    <span class="cm">-- Validate salary cap</span>
+    <span class="kw">IF</span> v_salary > c_max_sal <span class="kw">THEN</span>
+        <span class="fn">RAISE_APPLICATION_ERROR</span>(-<span class="num">20002</span>,
+            <span class="str">'Salary $'</span> || v_salary || <span class="str">' exceeds max $'</span> || c_max_sal);
+    <span class="kw">END IF</span>;
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN OTHERS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="fn">SQLERRM</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>ORA-20001: Hire date cannot be in the future: 01-JAN-2028</div>
+          <div class="callout purple"><span class="callout-icon">📋</span><p><strong>Numbering convention:</strong> Organise error ranges by module — e.g., -20001 to -20099 for employee validation, -20100 to -20199 for order processing, -20900 to -20999 for system errors.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SECTION 9: SELECT INTO ═══════ -->
+    <div class="session-block" id="select-into-section">
+      <div class="session-header">
+        <div class="session-icon">📥</div>
+        <div>
+          <h2>SELECT INTO</h2>
+          <p>Retrieve exactly one SQL row into PL/SQL variables — the bridge between SQL and PL/SQL</p>
+        </div>
+      </div>
+
+      <div class="topic-card" id="select-into-basic">
+        <div class="topic-card-header"><span class="topic-num">9.1</span><div><h3>Basic SELECT INTO</h3><p>Fetch column values from exactly one row directly into PL/SQL variables</p></div></div>
+        <div class="topic-body">
+          <div class="prose"><p>SELECT INTO is the PL/SQL mechanism to retrieve data from the database into variables. It must return <strong>exactly one row</strong> — zero rows raises NO_DATA_FOUND, more than one raises TOO_MANY_ROWS.</p></div>
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">select_into_basic.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_emp_id   employees.employee_id<span class="op">%TYPE</span> := <span class="num">101</span>;
+    v_name     employees.last_name<span class="op">%TYPE</span>;
+    v_salary   employees.salary<span class="op">%TYPE</span>;
+    v_dept     departments.department_name<span class="op">%TYPE</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- Single row fetch with JOIN</span>
+    <span class="kw">SELECT</span> e.last_name, e.salary, d.department_name
+    <span class="kw">INTO</span>   v_name, v_salary, v_dept
+    <span class="kw">FROM</span>   employees e
+    <span class="kw">JOIN</span>   departments d <span class="kw">ON</span> e.department_id = d.department_id
+    <span class="kw">WHERE</span>  e.employee_id = v_emp_id;
+
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Name  : '</span> || v_name);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Dept  : '</span> || v_dept);
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Salary: $'</span> || v_salary);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Name  : King<br>Dept  : Executive<br>Salary: $24000</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="select-into-errors">
+        <div class="topic-card-header"><span class="topic-num">9.2</span><div><h3>SELECT INTO — Error Handling</h3><p>NO_DATA_FOUND and TOO_MANY_ROWS must always be handled</p></div></div>
+        <div class="topic-body">
+          <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">select_into_errors.sql</span></div>
+          <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_name employees.first_name<span class="op">%TYPE</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> first_name <span class="kw">INTO</span> v_name
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  employee_id = <span class="num">99999</span>;   <span class="cm">-- does not exist</span>
+
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Found: '</span> || v_name);
+
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN NO_DATA_FOUND THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Employee not found.'</span>);
+
+    <span class="kw">WHEN TOO_MANY_ROWS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Multiple rows returned — add WHERE condition.'</span>);
+
+    <span class="kw">WHEN OTHERS THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Error: '</span> || <span class="fn">SQLERRM</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          <div class="output-box"><div class="output-label">Output</div>Employee not found.</div>
+        </div>
+      </div>
+
+      <div class="topic-card" id="select-into-patterns">
+        <div class="topic-card-header"><span class="topic-num">9.3</span><div><h3>Safe SELECT INTO Patterns</h3><p>Techniques that guarantee a single row is returned — avoiding both error types</p></div></div>
+        <div class="topic-body">
+          <div class="subsection">
+            <div class="subsection-title">Pattern 1 — Use Aggregate (Always returns 1 row)</div>
+            <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">safe_aggregate.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_avg_sal <span class="tp">NUMBER</span>;
+    v_emp_cnt <span class="tp">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- Aggregate ALWAYS returns 1 row (NULL if no data)</span>
+    <span class="kw">SELECT</span> <span class="fn">AVG</span>(salary), <span class="fn">COUNT</span>(*)
+    <span class="kw">INTO</span>   v_avg_sal, v_emp_cnt
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  department_id = <span class="num">50</span>;
+
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Avg Salary: $'</span> || <span class="fn">NVL</span>(v_avg_sal, <span class="num">0</span>));
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Headcount : '</span> || v_emp_cnt);
+<span class="kw">END</span>;
+/</pre></div></div>
+          </div>
+
+          <div class="subsection">
+            <div class="subsection-title">Pattern 2 — SELECT INTO with %ROWTYPE</div>
+            <div class="mac-window"><div class="mac-titlebar"><span class="mac-btn close"></span><span class="mac-btn min"></span><span class="mac-btn max"></span><span class="mac-file-label">safe_rowtype.sql</span></div>
+            <div class="mac-body"><pre><span class="kw">DECLARE</span>
+    v_emp employees<span class="op">%ROWTYPE</span>;   <span class="cm">-- all columns in one variable</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> * <span class="kw">INTO</span> v_emp
+    <span class="kw">FROM</span>   employees
+    <span class="kw">WHERE</span>  employee_id = <span class="num">101</span>;  <span class="cm">-- primary key guarantees 1 row</span>
+
+    <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(v_emp.first_name || <span class="str">' earns $'</span> || v_emp.salary);
+<span class="kw">EXCEPTION</span>
+    <span class="kw">WHEN NO_DATA_FOUND THEN</span>
+        <span class="fn">DBMS_OUTPUT.PUT_LINE</span>(<span class="str">'Employee 101 not found.'</span>);
+<span class="kw">END</span>;
+/</pre></div></div>
+          </div>
+
+          <div class="callout tip"><span class="callout-icon">✅</span><p><strong>Rule:</strong> Always use a PRIMARY KEY or UNIQUE column in the WHERE clause of SELECT INTO. This mathematically guarantees at most one row — eliminating TOO_MANY_ROWS.</p></div>
+
+          <table class="data-table">
+            <thead><tr><th>Safe Pattern</th><th>Guarantees</th><th>Use When</th></tr></thead>
+            <tbody>
+              <tr><td>Primary key WHERE</td><td>Max 1 row</td><td>Fetching one specific record</td></tr>
+              <tr><td>Aggregate (COUNT, AVG)</td><td>Always 1 row</td><td>Summary statistics</td></tr>
+              <tr><td>MAX / MIN subquery</td><td>Always 1 row</td><td>Finding extremes</td></tr>
+              <tr><td>Always EXCEPTION block</td><td>Safe recovery</td><td>All SELECT INTO statements</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>Prepared by <a href="http://ragulrajportfolio.web.app/" target="_blank" rel="noopener">Ragulraj Dhamodharan</a> &nbsp;·&nbsp; Oracle Developer Track &nbsp;·&nbsp; PL/SQL Fundamentals</p>
+</footer>
+
+</body>
+</html>

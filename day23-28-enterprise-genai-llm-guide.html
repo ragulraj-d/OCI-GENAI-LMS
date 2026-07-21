@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise GenAI Training Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --primary:#E8610A;--primary-light:#FFF3EC;--primary-border:#FDDCBA;
+  --bg:#F6F7F9;--surface:#FFFFFF;--surface2:#F3F4F6;--surface3:#E9EAED;
+  --border:#E2E4E8;--border-strong:#C8CCD4;
+  --text:#0F1117;--text-2:#374151;--text-3:#6B7280;--text-4:#9CA3AF;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+  --green:#15803D;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+  --purple:#6D28D9;--purple-bg:#F5F3FF;--purple-border:#DDD6FE;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-border:#FECACA;
+  --yellow:#B45309;--yellow-bg:#FFFBEB;--yellow-border:#FDE68A;
+  --cyan:#0E7490;--cyan-bg:#ECFEFF;--cyan-border:#A5F3FC;
+  --pink:#BE185D;--pink-bg:#FDF2F8;--pink-border:#FBCFE8;
+  --nav-h:56px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
+  --radius:10px;--radius-sm:6px;--radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.7}
+
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);height:var(--nav-h);display:flex;align-items:center;padding:0 24px;gap:0;box-shadow:var(--shadow-sm)}
+.nav-brand{font-weight:700;font-size:14px;color:var(--primary);white-space:nowrap;margin-right:24px;letter-spacing:-.2px}
+.nav-links{display:flex;gap:0;overflow-x:auto;flex:1}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{display:block;padding:0 13px;height:var(--nav-h);line-height:var(--nav-h);font-size:12px;font-weight:600;color:var(--text-3);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.nav-links a:hover{color:var(--primary);border-bottom-color:var(--primary)}
+.nav-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+/* ── CHAPTER HEADER ── */
+.ch{padding:52px 0 0}
+.ch-inner{border-bottom:2px solid var(--border);padding-bottom:28px;margin-bottom:36px}
+.ch-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ch-num{width:34px;height:34px;border-radius:8px;background:var(--primary);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ch-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)}
+.ch-title{font-size:26px;font-weight:700;line-height:1.25;letter-spacing:-.4px;margin-bottom:6px}
+.ch-title em{color:var(--primary);font-style:normal}
+.ch-sub{color:var(--text-3);font-size:14px}
+
+/* ── TOPIC BLOCK ── */
+.topic{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.topic-hd{padding:16px 22px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.topic-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.topic-title{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.topic-body{padding:22px}
+
+/* ── GRID CARDS (WH-grid) ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:16px 0}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-label{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:8px}
+.card h4{font-size:14px;font-weight:700;margin-bottom:6px}
+.card p,.card ul{font-size:13px;color:var(--text-2);line-height:1.65}
+.card ul{padding-left:16px}
+.card ul li{margin-bottom:3px}
+.c-blue{border-left:3px solid var(--blue)}.c-blue .card-label{color:var(--blue)}
+.c-green{border-left:3px solid var(--green)}.c-green .card-label{color:var(--green)}
+.c-orange{border-left:3px solid var(--primary)}.c-orange .card-label{color:var(--primary)}
+.c-purple{border-left:3px solid var(--purple)}.c-purple .card-label{color:var(--purple)}
+.c-red{border-left:3px solid var(--red)}.c-red .card-label{color:var(--red)}
+.c-yellow{border-left:3px solid var(--yellow)}.c-yellow .card-label{color:var(--yellow)}
+.c-cyan{border-left:3px solid var(--cyan)}.c-cyan .card-label{color:var(--cyan)}
+.c-pink{border-left:3px solid var(--pink)}.c-pink .card-label{color:var(--pink)}
+
+/* ── OCI BOX ── */
+.oci{background:#FFF8F3;border:1px solid var(--primary-border);border-left:4px solid var(--primary);border-radius:var(--radius);padding:18px 22px;margin:16px 0}
+.oci-lbl{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.oci h4{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:8px}
+.oci p,.oci ul{font-size:13px;color:var(--text-2);line-height:1.65}
+.oci ul{padding-left:18px;margin-top:6px}
+.oci ul li{margin-bottom:4px}
+
+/* ── CALLOUTS ── */
+.callout{border-radius:var(--radius-sm);padding:12px 16px;margin:12px 0;font-size:13px;display:flex;gap:10px;align-items:flex-start;line-height:1.6}
+.callout-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.callout.info{background:var(--blue-bg);border:1px solid var(--blue-border)}
+.callout.tip{background:var(--green-bg);border:1px solid var(--green-border)}
+.callout.warn{background:var(--yellow-bg);border:1px solid var(--yellow-border)}
+.callout.danger{background:var(--red-bg);border:1px solid var(--red-border)}
+.callout.note{background:var(--purple-bg);border:1px solid var(--purple-border)}
+
+/* ── CODE ── */
+.code-wrap{background:#1E1E2E;border:1px solid #313244;border-radius:var(--radius);margin:16px 0;overflow:hidden}
+.code-hd{background:#181825;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #313244}
+.code-lang{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#F97316}
+.code-file{font-size:11px;color:#6C7086}
+.code-wrap pre{padding:18px;overflow-x:auto;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12.5px;line-height:1.8;color:#CDD6F4;margin:0}
+.kw{color:#CBA6F7}.st{color:#A6E3A1}.cm{color:#6C7086;font-style:italic}
+.nu{color:#FAB387}.fn{color:#89B4FA}.ty{color:#F38BA8}.op{color:#89DCEB}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;margin:16px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--surface2);color:var(--text);padding:10px 14px;text-align:left;font-size:11px;letter-spacing:.8px;text-transform:uppercase;border-bottom:2px solid var(--border);font-weight:700}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+td strong{color:var(--text)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.bg{background:var(--green-bg);color:var(--green)}
+.bb{background:var(--blue-bg);color:var(--blue)}
+.bp{background:var(--purple-bg);color:var(--purple)}
+.br{background:var(--red-bg);color:var(--red)}
+.by{background:var(--yellow-bg);color:var(--yellow)}
+.bo{background:var(--primary-light);color:var(--primary)}
+
+/* ── ASCII DIAGRAM ── */
+.diagram{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-2);line-height:1.9;overflow-x:auto;white-space:pre}
+
+/* ── PIPELINE ── */
+.pipe{display:flex;align-items:stretch;gap:0;margin:16px 0;flex-wrap:wrap}
+.pipe-step{flex:1;min-width:100px;background:var(--surface2);border:1px solid var(--border);border-right:none;padding:12px 14px;text-align:center;position:relative}
+.pipe-step:last-child{border-right:1px solid var(--border)}
+.pipe-step:first-child{border-radius:var(--radius-sm) 0 0 var(--radius-sm)}
+.pipe-step:last-child{border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.pipe-step::after{content:'›';position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:18px;font-weight:700;z-index:2;background:var(--bg);padding:0 2px}
+.pipe-step:last-child::after{display:none}
+.ps-n{font-size:10px;color:var(--primary);font-weight:700;margin-bottom:3px}
+.ps-l{font-size:12px;font-weight:700}
+.ps-s{font-size:11px;color:var(--text-3);margin-top:2px}
+
+/* ── INTERVIEW ── */
+.iq-list{counter-reset:iq;list-style:none;padding:0;margin:12px 0}
+.iq-list li{counter-increment:iq;padding:10px 14px;margin-bottom:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text-2);position:relative;padding-left:42px}
+.iq-list li::before{content:counter(iq);position:absolute;left:12px;top:50%;transform:translateY(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* ── SUMMARY BOX ── */
+.summary{background:linear-gradient(135deg,var(--primary-light),#fff);border:1px solid var(--primary-border);border-radius:var(--radius);padding:18px 22px;margin-top:16px}
+.summary h4{color:var(--primary);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.summary ul{padding-left:18px;font-size:13px;color:var(--text-2)}
+.summary li{margin-bottom:4px}
+
+/* ── MISC ── */
+h3{font-size:15px;font-weight:700;margin:20px 0 10px;color:var(--text);letter-spacing:-.2px}
+h3 span{color:var(--primary)}
+p{color:var(--text-2);line-height:1.7;margin-bottom:10px;font-size:14px}
+ul,ol{padding-left:20px;color:var(--text-2);font-size:14px;line-height:1.65}
+li{margin-bottom:4px}
+strong{color:var(--text)}
+hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--primary)}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:2px}
+.po{background:var(--primary-light);color:var(--primary);border:1px solid var(--primary-border)}
+.pb{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.pg{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.pp{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+.section-divider{height:2px;background:linear-gradient(90deg,var(--primary),transparent);margin:48px 0 0;border-radius:2px}
+@media(max-width:768px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .pipe{flex-direction:column}
+  .pipe-step{border-right:1px solid var(--border);border-bottom:none}
+  .pipe-step:first-child{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+  .pipe-step:last-child{border-radius:0 0 var(--radius-sm) var(--radius-sm);border-bottom:1px solid var(--border)}
+  .pipe-step::after{content:'↓';right:50%;top:unset;bottom:-14px;font-size:14px}
+  .wrap{padding:0 16px}
+  .ch-title{font-size:21px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="topnav">
+  <div class="nav-brand">⚡ Enterprise GenAI Guide</div>
+  <div class="nav-links">
+    <a href="#c1">AI Foundations</a>
+    <a href="#c2">ML</a>
+    <a href="#c3">Deep Learning</a>
+    <a href="#c4">Transformers</a>
+    <a href="#c5">LLMs</a>
+    <a href="#c6">LLM Types</a>
+    <a href="#c7">Prompt Eng.</a>
+    <a href="#c8">RAG</a>
+    <a href="#c9">Fine-Tuning</a>
+    <a href="#c10">Compression</a>
+    <a href="#c11">Evaluation</a>
+    <a href="#c12">Deployment</a>
+    <a href="#c13">OCI</a>
+    <a href="#c14">Future</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 1 · AI FOUNDATIONS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c1" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">1</div><div class="ch-tag">Foundation</div></div>
+  <div class="ch-title">Artificial Intelligence — <em>The Big Picture</em></div>
+  <div class="ch-sub">Understanding AI · Machine Learning · Deep Learning · Neural Networks</div>
+</div>
+
+<!-- TOPIC: What is AI -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#EFF6FF">🧠</div>
+    <div class="topic-title">What is Artificial Intelligence?</div>
+  </div>
+  <div class="topic-body">
+    <p>Imagine you ask your phone: <em>"What's the weather in Chennai tomorrow?"</em> — Your phone understands your sentence, connects to a weather service, and replies in plain English. No human helped it. That ability — a machine understanding, reasoning, and responding like a human — is <strong>Artificial Intelligence</strong>.</p>
+    <p>Formally: AI is the science of making machines perform tasks that normally require human intelligence — understanding language, recognising patterns, making decisions, and solving problems.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">🔷 Definition</div>
+        <h4>Artificial Intelligence</h4>
+        <p>Machines that simulate human cognitive functions — learning, reasoning, problem-solving, perception, and language understanding.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">⚡ Why It Exists</div>
+        <h4>The Problem It Solved</h4>
+        <p>Manual rule-based systems broke the moment reality didn't match the rules. AI learns from data — no hardcoding needed. Works even on edge cases.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">📚 Before AI</div>
+        <h4>Rule-Based Systems (Expert Systems)</h4>
+        <p>Engineers manually wrote IF-THEN rules. A medical diagnosis system had 10,000+ hand-coded rules. Broke down with new diseases or edge cases.</p>
+      </div>
+    </div>
+
+    <h3>🗺️ The AI Landscape — Three Levels</h3>
+    <div class="diagram">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                     ARTIFICIAL INTELLIGENCE                     │
+  │         "Any technique that enables machines to mimic           │
+  │          human behavior" (rule-based or learned)                │
+  │                                                                 │
+  │   ┌─────────────────────────────────────────────────────────┐  │
+  │   │                  MACHINE LEARNING                        │  │
+  │   │   "Systems that learn from data without being           │  │
+  │   │    explicitly programmed for every rule"                │  │
+  │   │                                                         │  │
+  │   │   ┌─────────────────────────────────────────────────┐  │  │
+  │   │   │              DEEP LEARNING                       │  │  │
+  │   │   │  "ML using multi-layer neural networks that     │  │  │
+  │   │   │   automatically learn features from raw data"   │  │  │
+  │   │   │                                                  │  │  │
+  │   │   │   ┌──────────────────────────────────────────┐  │  │  │
+  │   │   │   │    LARGE LANGUAGE MODELS (LLMs)          │  │  │  │
+  │   │   │   │  Deep Learning on massive text — GPT,    │  │  │  │
+  │   │   │   │  Claude, Gemini, LLaMA, Cohere           │  │  │  │
+  │   │   │   └──────────────────────────────────────────┘  │  │  │
+  │   │   └─────────────────────────────────────────────────┘  │  │
+  │   └─────────────────────────────────────────────────────────┘  │
+  └─────────────────────────────────────────────────────────────────┘</div>
+
+    <h3>📅 AI Evolution Timeline</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Year</th><th>Era</th><th>Technology</th><th>What Changed</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1950s</strong></td><td>Birth of AI</td><td>Logic Theorist, Turing Test</td><td>Concept of machine intelligence defined</td></tr>
+        <tr><td><strong>1980s</strong></td><td>Expert Systems</td><td>IF-THEN rule engines</td><td>First commercial AI (banking, medical)</td></tr>
+        <tr><td><strong>1990s</strong></td><td>Statistical ML</td><td>SVM, Decision Trees</td><td>Learn from data instead of rules</td></tr>
+        <tr><td><strong>2006</strong></td><td>Deep Learning</td><td>Deep Belief Networks</td><td>Many-layer neural networks become feasible</td></tr>
+        <tr><td><strong>2012</strong></td><td>GPU Revolution</td><td>AlexNet (ImageNet)</td><td>Deep learning beats human image recognition</td></tr>
+        <tr><td><strong>2017</strong></td><td>Transformers</td><td>"Attention Is All You Need"</td><td>Foundation of all modern LLMs</td></tr>
+        <tr><td><strong>2018–19</strong></td><td>Pre-trained Models</td><td>BERT, GPT-2</td><td>Train once, fine-tune everywhere</td></tr>
+        <tr><td><strong>2020–22</strong></td><td>Scale</td><td>GPT-3, PaLM, Codex</td><td>100B+ parameters, emergent capabilities</td></tr>
+        <tr><td><strong>2023+</strong></td><td>GenAI Era</td><td>GPT-4, Claude, Gemini, LLaMA</td><td>General-purpose AI assistants at enterprise scale</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>🏭 AI in Industry Today</h3>
+    <div class="grid-4">
+      <div class="card c-blue"><div class="card-label">🏦 Banking</div><p>Fraud detection, credit scoring, KYC automation, loan processing</p></div>
+      <div class="card c-green"><div class="card-label">🏥 Healthcare</div><p>Disease diagnosis, drug discovery, patient record analysis, imaging AI</p></div>
+      <div class="card c-orange"><div class="card-label">🛒 Retail</div><p>Recommendation engines, demand forecasting, chatbots, inventory AI</p></div>
+      <div class="card c-purple"><div class="card-label">🏭 Manufacturing</div><p>Predictive maintenance, quality inspection, supply chain optimization</p></div>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Real-World Scenario</div>
+      <h4>Enterprise AI Platform on Oracle Cloud</h4>
+      <p>A large enterprise IT services company's banking clients required an AI backbone for multiple use cases simultaneously: fraud alerts, loan underwriting, customer service automation, and document processing.</p>
+      <ul>
+        <li><strong>OCI AI Services</strong> — Vision AI for cheque processing, Language AI for sentiment analysis</li>
+        <li><strong>OCI Data Science</strong> — Central platform for all model training and experimentation</li>
+        <li><strong>OCI Generative AI</strong> — Cohere Command R+ for customer-facing chat and document Q&amp;A</li>
+        <li><strong>OCI Object Storage</strong> — Data lake for 50TB of customer transaction data</li>
+        <li><strong>OCI API Gateway</strong> — Unified AI API layer exposing all models to downstream apps</li>
+        <li><strong>Result:</strong> 65% reduction in manual processing time, ₹3.2 Cr annual cost savings</li>
+      </ul>
+    </div>
+
+    <div class="summary">
+      <h4>🎯 Key Takeaways</h4>
+      <ul>
+        <li>AI = machines simulating human intelligence. ML and Deep Learning are subsets of AI.</li>
+        <li>Rule-based systems failed at scale — AI learns patterns from data instead.</li>
+        <li>The 2017 Transformer paper is the most important event in modern AI history.</li>
+        <li>LLMs sit at the intersection of Deep Learning, NLP, and massive scale.</li>
+        <li>OCI provides end-to-end AI services from data storage to model deployment.</li>
+      </ul>
+    </div>
+
+    <ol class="iq-list">
+      <li>What is the difference between Artificial Intelligence, Machine Learning, and Deep Learning?</li>
+      <li>Why did rule-based expert systems fail? What did machine learning solve?</li>
+      <li>What was the significance of the 2017 "Attention Is All You Need" paper?</li>
+      <li>Name 3 enterprise AI use cases in banking and explain the AI technique used.</li>
+      <li>What OCI services would you use to build a complete AI pipeline for a bank?</li>
+    </ol>
+  </div>
+</div>
+
+<!-- TOPIC: Machine Learning -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F0FDF4">📊</div>
+    <div class="topic-title">Machine Learning — Learning From Data</div>
+  </div>
+  <div class="topic-body">
+    <p>A traditional program for spam detection would look like: <em>IF email contains "lottery" OR "winner" THEN mark spam.</em> This fails the moment spammers write "l0ttery" or use images. <strong>Machine Learning</strong> instead learns from thousands of examples of spam and non-spam emails — it finds its own patterns without being told what they are.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">🔷 Definition</div>
+        <p>ML is the field where algorithms learn patterns from data to make decisions or predictions — without explicit rule programming.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">⚡ Why It Exists</div>
+        <p>Real-world problems have millions of edge cases. Writing rules for each is impossible. ML finds rules automatically from examples.</p>
+      </div>
+      <div class="card c-purple">
+        <div class="card-label">📚 Before ML</div>
+        <p>Expert Systems required domain experts to write every rule manually. MYCIN (medical diagnosis, 1970s) had 600+ handcrafted rules — still missed rare cases.</p>
+      </div>
+    </div>
+
+    <h3>🗂️ Types of Machine Learning</h3>
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">1️⃣ Supervised Learning</div>
+        <h4>Learns from labelled examples</h4>
+        <p><strong>Input → Label:</strong> 10,000 emails labelled spam/not-spam → model learns to classify new emails</p>
+        <ul><li>Classification (spam? fraud? disease?)</li><li>Regression (what price? what demand?)</li></ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">2️⃣ Unsupervised Learning</div>
+        <h4>Finds hidden structure</h4>
+        <p><strong>Input → Pattern:</strong> 1M customer purchase histories → model discovers 5 customer segments automatically</p>
+        <ul><li>Clustering (customer segmentation)</li><li>Dimensionality reduction</li></ul>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">3️⃣ Reinforcement Learning</div>
+        <h4>Learns by trial and reward</h4>
+        <p><strong>Agent → Action → Reward:</strong> AI plays 1M chess games, wins get +1, losses get -1, learns best strategy</p>
+        <ul><li>Game playing (AlphaGo)</li><li>Robot control, trading bots</li></ul>
+      </div>
+    </div>
+
+    <h3>⚙️ How ML Works — Step by Step</h3>
+    <div class="diagram">
+  INPUT DATA          FEATURE           TRAINING            PREDICTION
+  (Raw Examples)  →  EXTRACTION    →   ALGORITHM      →    (Output)
+                     (What matters)    (Finds pattern)
+
+  Example: Credit Score Prediction
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────┐
+  │ 50,000 loan  │    │ Age, Income, │    │ Decision     │    │ Approve  │
+  │ applications │───▶│ Debt Ratio,  │───▶│ Tree or      │───▶│ Reject   │
+  │ (approved/   │    │ Employment   │    │ XGBoost      │    │ Review   │
+  │  rejected)   │    │ History...   │    │ trains on    │    │          │
+  └──────────────┘    └──────────────┘    │ these labels │    └──────────┘
+                                          └──────────────┘
+
+  KEY INSIGHT: The algorithm FINDS the rules. You don't write them!</div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI ML Scenario</div>
+      <h4>Bajaj Finserv — Credit Risk ML Model on OCI Data Science</h4>
+      <ul>
+        <li><strong>Business Problem:</strong> Manual loan review takes 3 days per application. Need instant, accurate decisions.</li>
+        <li><strong>OCI Data Science:</strong> Jupyter environment + AutoML to train XGBoost model on 500K historical applications</li>
+        <li><strong>OCI Object Storage:</strong> Training data lake — 2TB of customer financial data, encrypted</li>
+        <li><strong>OCI Model Deployment:</strong> REST endpoint called by loan application web portal in real-time</li>
+        <li><strong>OCI Monitoring:</strong> Track prediction drift — alert when model accuracy drops below 92%</li>
+        <li><strong>Result:</strong> Loan decision in 2 seconds. 94.3% accuracy. Processing volume: 50,000 decisions/day</li>
+      </ul>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">ml_credit_scoring.py</span></div>
+      <pre><span class="cm"># ── MACHINE LEARNING: Credit Risk Scoring ─────────────────────────</span>
+<span class="cm"># Beginner-friendly example — every line explained</span>
+<span class="kw">from</span> <span class="ty">sklearn</span>.<span class="ty">ensemble</span> <span class="kw">import</span> <span class="fn">RandomForestClassifier</span>
+<span class="kw">from</span> <span class="ty">sklearn</span>.<span class="ty">model_selection</span> <span class="kw">import</span> <span class="fn">train_test_split</span>
+<span class="kw">from</span> <span class="ty">sklearn</span>.<span class="ty">metrics</span> <span class="kw">import</span> <span class="fn">accuracy_score</span>
+<span class="kw">import</span> <span class="ty">pandas</span> <span class="kw">as</span> pd
+
+<span class="cm"># Step 1: Load data (each row = one loan application)</span>
+<span class="cm"># Columns: age, income, existing_debt, employment_years, approved (0/1)</span>
+df = pd.<span class="fn">read_csv</span>(<span class="st">"loan_applications.csv"</span>)
+
+<span class="cm"># Step 2: Separate FEATURES (inputs) from LABEL (what we're predicting)</span>
+X = df[[<span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"existing_debt"</span>, <span class="st">"employment_years"</span>]]  <span class="cm"># Features</span>
+y = df[<span class="st">"approved"</span>]  <span class="cm"># Label: 1=Approved, 0=Rejected</span>
+
+<span class="cm"># Step 3: Split data — 80% for training, 20% to test accuracy later</span>
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(X, y, test_size=<span class="nu">0.2</span>, random_state=<span class="nu">42</span>)
+<span class="cm"># random_state=42 ensures reproducible results every time you run</span>
+
+<span class="cm"># Step 4: Create the ML model — Random Forest = 100 Decision Trees voting together</span>
+model = <span class="fn">RandomForestClassifier</span>(n_estimators=<span class="nu">100</span>, random_state=<span class="nu">42</span>)
+
+<span class="cm"># Step 5: TRAIN — model studies 40,000 examples and learns patterns</span>
+model.<span class="fn">fit</span>(X_train, y_train)
+<span class="cm"># After this line: model has learned "high income + low debt → approve"</span>
+
+<span class="cm"># Step 6: PREDICT on new applications it has never seen before</span>
+predictions = model.<span class="fn">predict</span>(X_test)
+
+<span class="cm"># Step 7: Measure accuracy</span>
+accuracy = <span class="fn">accuracy_score</span>(y_test, predictions)
+<span class="fn">print</span>(<span class="st">f"Model Accuracy: {accuracy:.1%}"</span>)  <span class="cm"># Output: Model Accuracy: 94.2%</span>
+
+<span class="cm"># Step 8: Predict for a NEW customer</span>
+new_customer = [[<span class="nu">35</span>, <span class="nu">85000</span>, <span class="nu">20000</span>, <span class="nu">8</span>]]  <span class="cm"># age=35, income=₹85K, debt=₹20K, 8yrs exp</span>
+result = model.<span class="fn">predict</span>(new_customer)
+<span class="fn">print</span>(<span class="st">"Decision:"</span>, <span class="st">"APPROVED"</span> <span class="kw">if</span> result[<span class="nu">0</span>] == <span class="nu">1</span> <span class="kw">else</span> <span class="st">"REJECTED"</span>)
+<span class="cm"># Output: Decision: APPROVED</span></pre>
+    </div>
+
+    <div class="summary">
+      <h4>🎯 ML Summary</h4>
+      <ul>
+        <li>ML learns patterns from examples — no manual rule writing needed.</li>
+        <li>Supervised Learning needs labelled data. Unsupervised finds hidden structure.</li>
+        <li>Traditional ML needs manual feature engineering — Deep Learning eliminates this.</li>
+        <li>OCI Data Science provides managed Jupyter notebooks + AutoML for enterprise ML.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TOPIC: Deep Learning -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F5F3FF">🔬</div>
+    <div class="topic-title">Deep Learning — When Features Learn Themselves</div>
+  </div>
+  <div class="topic-body">
+    <p>Traditional ML requires a human expert to decide which features matter. To detect cancer in an X-ray, a radiologist must tell the ML model: <em>"look for irregular edges, density variations, calcifications..."</em> This is called <strong>feature engineering</strong> and it's time-consuming and imperfect.</p>
+    <p><strong>Deep Learning</strong> eliminated this problem. You feed in raw pixels. The neural network figures out by itself that edges matter, then textures, then shapes, then structures. No human has to define what to look for.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">🔷 What</div>
+        <p>ML using <em>multi-layer artificial neural networks</em> that automatically learn hierarchical features from raw data. The "deep" refers to many layers (10–1000+).</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">⚡ Why</div>
+        <p>Traditional ML failed at images, audio, text — too complex for human feature engineering. Deep Learning processes raw data end-to-end and outperforms humans on many tasks.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">📚 Before DL</div>
+        <p>SVM, Random Forest needed manual features. For face recognition, you'd manually code edge detectors, then eye detectors... Deep Learning replaced all of this with one model trained end-to-end.</p>
+      </div>
+    </div>
+
+    <h3>🏗️ Neural Network Architecture</h3>
+    <div class="diagram">
+  INPUT LAYER         HIDDEN LAYERS            OUTPUT LAYER
+  (Raw Data)         (Feature Learning)        (Prediction)
+
+  pixel₁ ─────────────────────────────────────────┐
+  pixel₂ ────── ●─────── ●─────── ●─────── ●──── │── cat (82%)
+  pixel₃ ──────/│\      /│\      /│\      /│\    │── dog (15%)
+  pixel₄ ─────  │  ────  │  ────  │  ────  │  ── ┘── bird (3%)
+  pixel₅ ──────\│/      \│/      \│/      \│/
+                ●         ●         ●         ●
+              Layer 1   Layer 2   Layer 3   Layer 4
+             (Edges)  (Textures)(Shapes) (Objects)
+
+  Each ● = neuron that computes: output = activation(weights × inputs + bias)
+  
+  FORWARD PASS → Compare output to correct label → BACKPROPAGATION
+  → Adjust weights → Repeat millions of times → Model learns!</div>
+
+    <div class="grid-4">
+      <div class="card c-blue"><div class="card-label">🖼️ CNN</div><h4>Images</h4><p>Convolutional layers detect spatial patterns. Used in: face recognition, medical imaging, document OCR</p></div>
+      <div class="card c-green"><div class="card-label">🔄 RNN/LSTM</div><h4>Sequences</h4><p>Processes data in order, remembers context. Used in: time series, early NLP, speech recognition</p></div>
+      <div class="card c-orange"><div class="card-label">⚡ Transformer</div><h4>Attention</h4><p>Attends to all positions simultaneously. Used in: ALL modern LLMs (GPT, BERT, LLaMA, Claude)</p></div>
+      <div class="card c-purple"><div class="card-label">🎨 GAN</div><h4>Generation</h4><p>Generator vs Discriminator in competition. Used in: image synthesis, deepfake detection, data augmentation</p></div>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Deep Learning Scenario</div>
+      <h4>NSE Academy — Document Classification with CNNs on OCI</h4>
+      <ul>
+        <li><strong>Problem:</strong> NSE receives 5,000 regulatory documents/day in scanned PDF format. Manual classification into 12 categories takes 40 minutes per document.</li>
+        <li><strong>Solution:</strong> CNN-based document image classifier trained on 200,000 labelled documents</li>
+        <li><strong>OCI Compute GPU:</strong> BM.GPU.A10.4 — 4× A10 GPUs for training (completed in 6 hours)</li>
+        <li><strong>OCI Data Science:</strong> Model training notebook + MLflow experiment tracking</li>
+        <li><strong>OCI Functions:</strong> Serverless trigger — new document in Object Storage → auto-classify</li>
+        <li><strong>Accuracy:</strong> 97.8% — document routed to correct team instantly. Processing: 5,000 docs in 3 minutes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TOPIC: Neural Networks Deep Dive -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FFF8F3">⚙️</div>
+    <div class="topic-title">Neural Networks — How a Brain-Inspired Machine Learns</div>
+  </div>
+  <div class="topic-body">
+    <p>The human brain has ~86 billion neurons. Each neuron receives signals, processes them, and fires if the signal is strong enough. Artificial neural networks are a mathematical abstraction of this idea — simplified, but powerful enough to learn language, vision, and reasoning.</p>
+
+    <h3>🔬 The Neuron — Building Block</h3>
+    <div class="diagram">
+  BIOLOGICAL NEURON:          ARTIFICIAL NEURON (Perceptron):
+  
+  Dendrites (inputs)          x₁ ─── w₁ ─┐
+         │                    x₂ ─── w₂ ─┤─── Σ(wᵢxᵢ + b) → activation() → output
+  Cell body (sums)            x₃ ─── w₃ ─┘
+         │                    
+  Axon (output fires          Where:
+   if threshold met)          x = input values
+                              w = weights (what model learns)
+                              b = bias (adjustable threshold)
+                              activation = ReLU/Sigmoid/Tanh</div>
+
+    <h3>🔄 Training — Backpropagation Explained Simply</h3>
+    <div class="diagram">
+  STEP 1: FORWARD PASS
+  Input → Layer1 → Layer2 → ... → Output (e.g., predicted = 0.3)
+  
+  STEP 2: CALCULATE LOSS (how wrong are we?)
+  Loss = (actual - predicted)² = (1.0 - 0.3)² = 0.49  ← too high!
+  
+  STEP 3: BACKPROPAGATION
+  "Which weights contributed most to this error?"
+  Gradient flows BACKWARD through all layers → each weight gets its blame
+  
+  STEP 4: WEIGHT UPDATE (Gradient Descent)
+  new_weight = old_weight - (learning_rate × gradient)
+  = 0.5 - (0.01 × 0.49) = 0.4951  ← slightly better
+  
+  STEP 5: REPEAT millions of times
+  Each iteration: weights get a tiny bit better → loss decreases → model learns</div>
+
+    <div class="grid-3">
+      <div class="card c-blue"><div class="card-label">Activation Functions</div><h4>Why needed?</h4><p>Without activation, neural networks = one big linear equation (useless). Activations add non-linearity so networks can learn complex patterns.</p><p><strong>ReLU:</strong> max(0,x) — most common<br><strong>Sigmoid:</strong> 0–1 output (binary classification)<br><strong>Softmax:</strong> probabilities that sum to 1</p></div>
+      <div class="card c-green"><div class="card-label">Loss Functions</div><h4>Measuring wrongness</h4><p><strong>MSE:</strong> Regression problems (price prediction)<br><strong>Cross-Entropy:</strong> Classification (spam/not spam)<br><strong>KL Divergence:</strong> Distribution matching (used in LLM training!)</p></div>
+      <div class="card c-orange"><div class="card-label">Optimizers</div><h4>How to update weights</h4><p><strong>SGD:</strong> Basic gradient descent<br><strong>Adam:</strong> Adaptive learning rates — most popular<br><strong>AdamW:</strong> Adam + weight decay — used to train all modern LLMs</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch1 -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 2 · TRANSFORMERS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c2" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">2</div><div class="ch-tag">Architecture</div></div>
+  <div class="ch-title">Transformers — <em>The Architecture That Changed Everything</em></div>
+  <div class="ch-sub">Self-Attention · Multi-Head Attention · Positional Encoding · The Transformer Block</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F5F3FF">⚡</div>
+    <div class="topic-title">The Transformer Architecture (2017)</div>
+  </div>
+  <div class="topic-body">
+    <p>Before 2017, the best NLP models were RNNs (Recurrent Neural Networks). They read text <em>one word at a time</em>, left to right. The problem: by the time an RNN reached word 200 in a long document, it had almost completely forgotten word 1. This is called the <strong>vanishing gradient problem</strong>.</p>
+    <p>In 2017, Google researchers published <em>"Attention Is All You Need"</em> — introducing the Transformer. Instead of reading one word at a time, a Transformer looks at ALL words simultaneously and computes how much attention each word should pay to every other word. This single idea unlocked GPT, BERT, Claude, and every modern LLM.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">📚 Before (RNN/LSTM)</div>
+        <ul>
+          <li>Reads text word-by-word sequentially</li>
+          <li>Forgets distant context (long sentences)</li>
+          <li>Cannot be parallelised (slow to train)</li>
+          <li>Best: 512-token context window</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">⚡ Transformer Advantage</div>
+        <ul>
+          <li>Reads all words at once (parallel)</li>
+          <li>Any word can attend to any other</li>
+          <li>Massively parallelisable → GPU-friendly</li>
+          <li>Context: 8K → 128K → 1M+ tokens</li>
+        </ul>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">🏆 Impact</div>
+        <ul>
+          <li>Foundation of ALL modern LLMs</li>
+          <li>BERT (2018), GPT-2 (2019), GPT-3 (2020)</li>
+          <li>Extends to vision (ViT), audio, video</li>
+          <li>The most cited architecture in AI history</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>🔍 Self-Attention — The Core Insight</h3>
+    <p>Consider the sentence: <em>"The bank can guarantee deposits will eventually cover future tuition costs because it was established before the recent financial crisis."</em></p>
+    <p>The word <strong>"it"</strong> refers to "bank." Humans understand this. RNNs often fail over long distances. Self-attention solves this by computing a score between every pair of words — "it" and "bank" get a high attention score because the context makes them related.</p>
+
+    <div class="diagram">
+  SELF-ATTENTION: "How much should each word attend to every other word?"
+
+  Sentence: "The bank guaranteed deposits"
+              ↑       ↑          ↑          ↑
+  
+  For word "guaranteed":
+  ┌─────────────────────────────────────────────────┐
+  │  Attention to "The"      = 0.05  (low)          │
+  │  Attention to "bank"     = 0.71  (HIGH!)        │
+  │  Attention to "guaranteed" = 0.15 (self)        │
+  │  Attention to "deposits" = 0.09  (moderate)     │
+  └─────────────────────────────────────────────────┘
+  
+  HOW IT WORKS — The QKV Mechanism:
+  
+  Every word is projected into 3 vectors:
+  Q (Query)  = "What am I looking for?"
+  K (Key)    = "What do I represent?"  
+  V (Value)  = "What information do I carry?"
+  
+  Attention Score = softmax(Q × Kᵀ / √dₖ) × V
+                    ──────────────────────────
+                    "How similar is my query to each key?"
+                    Scaled by √dₖ to prevent vanishing gradients
+                    softmax → probabilities that sum to 1</div>
+
+    <h3>🏗️ Complete Transformer Architecture</h3>
+    <div class="diagram">
+  ┌──────────────────────────────────────────────────────────────┐
+  │                   TRANSFORMER BLOCK                          │
+  │                   (stacked N times)                          │
+  │                                                              │
+  │    Input Tokens                                              │
+  │         │                                                    │
+  │    ┌────▼────┐                                              │
+  │    │ Token   │  "bank" → [0.2, -0.5, 0.8, ...] (512-dim)   │
+  │    │Embedding│  Each word becomes a dense vector             │
+  │    └────┬────┘                                              │
+  │         │                                                    │
+  │    ┌────▼────────┐                                          │
+  │    │ Positional  │  + position encoding (word 1, 2, 3...)   │
+  │    │  Encoding   │  Transformer has no built-in order!       │
+  │    └────┬────────┘                                          │
+  │         │                                                    │
+  │    ┌────▼──────────────┐                                    │
+  │    │ Multi-Head        │  8–32 attention heads in parallel   │
+  │    │ Self-Attention    │  Each head learns different aspects  │
+  │    │ + Residual + Norm │  Head 1: syntax, Head 2: coreference│
+  │    └────┬──────────────┘                                    │
+  │         │                                                    │
+  │    ┌────▼──────────────┐                                    │
+  │    │ Feed-Forward      │  2 linear layers per token         │
+  │    │ Network (FFN)     │  Expands then compresses             │
+  │    │ + Residual + Norm │  (dim × 4 → dim)                   │
+  │    └────┬──────────────┘                                    │
+  │         │                                                    │
+  │    Output Representations (same shape as input)              │
+  └──────────────────────────────────────────────────────────────┘</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Component</th><th>What It Does</th><th>Why Needed</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Token Embedding</strong></td><td>Converts each word to a dense vector (768 or 4096 dims)</td><td>Machines work with numbers, not words</td></tr>
+        <tr><td><strong>Positional Encoding</strong></td><td>Adds position information to each token</td><td>Self-attention is order-agnostic — needs to know "word 1 vs word 10"</td></tr>
+        <tr><td><strong>Multi-Head Attention</strong></td><td>Multiple attention patterns computed in parallel</td><td>Different heads capture syntax, semantics, coreference independently</td></tr>
+        <tr><td><strong>Layer Norm</strong></td><td>Normalises activations after each sub-layer</td><td>Prevents training instability in deep networks</td></tr>
+        <tr><td><strong>Residual Connection</strong></td><td>Output = sublayer(x) + x (skip connection)</td><td>Allows gradients to flow through very deep networks without vanishing</td></tr>
+        <tr><td><strong>FFN (Feed-Forward)</strong></td><td>2 linear layers per token, applied independently</td><td>Adds non-linear transformation capacity beyond attention</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — Transformer Training at Scale</div>
+      <h4>Large-Scale Transformer Training on OCI GPU Cluster</h4>
+      <ul>
+        <li><strong>Use Case:</strong> Fine-tuning a 7B Transformer LLM for legal document analysis for an insurance company</li>
+        <li><strong>OCI GPU Cluster:</strong> BM.GPU.H100.8 — 8× H100 80GB GPUs per node, 4 nodes = 32 GPUs total</li>
+        <li><strong>OCI Object Storage:</strong> 500GB training corpus (legal documents, contracts, case law)</li>
+        <li><strong>OCI Kubernetes Engine (OKE):</strong> Orchestrates distributed training across nodes via Kubeflow</li>
+        <li><strong>OCI Logging:</strong> Real-time loss curves, GPU utilisation, throughput metrics</li>
+        <li><strong>Training time:</strong> 7B model × 500GB data = 18 hours on 32 GPUs (vs 60 days on single GPU)</li>
+      </ul>
+    </div>
+
+    <ol class="iq-list">
+      <li>What problem did RNNs have that Transformers solved? Explain with an example.</li>
+      <li>Explain the Query, Key, Value (QKV) mechanism in self-attention in simple terms.</li>
+      <li>What is the purpose of positional encoding? What happens without it?</li>
+      <li>Why are residual connections critical in deep Transformer networks?</li>
+      <li>What does "multi-head" mean in multi-head attention? Why use multiple heads?</li>
+    </ol>
+
+    <div class="summary">
+      <h4>🎯 Transformer Key Takeaways</h4>
+      <ul>
+        <li>Transformers replaced RNNs by processing all tokens simultaneously via self-attention.</li>
+        <li>QKV mechanism: Query asks, Key answers, Value delivers the information.</li>
+        <li>Multi-head attention = multiple parallel views of the same input (syntax, semantics, coreference...).</li>
+        <li>Residual connections + Layer Norm make training 100+ layer deep networks stable.</li>
+        <li>Every modern LLM (GPT-4, Claude, LLaMA, Gemini) is a stack of Transformer blocks.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch2 (Transformers) -->
+
+<div class="section-divider"></div>
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 3 · LARGE LANGUAGE MODELS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c3" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">3</div><div class="ch-tag">Core Concept</div></div>
+  <div class="ch-title">Large Language Models — <em>What They Are & How They Work</em></div>
+  <div class="ch-sub">Language Models · LLMs · SLMs · LLM vs SLM · Types of LLMs · Popular Families</div>
+</div>
+
+<!-- TOPIC: Language Models → LLMs -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#EFF6FF">📝</div>
+    <div class="topic-title">Language Models → Large Language Models</div>
+  </div>
+  <div class="topic-body">
+    <p>A <strong>Language Model</strong> has one simple job: <em>predict the next word.</em> Given "The stock market is going", a language model predicts "up" or "down" based on patterns learned from text. This seemingly trivial task, scaled to billions of parameters and trained on trillions of words, produces something remarkable — a model that understands context, reasons, codes, writes, and converses.</p>
+
+    <div class="diagram">
+  LANGUAGE MODELLING — NEXT TOKEN PREDICTION:
+
+  Input:  "The patient has a high fever and"
+  
+  Model predicts probabilities for next word:
+  ┌──────────────────────────────────────────┐
+  │  "chills"      → 0.34  ████████          │
+  │  "headache"    → 0.28  ███████           │
+  │  "cough"       → 0.19  █████             │
+  │  "temperature" → 0.12  ███               │
+  │  "symptoms"    → 0.07  ██                │
+  └──────────────────────────────────────────┘
+  
+  Model samples → outputs "chills"
+  
+  New input: "The patient has a high fever and chills"
+  → predict next word → repeat → generates full response
+  
+  THAT'S IT. Everything GPT-4/Claude does is "next token prediction"
+  — but with 1 trillion parameters trained on the entire internet!</div>
+
+    <div class="grid-4">
+      <div class="card c-blue"><div class="card-label">Scale</div><h4>Parameters</h4><p>GPT-2: 1.5B<br>GPT-3: 175B<br>LLaMA-70B: 70B<br>GPT-4: ~1.8T (est.)</p></div>
+      <div class="card c-green"><div class="card-label">Training Data</div><h4>Text Corpora</h4><p>Common Crawl (internet), Wikipedia, Books, Code, Scientific papers, News — trillions of tokens</p></div>
+      <div class="card c-orange"><div class="card-label">Emergent Abilities</div><h4>Appeared at Scale</h4><p>Few-shot learning, chain-of-thought reasoning, code generation — appeared unexpectedly beyond ~100B params</p></div>
+      <div class="card c-purple"><div class="card-label">Cost</div><h4>Training Budget</h4><p>GPT-4 training: ~$100M USD, months on 25,000 A100 GPUs — why pre-trained models are shared/sold</p></div>
+    </div>
+
+    <h3>⚖️ LLM vs SLM — Full Comparison</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Dimension</th><th>LLM (Large)</th><th>SLM (Small)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Parameters</strong></td><td>7B – 1T+ (GPT-4, Llama-70B)</td><td>125M – 3B (Phi-2, TinyLlama, Gemma-2B)</td></tr>
+        <tr><td><strong>Training Cost</strong></td><td>Millions USD, weeks on 1000s of GPUs</td><td>Thousands USD, hours/days on few GPUs</td></tr>
+        <tr><td><strong>Inference Speed</strong></td><td>Slower — more compute per token</td><td>Very fast — sub-50ms possible</td></tr>
+        <tr><td><strong>GPU Memory</strong></td><td>40GB–320GB+ VRAM</td><td>4GB–8GB VRAM or CPU-only</td></tr>
+        <tr><td><strong>General Capability</strong></td><td>Excellent — complex reasoning, creativity, multi-domain</td><td>Good for narrow, well-defined tasks</td></tr>
+        <tr><td><strong>Fine-Tuning Cost</strong></td><td>Expensive (LoRA helps)</td><td>Fast and cheap — even on CPU</td></tr>
+        <tr><td><strong>Data Privacy</strong></td><td>Usually cloud-based API</td><td>Fully on-prem or device-local</td></tr>
+        <tr><td><strong>Best For</strong></td><td>General assistant, complex multi-step tasks</td><td>Specific task (MCQ gen, classification, edge AI)</td></tr>
+        <tr><td><strong>Examples</strong></td><td>GPT-4, Claude 3, LLaMA-70B, Cohere Command R+</td><td>Phi-2, Phi-3, Gemma-2B, TinyLlama, DistilBERT</td></tr>
+        <tr><td><strong>OCI Deployment</strong></td><td>OCI GenAI Service (managed) or dedicated GPU cluster</td><td>OCI Compute A1.Flex (ARM CPU), no GPU needed</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- TOPIC: Types of LLMs -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F0FDF4">🏛️</div>
+    <div class="topic-title">Types of LLMs — Encoder, Decoder, Encoder-Decoder</div>
+  </div>
+  <div class="topic-body">
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">📥 Encoder-Only</div>
+        <h4>Understand text deeply</h4>
+        <p><strong>Attention:</strong> Bidirectional (reads ALL context simultaneously)</p>
+        <p><strong>Task:</strong> Produces rich token representations — not text generation</p>
+        <p><strong>Used for:</strong> Classification, NER, Sentiment, Embeddings, Semantic Search</p>
+        <p><strong>Examples:</strong> BERT, RoBERTa, DistilBERT</p>
+        <p><strong>Think of it as:</strong> A brilliant reader who understands everything but can't write</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">📤 Decoder-Only</div>
+        <h4>Generate text token by token</h4>
+        <p><strong>Attention:</strong> Causal / Masked (can only see previous tokens)</p>
+        <p><strong>Task:</strong> Autoregressive text generation — next token prediction</p>
+        <p><strong>Used for:</strong> Chatbots, Code generation, Document drafting, RAG, Reasoning</p>
+        <p><strong>Examples:</strong> GPT-4, LLaMA, Mistral, Claude, Cohere Command R</p>
+        <p><strong>Think of it as:</strong> A brilliant writer who generates word by word</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">↔️ Encoder-Decoder</div>
+        <h4>Transform input to output</h4>
+        <p><strong>Attention:</strong> Encoder: bidirectional; Decoder: causal + cross-attention</p>
+        <p><strong>Task:</strong> Sequence-to-sequence transformation</p>
+        <p><strong>Used for:</strong> Translation, Summarization, Question Answering</p>
+        <p><strong>Examples:</strong> T5, BART, FLAN-T5, mT5</p>
+        <p><strong>Think of it as:</strong> A translator who reads the full source, then writes the target</p>
+      </div>
+    </div>
+
+    <div class="diagram">
+  ENCODER-ONLY (BERT):
+  "I love AI"  →  [MASK] = what word? → [Understand: AI/technology/ML] 
+  All tokens attend to all others simultaneously (bidirectional)
+
+  DECODER-ONLY (GPT):
+  "I love" → predict "AI" → "I love AI" → predict "because" → generates...
+  Each token only attends to previous tokens (causal/masked attention)
+
+  ENCODER-DECODER (T5):
+  "translate to French: I love AI" → ENCODER reads all → DECODER generates "J'aime l'IA"
+  Cross-attention: decoder attends to encoder's representation while generating</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Feature</th><th>Encoder-Only</th><th>Decoder-Only</th><th>Encoder-Decoder</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Attention Type</strong></td><td>Bidirectional</td><td>Causal (left-to-right)</td><td>Both</td></tr>
+        <tr><td><strong>Can Generate Text</strong></td><td><span class="badge br">No</span></td><td><span class="badge bg">Yes</span></td><td><span class="badge bg">Yes</span></td></tr>
+        <tr><td><strong>Best Task</strong></td><td>Understanding, Classification</td><td>Generation, Chat, RAG</td><td>Translation, Summarization</td></tr>
+        <tr><td><strong>Speed</strong></td><td>Fast inference</td><td>Moderate (autoregressive)</td><td>Slower (two components)</td></tr>
+        <tr><td><strong>Training</strong></td><td>Masked LM (MLM)</td><td>Causal LM (CLM)</td><td>Span corruption</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- TOPIC: Popular LLM Families -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FFF8F3">🌐</div>
+    <div class="topic-title">Popular LLM Families — Commercial & Open Source</div>
+  </div>
+  <div class="topic-body">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Family</th><th>Creator</th><th>Type</th><th>Sizes</th><th>Open?</th><th>Strength</th><th>OCI Availability</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>GPT-4 / 4o</strong></td><td>OpenAI</td><td>Decoder</td><td>Unknown (~1.8T est.)</td>
+          <td><span class="badge br">Closed API</span></td>
+          <td>General reasoning, multimodal</td><td>Via Azure (OCI multicloud)</td>
+        </tr>
+        <tr>
+          <td><strong>Claude 3 / 3.5</strong></td><td>Anthropic</td><td>Decoder</td><td>Haiku / Sonnet / Opus</td>
+          <td><span class="badge br">Closed API</span></td>
+          <td>Long context (200K), safety, analysis</td><td>Via API integration</td>
+        </tr>
+        <tr>
+          <td><strong>LLaMA 2 / 3 / 3.1</strong></td><td>Meta</td><td>Decoder</td><td>7B, 13B, 70B, 405B</td>
+          <td><span class="badge bg">Open (commercial)</span></td>
+          <td>On-prem deployment, fine-tuning</td><td>OCI Data Science + OCI GenAI</td>
+        </tr>
+        <tr>
+          <td><strong>Mistral / Mixtral</strong></td><td>Mistral AI</td><td>Decoder (MoE)</td><td>7B, 8×7B, 8×22B</td>
+          <td><span class="badge bg">Open (Apache 2.0)</span></td>
+          <td>Fast inference, MoE efficiency, EU compliance</td><td>OCI Data Science</td>
+        </tr>
+        <tr>
+          <td><strong>Gemma 2</strong></td><td>Google</td><td>Decoder</td><td>2B, 9B, 27B</td>
+          <td><span class="badge bg">Open</span></td>
+          <td>Efficient, strong reasoning for size</td><td>OCI Compute + Model Catalog</td>
+        </tr>
+        <tr>
+          <td><strong>Phi-2 / Phi-3</strong></td><td>Microsoft</td><td>Decoder</td><td>2.7B, 3.8B, 7B, 14B</td>
+          <td><span class="badge bg">Open (MIT)</span></td>
+          <td>SLM champion — near-LLM quality at tiny size</td><td>OCI CPU Compute (no GPU!)</td>
+        </tr>
+        <tr>
+          <td><strong>Qwen 2 / 2.5</strong></td><td>Alibaba</td><td>Decoder</td><td>0.5B to 72B</td>
+          <td><span class="badge bg">Open</span></td>
+          <td>Multilingual (Chinese + English), coding</td><td>OCI Data Science</td>
+        </tr>
+        <tr>
+          <td><strong>Cohere Command R / R+</strong></td><td>Cohere</td><td>Decoder (RAG-optimised)</td><td>35B / 104B</td>
+          <td><span class="badge br">Closed API</span></td>
+          <td>Best-in-class for enterprise RAG</td><td><span class="badge bo">Native OCI GenAI Service ✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>BERT / RoBERTa</strong></td><td>Google</td><td>Encoder</td><td>110M, 340M</td>
+          <td><span class="badge bg">Open (Apache 2.0)</span></td>
+          <td>Classification, NER, Embeddings</td><td>OCI Data Science (CPU viable)</td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI GenAI Service — Native Models Available</div>
+      <h4>What OCI Generative AI Provides Out-of-the-Box</h4>
+      <ul>
+        <li><strong>Cohere Command R / R+</strong> — Enterprise chat, RAG, document Q&amp;A (On-Demand API)</li>
+        <li><strong>Cohere Embed English / Multilingual</strong> — Text to vector embeddings for semantic search</li>
+        <li><strong>Meta LLaMA 3 / 3.1 (8B, 70B)</strong> — Open model access via managed API</li>
+        <li><strong>Dedicated AI Cluster</strong> — Bring your own fine-tuned model, hosted on dedicated GPU infrastructure</li>
+        <li><strong>Key advantage:</strong> All inference stays within your OCI tenancy. Data never leaves Oracle infrastructure — critical for RBI data localisation, SEBI, HIPAA, and DPDP Act compliance.</li>
+      </ul>
+    </div>
+
+    <div class="summary">
+      <h4>🎯 LLM Key Takeaways</h4>
+      <ul>
+        <li>All LLMs do next-token prediction — scale and training data create intelligence.</li>
+        <li>Encoder-only = understand; Decoder-only = generate; Encoder-Decoder = transform.</li>
+        <li>Open models (LLaMA, Mistral, Phi) allow on-prem deployment for data privacy.</li>
+        <li>OCI GenAI Service offers managed LLMs natively — no GPU provisioning needed.</li>
+        <li>For BFSI in India: OCI's data residency is a regulatory compliance advantage.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch3 -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 4 · PROMPT ENGINEERING -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c4" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">4</div><div class="ch-tag">Skill</div></div>
+  <div class="ch-title">Prompt Engineering — <em>The Art of Talking to AI</em></div>
+  <div class="ch-sub">System Prompts · Few-Shot · Chain of Thought · Tree of Thought · ReAct · Function Calling</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#ECFEFF">💬</div>
+    <div class="topic-title">Prompt Engineering — Complete Guide</div>
+  </div>
+  <div class="topic-body">
+    <p>You have access to a brilliant expert. But the quality of their answer depends entirely on how you ask the question. Ask vaguely, get a vague answer. Ask with context, structure, and examples — get a precise, expert-level answer. <strong>Prompt Engineering</strong> is the discipline of crafting inputs to LLMs to reliably produce high-quality, task-specific outputs.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">❌ Bad Prompt</div>
+        <p>"Summarise this document."</p>
+        <p style="margin-top:8px;color:var(--red)">Result: Generic 3-line summary with no structure, misses key points, wrong tone for audience.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">✅ Good Prompt</div>
+        <p>"You are a financial analyst. Summarise this earnings report in 5 bullet points for a non-technical board audience. Focus on revenue, profit margin, and risks. Use plain language. Output format: bullet list."</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">🔑 Key Elements</div>
+        <ul>
+          <li><strong>Role:</strong> Who is the AI?</li>
+          <li><strong>Task:</strong> What exactly to do</li>
+          <li><strong>Context:</strong> Background info</li>
+          <li><strong>Format:</strong> How to output</li>
+          <li><strong>Constraints:</strong> Limits/rules</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>📚 Prompting Techniques — From Basic to Advanced</h3>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">1️⃣ Zero-Shot</div>
+        <h4>No examples given</h4>
+        <p>Prompt: "Classify this review as positive or negative: 'Great product, very fast delivery!'"</p>
+        <p>Model uses general knowledge. Works for simple, common tasks.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">2️⃣ Few-Shot</div>
+        <h4>Give 2–5 examples</h4>
+        <p>Prompt: "Review: 'Excellent!' → Positive | Review: 'Terrible!' → Negative | Review: 'Decent quality' → ?"</p>
+        <p>Model learns the pattern from examples. Better for specific formats or niche tasks.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">3️⃣ Chain of Thought (CoT)</div>
+        <h4>Think step by step</h4>
+        <p>Prompt: "If I have ₹10,000 and invest 40% in equities and 60% in FDs, how much is in FDs? Let's think step by step."</p>
+        <p>Forces reasoning. Dramatically improves math, logic, multi-step tasks.</p>
+      </div>
+      <div class="card c-purple">
+        <div class="card-label">4️⃣ Tree of Thought (ToT)</div>
+        <h4>Explore multiple paths</h4>
+        <p>Model generates multiple solution paths, evaluates each, backtracks if stuck. Best for complex planning and strategy problems. Like a decision tree in the model's reasoning.</p>
+      </div>
+      <div class="card c-cyan">
+        <div class="card-label">5️⃣ ReAct</div>
+        <h4>Reason + Act + Observe</h4>
+        <p>Model interleaves reasoning with tool calls. Thought → Action (call API/search) → Observation → Next Thought. Powers AI agents that use the web, code execution, databases.</p>
+      </div>
+      <div class="card c-pink">
+        <div class="card-label">6️⃣ System Prompts</div>
+        <h4>Define AI's persona and rules</h4>
+        <p>Sent before conversation. Defines: role, constraints, output format, tone, what to refuse. Invisible to user. Example: "You are a SEBI-compliant financial advisor. Never recommend specific stocks."</p>
+      </div>
+    </div>
+
+    <h3>🔧 Function Calling / Tool Use</h3>
+    <p>Modern LLMs can decide <em>which tool to call</em> based on the user's request. You define available tools (database lookup, calculator, API call), and the model outputs a structured JSON specifying the tool and parameters — your code executes it and returns the result.</p>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">prompt_engineering_oci.py</span></div>
+      <pre><span class="cm"># ── COMPLETE PROMPT ENGINEERING EXAMPLES ON OCI GenAI ─────────────</span>
+<span class="kw">import</span> oci
+<span class="kw">from</span> oci.generative_ai_inference <span class="kw">import</span> <span class="fn">GenerativeAiInferenceClient</span>
+<span class="kw">from</span> oci.generative_ai_inference.models <span class="kw">import</span> <span class="fn">ChatDetails</span>, <span class="fn">CohereChatRequest</span>, <span class="fn">OnDemandServingMode</span>, <span class="fn">CohereMessage</span>
+
+config = oci.config.<span class="fn">from_file</span>()
+client = <span class="fn">GenerativeAiInferenceClient</span>(config)
+COMPARTMENT = <span class="st">"ocid1.compartment.oc1..your_compartment_id"</span>
+
+<span class="kw">def</span> <span class="fn">ask_oci</span>(system_msg, user_msg, temp=<span class="nu">0.3</span>):
+    <span class="st">"""Helper: send system+user message to OCI Cohere Command R+"""</span>
+    resp = client.<span class="fn">chat</span>(<span class="fn">ChatDetails</span>(
+        compartment_id=COMPARTMENT,
+        serving_mode=<span class="fn">OnDemandServingMode</span>(model_id=<span class="st">"cohere.command-r-plus"</span>),
+        chat_request=<span class="fn">CohereChatRequest</span>(
+            message=user_msg,
+            preamble=system_msg,    <span class="cm"># Cohere's equivalent of system prompt</span>
+            temperature=temp,
+            max_tokens=<span class="nu">500</span>
+        )
+    ))
+    <span class="kw">return</span> resp.data.chat_response.text
+
+<span class="cm"># ── TECHNIQUE 1: Zero-Shot ─────────────────────</span>
+result = <span class="fn">ask_oci</span>(
+    system_msg=<span class="st">"You are a financial document classifier."</span>,
+    user_msg=<span class="st">"Classify this text into one category (Invoice / Contract / Report / Other):\n'Pursuant to Section 4.2, the licensee agrees to pay monthly royalties...'"</span>
+)
+<span class="fn">print</span>(<span class="st">"Zero-Shot:"</span>, result)  <span class="cm"># → Contract</span>
+
+<span class="cm"># ── TECHNIQUE 2: Few-Shot ──────────────────────</span>
+few_shot_prompt = <span class="st">"""
+Classify financial documents:
+Text: "Invoice #1234, Amount: ₹45,000, Due: 30 days" → Category: Invoice
+Text: "Q3 2024 Revenue: ₹12.4 Cr, EBITDA: 18%" → Category: Report  
+Text: "This Non-Disclosure Agreement between Party A and Party B..." → Category: Contract
+
+Now classify:
+Text: "Payment for services rendered in October 2024, PO #5678"
+"""</span>
+result = <span class="fn">ask_oci</span>(<span class="st">"You are a document classifier."</span>, few_shot_prompt)
+<span class="fn">print</span>(<span class="st">"Few-Shot:"</span>, result)  <span class="cm"># → Invoice</span>
+
+<span class="cm"># ── TECHNIQUE 3: Chain of Thought ─────────────</span>
+cot_prompt = <span class="st">"""
+A company has ₹50 Cr revenue. COGS is 35% of revenue. Gross profit = Revenue - COGS.
+If operating expenses are ₹8 Cr, what is operating profit?
+Let's think step by step.
+"""</span>
+result = <span class="fn">ask_oci</span>(<span class="st">"You are a financial analyst."</span>, cot_prompt)
+<span class="fn">print</span>(<span class="st">"Chain of Thought:\n"</span>, result)
+<span class="cm"># Model reasons:
+# Step 1: COGS = 35% × 50 = ₹17.5 Cr
+# Step 2: Gross Profit = 50 - 17.5 = ₹32.5 Cr
+# Step 3: Operating Profit = 32.5 - 8 = ₹24.5 Cr</span>
+
+<span class="cm"># ── TECHNIQUE 4: Structured Output Prompt ─────</span>
+structured_prompt = <span class="st">"""
+Extract information from this text and return ONLY valid JSON.
+No explanation, no markdown — just the JSON object.
+
+Text: "Rajesh Kumar, Senior Engineer at TCS Mumbai, has been with the company for 8 years. 
+His employee ID is EMP-4521 and he earns ₹18 LPA."
+
+Required format:
+{
+  "name": "",
+  "role": "",
+  "company": "",
+  "location": "",
+  "years_experience": 0,
+  "employee_id": "",
+  "salary_lpa": 0
+}"""</span>
+result = <span class="fn">ask_oci</span>(<span class="st">"You are a JSON extraction expert."</span>, structured_prompt, temp=<span class="nu">0.0</span>)
+<span class="fn">print</span>(<span class="st">"Structured:"</span>, result)  <span class="cm"># → Clean JSON object</span></pre>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — Prompt Engineering at Enterprise Scale</div>
+      <h4>AI-Powered HR Automation with Prompt Templates</h4>
+      <ul>
+        <li><strong>Problem:</strong> HR processes 1,200 employee requests/day — leave, policy queries, payroll doubts, appraisals. Each needs contextual, accurate, compliant answers.</li>
+        <li><strong>Solution:</strong> Prompt template library — 47 templates for different HR scenarios, all with system prompts enforcing compliance and tone</li>
+        <li><strong>OCI GenAI Service:</strong> Cohere Command R+ as the inference engine</li>
+        <li><strong>OCI Functions:</strong> Serverless function selects the right prompt template based on request classification</li>
+        <li><strong>OCI API Gateway:</strong> Rate-limited endpoint with auth — exposed to HR portal and Slack</li>
+        <li><strong>Result:</strong> 87% queries resolved without human intervention. Response time: 1.2 seconds average</li>
+      </ul>
+    </div>
+
+    <h3>⚖️ Prompt Engineering vs RAG vs Fine-Tuning</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Approach</th><th>When to Use</th><th>Cost</th><th>Freshness</th><th>Accuracy</th><th>Latency</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Prompt Engineering</strong></td>
+          <td>General tasks, format control, behaviour shaping</td>
+          <td><span class="badge bg">Free</span></td>
+          <td>Only what model knows (cutoff)</td>
+          <td>Good for common tasks</td>
+          <td><span class="badge bg">Fastest</span></td>
+        </tr>
+        <tr>
+          <td><strong>RAG</strong></td>
+          <td>Current data, private docs, knowledge base Q&amp;A</td>
+          <td><span class="badge by">Low (infra cost)</span></td>
+          <td><span class="badge bg">Always current</span></td>
+          <td>Very good — grounded in docs</td>
+          <td>Moderate (+retrieval)</td>
+        </tr>
+        <tr>
+          <td><strong>Fine-Tuning</strong></td>
+          <td>Domain jargon, specific format, consistent persona</td>
+          <td><span class="badge br">High (training cost)</span></td>
+          <td>Frozen at training time</td>
+          <td><span class="badge bg">Best for domain tasks</span></td>
+          <td><span class="badge bg">Fast (no retrieval)</span></td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <ol class="iq-list">
+      <li>What is the difference between zero-shot and few-shot prompting? When would you use each?</li>
+      <li>How does Chain of Thought prompting improve model accuracy on mathematical tasks?</li>
+      <li>What is a System Prompt and why is it important in enterprise applications?</li>
+      <li>Explain the ReAct framework — how does it enable AI agents to use tools?</li>
+      <li>When would you choose fine-tuning over prompt engineering, and vice versa?</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch4 Prompt Eng -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 5 · RAG -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c5" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">5</div><div class="ch-tag">Architecture Pattern</div></div>
+  <div class="ch-title">Retrieval-Augmented Generation — <em>Grounding AI in Your Data</em></div>
+  <div class="ch-sub">Embeddings · Vector Databases · Semantic Search · RAG Pipeline · OCI AI Vector Search</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F0FDF4">🔍</div>
+    <div class="topic-title">RAG — Complete Architecture & Implementation</div>
+  </div>
+  <div class="topic-body">
+    <p>An LLM knows everything it learned during training — but nothing after that. A GPT-4 model trained in April 2023 doesn't know about new products, recent regulations, or your internal company policies. When asked, it either says "I don't know" or worse — <em>makes something up</em> (hallucination).</p>
+    <p><strong>RAG solves this</strong> by giving the model access to a real-time knowledge base. Before answering, the system retrieves the most relevant documents from your database and includes them in the prompt. The model reads the relevant context and answers based on actual facts — not training memory.</p>
+
+    <div class="diagram">
+  RAG PIPELINE — HOW IT WORKS:
+
+  INDEXING PHASE (one-time, offline):
+  ┌────────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ Your Documents │───▶│  Chunking    │───▶│  Embedding   │───▶│  Vector DB   │
+  │ PDFs, Docs,    │    │ Split into   │    │  Model       │    │  Store       │
+  │ Policies,      │    │ 500-word     │    │  Text →      │    │  Each chunk  │
+  │ Knowledge Base │    │ chunks       │    │  Vector      │    │  + vector    │
+  └────────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+
+  RETRIEVAL PHASE (real-time, per query):
+  User Query
+      │
+      ▼
+  Embed Query → Query Vector
+      │
+      ▼
+  Search Vector DB (cosine similarity) → Top-K relevant chunks
+      │
+      ▼
+  Build Augmented Prompt:
+  "Context: [chunk1] [chunk2] [chunk3]
+   Question: [user question]
+   Answer based only on the context above."
+      │
+      ▼
+  LLM generates answer grounded in YOUR documents
+      │
+      ▼
+  Response (with source citations)</div>
+
+    <h3>🔢 What Are Embeddings?</h3>
+    <p>An <strong>embedding</strong> is a dense numerical vector that captures the <em>meaning</em> of text. "Heart attack" and "Myocardial Infarction" have different words but similar vectors — because they mean the same thing. Semantic search uses this — find documents by meaning, not just keyword match.</p>
+
+    <div class="diagram">
+  TEXT → EMBEDDING VECTOR (1536-dimensional):
+  
+  "Customer complaint about delayed delivery" 
+      → [0.234, -0.891, 0.456, 0.123, ..., -0.677]  ← 1536 numbers
+  
+  "Order arrived late, very upset with service"
+      → [0.241, -0.879, 0.461, 0.118, ..., -0.681]  ← very similar!
+  
+  Cosine Similarity = 0.97  ← Nearly identical meaning
+  
+  "The GDP grew by 4.2% in Q3"
+      → [-0.112, 0.334, -0.789, 0.901, ..., 0.234]  ← very different
+  
+  Cosine Similarity vs complaint = 0.12  ← Unrelated topic</div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">rag_pipeline_oci.py</span></div>
+      <pre><span class="cm"># ── COMPLETE RAG PIPELINE ON OCI ─────────────────────────────────</span>
+<span class="cm"># Uses: OCI GenAI (Cohere Embed + Command R+) + OCI AI Vector Search</span>
+<span class="kw">import</span> oci, json
+<span class="kw">from</span> oci.generative_ai_inference <span class="kw">import</span> <span class="fn">GenerativeAiInferenceClient</span>
+<span class="kw">from</span> oci.generative_ai_inference.models <span class="kw">import</span> (
+    <span class="fn">EmbedTextDetails</span>, <span class="fn">CohereEmbedRequest</span>,
+    <span class="fn">ChatDetails</span>, <span class="fn">CohereChatRequest</span>, <span class="fn">OnDemandServingMode</span>,
+    <span class="fn">CohereSearchQueriesOnlyRequest</span>, <span class="fn">CohereChatDocument</span>
+)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+config = oci.config.<span class="fn">from_file</span>()
+client = <span class="fn">GenerativeAiInferenceClient</span>(config)
+COMPARTMENT = <span class="st">"ocid1.compartment.oc1..your_compartment"</span>
+
+<span class="cm"># ── STEP 1: EMBED DOCUMENTS (run once — build your knowledge base) ──</span>
+documents = [
+    <span class="st">"OCI GenAI Service supports Cohere Command R+ for enterprise chat applications."</span>,
+    <span class="st">"OCI Object Storage provides 99.999999999% durability with automatic replication."</span>,
+    <span class="st">"Enterprise clients use OCI Data Science for all ML model training pipelines."</span>,
+    <span class="st">"Bajaj Finserv processes 50,000 loan decisions per day using OCI-hosted ML models."</span>,
+    <span class="st">"OCI AI Vector Search supports high-dimensional similarity search with HNSW indexes."</span>,
+]
+
+<span class="kw">def</span> <span class="fn">embed_texts</span>(texts):
+    <span class="st">"""Convert list of texts → list of embedding vectors using OCI Cohere Embed"""</span>
+    response = client.<span class="fn">embed_text</span>(<span class="fn">EmbedTextDetails</span>(
+        compartment_id=COMPARTMENT,
+        serving_mode=<span class="fn">OnDemandServingMode</span>(model_id=<span class="st">"cohere.embed-english-v3.0"</span>),
+        embed_text_request=<span class="fn">CohereEmbedRequest</span>(
+            inputs=texts,
+            input_type=<span class="st">"search_document"</span>  <span class="cm"># For indexing; use "search_query" for queries</span>
+        )
+    ))
+    <span class="kw">return</span> response.data.embeddings  <span class="cm"># List of 1024-dim vectors</span>
+
+doc_vectors = <span class="fn">embed_texts</span>(documents)  <span class="cm"># Shape: [5, 1024]</span>
+<span class="cm"># In production: store these in OCI AI Vector Search (23ai), 
+# OpenSearch, or Chroma for persistent storage</span>
+
+<span class="cm"># ── STEP 2: RETRIEVE — Find relevant chunks for a query ──────────</span>
+<span class="kw">def</span> <span class="fn">retrieve</span>(query, top_k=<span class="nu">2</span>):
+    <span class="st">"""Find most semantically similar documents to the user's query"""</span>
+    <span class="cm"># Embed the query</span>
+    query_vec = <span class="fn">embed_texts</span>([query])
+    query_arr = np.<span class="fn">array</span>(query_vec[<span class="nu">0</span>])  <span class="cm"># Convert to numpy array</span>
+    
+    <span class="cm"># Compute cosine similarity with all document vectors</span>
+    scores = []
+    <span class="kw">for</span> i, doc_vec <span class="kw">in</span> <span class="fn">enumerate</span>(doc_vectors):
+        doc_arr = np.<span class="fn">array</span>(doc_vec)
+        <span class="cm"># Cosine similarity = dot product of normalised vectors</span>
+        similarity = np.<span class="fn">dot</span>(query_arr, doc_arr) / (
+            np.linalg.<span class="fn">norm</span>(query_arr) * np.linalg.<span class="fn">norm</span>(doc_arr)
+        )
+        scores.<span class="fn">append</span>((similarity, i))
+    
+    <span class="cm"># Sort by similarity (highest first) and return top_k</span>
+    scores.<span class="fn">sort</span>(reverse=<span class="kw">True</span>)
+    <span class="kw">return</span> [documents[i] <span class="kw">for</span> _, i <span class="kw">in</span> scores[:top_k]]
+
+<span class="cm"># ── STEP 3: GENERATE — Augmented prompt with retrieved context ────</span>
+<span class="kw">def</span> <span class="fn">rag_answer</span>(question):
+    <span class="st">"""Full RAG pipeline: retrieve relevant docs → generate grounded answer"""</span>
+    <span class="cm"># Retrieve relevant documents</span>
+    relevant_docs = <span class="fn">retrieve</span>(question, top_k=<span class="nu">2</span>)
+    context = <span class="st">"\n"</span>.<span class="fn">join</span>([<span class="st">f"[{i+1}] {doc}"</span> <span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(relevant_docs)])
+    
+    <span class="cm"># Build augmented prompt</span>
+    augmented_prompt = <span class="st">f"""Answer the question using ONLY the provided context.
+If the answer is not in the context, say "I don't have that information."
+
+Context:
+{context}
+
+Question: {question}"""</span>
+    
+    <span class="cm"># Generate answer with LLM</span>
+    response = client.<span class="fn">chat</span>(<span class="fn">ChatDetails</span>(
+        compartment_id=COMPARTMENT,
+        serving_mode=<span class="fn">OnDemandServingMode</span>(model_id=<span class="st">"cohere.command-r-plus"</span>),
+        chat_request=<span class="fn">CohereChatRequest</span>(
+            message=augmented_prompt,
+            preamble=<span class="st">"You are an accurate AI assistant. Only answer from the provided context."</span>,
+            temperature=<span class="nu">0.0</span>,  <span class="cm"># Zero temperature = deterministic, factual answers</span>
+            max_tokens=<span class="nu">300</span>
+        )
+    ))
+    <span class="kw">return</span> response.data.chat_response.text
+
+<span class="cm"># Test it!</span>
+question = <span class="st">"How many loan decisions does Bajaj Finserv process daily?"</span>
+answer = <span class="fn">rag_answer</span>(question)
+<span class="fn">print</span>(<span class="st">f"Q: {question}\nA: {answer}"</span>)
+<span class="cm"># A: Bajaj Finserv processes 50,000 loan decisions per day using OCI-hosted ML models.</span></pre>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — Enterprise RAG System</div>
+      <h4>NSE Academy — Regulatory Knowledge Base (SEBI Circulars + NCFM Content)</h4>
+      <ul>
+        <li><strong>Problem:</strong> NSE Academy has 12,000+ SEBI circulars, NCFM study materials, and regulatory guidelines. Students and professionals need instant, accurate answers from this corpus.</li>
+        <li><strong>Architecture:</strong>
+          <ul>
+            <li><strong>OCI Object Storage:</strong> 45GB of PDFs, circulars, and study materials</li>
+            <li><strong>OCI Functions:</strong> Triggered on new document upload → extract text → chunk → embed</li>
+            <li><strong>OCI AI Vector Search (23ai):</strong> Stores 2.3 million document chunk vectors with HNSW index</li>
+            <li><strong>OCI GenAI (Cohere Embed):</strong> Text → 1024-dim embedding vectors</li>
+            <li><strong>OCI GenAI (Command R+):</strong> RAG-optimised generation with source citations</li>
+            <li><strong>OCI API Gateway:</strong> REST API used by mobile app and portal</li>
+          </ul>
+        </li>
+        <li><strong>Result:</strong> Students get instant, citation-backed answers. Accuracy: 96.4% on regulatory Q&amp;A benchmark. 3,000 queries/day handled automatically.</li>
+      </ul>
+    </div>
+
+    <div class="summary">
+      <h4>🎯 RAG Key Takeaways</h4>
+      <ul>
+        <li>RAG = Retrieve relevant documents → Augment prompt → Generate grounded answer.</li>
+        <li>Embeddings convert text to vectors — similar meaning = similar vectors.</li>
+        <li>Vector databases enable semantic search (meaning-based, not keyword-based).</li>
+        <li>RAG eliminates hallucination on domain-specific queries by grounding in real data.</li>
+        <li>OCI AI Vector Search (Oracle 23ai) provides enterprise-grade vector storage natively.</li>
+      </ul>
+    </div>
+
+    <ol class="iq-list">
+      <li>What problem does RAG solve that prompt engineering alone cannot?</li>
+      <li>Explain the difference between keyword search and semantic (embedding-based) search.</li>
+      <li>What is a "chunk" in RAG? What determines the optimal chunk size?</li>
+      <li>What is hallucination in LLMs, and how does RAG reduce it?</li>
+      <li>Design a RAG architecture for a bank's internal policy Q&amp;A system on OCI.</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch5 RAG -->
+
+<div class="section-divider"></div>
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 6 · FINE-TUNING -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c6" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">6</div><div class="ch-tag">Adaptation</div></div>
+  <div class="ch-title">Fine-Tuning — <em>Teaching the Model Your Domain</em></div>
+  <div class="ch-sub">Full Fine-Tuning · PEFT · LoRA · QLoRA · GRPO · When to Fine-Tune</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FFFBEB">🎯</div>
+    <div class="topic-title">What is Fine-Tuning? And When Should You Use It?</div>
+  </div>
+  <div class="topic-body">
+    <p>A pre-trained LLM is like a brilliant new employee who has read every book ever written — but hasn't seen a single document from your company. They speak general English but don't know your product codes, your compliance terminology, or how your reports are formatted. <strong>Fine-tuning</strong> is the onboarding process — you show them hundreds or thousands of examples of your domain's inputs and expected outputs until they learn your style, vocabulary, and conventions.</p>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">🔷 What</div>
+        <p>Continuing to train a pre-trained model on your domain-specific dataset, adapting its weights to specialise for your task — without training from scratch.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">⚡ Why</div>
+        <ul>
+          <li>Model doesn't know your terminology</li>
+          <li>Inconsistent output format</li>
+          <li>Prompt engineering isn't enough</li>
+          <li>RAG can't change behaviour/style</li>
+          <li>Need task-specific personality</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">✅ When to Use</div>
+        <ul>
+          <li>You have 500–100,000 labelled examples</li>
+          <li>Domain jargon not in base model</li>
+          <li>Consistent output format critical</li>
+          <li>Low-latency inference needed</li>
+          <li>Data privacy (no RAG retrieval)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <strong>Common Mistake:</strong> Jumping straight to fine-tuning before trying prompt engineering or RAG. Fine-tuning is expensive. Always try simpler approaches first. Fine-tune only when prompt engineering and RAG provably fall short.
+    </div>
+
+    <h3>⚖️ Full Fine-Tuning vs PEFT</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Aspect</th><th>Full Fine-Tuning</th><th>PEFT (Parameter-Efficient)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Parameters Updated</strong></td><td>ALL (7B model = update 7B weights)</td><td>0.01–1% of total params (millions, not billions)</td></tr>
+        <tr><td><strong>GPU Memory</strong></td><td>4–8× A100 80GB for 7B model</td><td>1× A10G 24GB for same 7B model</td></tr>
+        <tr><td><strong>Training Time</strong></td><td>Days to weeks</td><td>Hours to 1 day</td></tr>
+        <tr><td><strong>Risk</strong></td><td>Catastrophic forgetting (loses general ability)</td><td>Low — base model unchanged</td></tr>
+        <tr><td><strong>Cost (OCI)</strong></td><td>₹50K–₹5L per training run</td><td>₹5K–₹30K per training run</td></tr>
+        <tr><td><strong>Multi-Client</strong></td><td>One model per client (expensive)</td><td>One base + multiple adapters (cheap)</td></tr>
+        <tr><td><strong>Use When</strong></td><td>Creating a truly new base model for massive domain shift</td><td>Domain adaptation, task tuning, style transfer</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- LoRA -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F0FDF4">🔩</div>
+    <div class="topic-title">LoRA — Low-Rank Adaptation (The Industry Standard)</div>
+  </div>
+  <div class="topic-body">
+    <p>LoRA's insight: when you fine-tune a neural network for a specific task, the <em>change in weights</em> tends to lie in a low-dimensional subspace. You don't need to update 7 billion parameters — you only need to update a tiny low-rank approximation of those changes.</p>
+
+    <div class="diagram">
+  STANDARD FINE-TUNING:
+  W_new = W_original + ΔW
+  Problem: ΔW is the same shape as W (7B × 7B for large layers!) — expensive!
+
+  LoRA:
+  Instead of updating W directly, learn ΔW = A × B
+  
+  Where:
+  A = (d × r) matrix    ← small!  e.g. 4096 × 16
+  B = (r × d) matrix    ← small!  e.g. 16 × 4096
+  
+  r = rank (hyperparameter, usually 4–64)
+  
+  DURING TRAINING: Only A and B are updated (W is frozen)
+  DURING INFERENCE: W_effective = W + (α/r) × A × B
+                    (Merged — zero extra cost at inference time!)
+
+  RESULT FOR LLaMA-7B:
+  Standard fine-tuning: update 7,000,000,000 parameters
+  LoRA (r=16):         update      4,194,304 parameters  ← 0.06%!
+  
+  Memory saved: from 80GB GPU to 12GB GPU — revolutionary!</div>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">r (Rank)</div>
+        <h4>Controls capacity</h4>
+        <p>Higher r = more parameters trained = more adaptation capacity = more memory.<br><strong>Common values:</strong> 4, 8, 16, 32, 64<br><strong>Default:</strong> 16 for most tasks</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">lora_alpha</div>
+        <h4>Scaling factor</h4>
+        <p>Controls magnitude of LoRA update: scale = alpha/r.<br><strong>Rule of thumb:</strong> alpha = 2×r<br><strong>Effect:</strong> Higher alpha = LoRA weights matter more relative to base model</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">target_modules</div>
+        <h4>Which layers to adapt</h4>
+        <p>Typically: q_proj, v_proj (attention queries and values). Adding k_proj, o_proj, and FFN layers increases capacity but cost.<br><strong>Typical: q_proj + v_proj</strong></p>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">lora_finetune.py</span></div>
+      <pre><span class="cm"># ── LoRA Fine-Tuning: Legal Document Clause Extractor ─────────────</span>
+<span class="cm"># OCI Use Case: Bajaj Finserv — Loan Agreement Analysis</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> <span class="fn">AutoModelForCausalLM</span>, <span class="fn">AutoTokenizer</span>, <span class="fn">TrainingArguments</span>
+<span class="kw">from</span> peft <span class="kw">import</span> <span class="fn">LoraConfig</span>, <span class="fn">get_peft_model</span>, <span class="fn">TaskType</span>
+<span class="kw">from</span> trl <span class="kw">import</span> <span class="fn">SFTTrainer</span>
+<span class="kw">from</span> datasets <span class="kw">import</span> <span class="fn">load_dataset</span>
+
+<span class="cm"># ── Step 1: Load base model (will be frozen — no changes to it) ──</span>
+model_name = <span class="st">"meta-llama/Llama-2-7b-chat-hf"</span>
+tokenizer = <span class="fn">AutoModelForCausalLM</span>.<span class="fn">from_pretrained</span>(model_name)
+tokenizer = <span class="fn">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(model_name)
+model = <span class="fn">AutoModelForCausalLM</span>.<span class="fn">from_pretrained</span>(
+    model_name,
+    load_in_4bit=<span class="kw">True</span>,    <span class="cm"># Load in 4-bit quantization to save memory (QLoRA)</span>
+    device_map=<span class="st">"auto"</span>      <span class="cm"># Automatically distribute across available GPUs</span>
+)
+
+<span class="cm"># ── Step 2: Configure LoRA — what to train and how ───────────────</span>
+lora_config = <span class="fn">LoraConfig</span>(
+    r=<span class="nu">16</span>,              <span class="cm"># Rank: higher = more capacity, more memory</span>
+    lora_alpha=<span class="nu">32</span>,     <span class="cm"># Scaling: alpha/r = 2.0 → moderate LoRA influence</span>
+    target_modules=[   <span class="cm"># Which weight matrices to attach LoRA adapters to</span>
+        <span class="st">"q_proj"</span>,       <span class="cm"># Query projection (attention)</span>
+        <span class="st">"v_proj"</span>,       <span class="cm"># Value projection (attention)</span>
+        <span class="st">"k_proj"</span>,       <span class="cm"># Key projection (optional — adds more capacity)</span>
+        <span class="st">"o_proj"</span>,       <span class="cm"># Output projection (optional)</span>
+    ],
+    lora_dropout=<span class="nu">0.05</span>, <span class="cm"># Dropout for regularisation (prevent overfitting)</span>
+    bias=<span class="st">"none"</span>,       <span class="cm"># Don't add trainable biases</span>
+    task_type=<span class="fn">TaskType</span>.CAUSAL_LM  <span class="cm"># We're doing text generation (causal LM)</span>
+)
+
+<span class="cm"># ── Step 3: Wrap base model with LoRA adapters ───────────────────</span>
+model = <span class="fn">get_peft_model</span>(model, lora_config)
+model.<span class="fn">print_trainable_parameters</span>()
+<span class="cm"># Output: trainable params: 4,194,304 || all params: 6,742,609,920 || trainable%: 0.0622%</span>
+<span class="cm"># ONLY 4.2M out of 6.7B parameters are trained — 99.94% is frozen!</span>
+
+<span class="cm"># ── Step 4: Load your domain dataset ─────────────────────────────</span>
+<span class="cm"># Format: each row has "instruction", "input", "output"</span>
+<span class="cm"># Example: {"instruction": "Extract penalty clause", "input": "&lt;contract text&gt;", "output": "..."}</span>
+dataset = <span class="fn">load_dataset</span>(<span class="st">"json"</span>, data_files=<span class="st">"loan_clause_data.jsonl"</span>)
+
+<span class="kw">def</span> <span class="fn">format_prompt</span>(example):
+    <span class="st">"""Format each example as instruction-following prompt"""</span>
+    <span class="kw">return</span> {<span class="st">"text"</span>: <span class="st">f"[INST] {example['instruction']}\n{example['input']} [/INST] {example['output']}"</span>}
+
+dataset = dataset.<span class="fn">map</span>(format_prompt)
+
+<span class="cm"># ── Step 5: Training configuration ───────────────────────────────</span>
+training_args = <span class="fn">TrainingArguments</span>(
+    output_dir=<span class="st">"./lora_legal_model"</span>,
+    num_train_epochs=<span class="nu">3</span>,              <span class="cm"># Pass over dataset 3 times</span>
+    per_device_train_batch_size=<span class="nu">4</span>,   <span class="cm"># 4 examples per GPU per step</span>
+    gradient_accumulation_steps=<span class="nu">4</span>,   <span class="cm"># Effective batch = 16 without more GPU memory</span>
+    learning_rate=<span class="nu">2e-4</span>,             <span class="cm"># Slightly higher than full FT (adapters train fast)</span>
+    fp16=<span class="kw">True</span>,                       <span class="cm"># Mixed precision — faster and less memory</span>
+    warmup_ratio=<span class="nu">0.03</span>,              <span class="cm"># Gradual warmup to prevent early instability</span>
+    logging_steps=<span class="nu">10</span>,
+    save_steps=<span class="nu">200</span>,
+    evaluation_strategy=<span class="st">"steps"</span>,
+    eval_steps=<span class="nu">200</span>,
+)
+
+<span class="cm"># ── Step 6: Train! ────────────────────────────────────────────────</span>
+trainer = <span class="fn">SFTTrainer</span>(
+    model=model,
+    train_dataset=dataset[<span class="st">"train"</span>],
+    dataset_text_field=<span class="st">"text"</span>,
+    args=training_args,
+    max_seq_length=<span class="nu">2048</span>,            <span class="cm"># Max tokens per training example</span>
+)
+trainer.<span class="fn">train</span>()
+
+<span class="cm"># ── Step 7: Save ONLY the LoRA adapter (tiny! ~30MB vs 13GB full model) ──</span>
+model.<span class="fn">save_pretrained</span>(<span class="st">"./bajaj_legal_lora_adapter"</span>)
+<span class="cm"># Merge into base model for single-file deployment:
+# merged = model.merge_and_unload()
+# merged.save_pretrained("./bajaj_legal_merged")</span></pre>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — LoRA Fine-Tuning for BFSI</div>
+      <h4>Bajaj Finserv — Loan Agreement Clause Extractor</h4>
+      <ul>
+        <li><strong>Problem:</strong> Legal team reviews 500+ loan agreements weekly. Extracting penalty, prepayment, and foreclosure clauses manually: 45 min/document.</li>
+        <li><strong>Training Data:</strong> 2,000 labelled clause extractions (instruction, contract text → extracted clause)</li>
+        <li><strong>OCI Data Science Job:</strong> GPU shape BM.GPU.A10.4 — 4× NVIDIA A10 24GB GPUs</li>
+        <li><strong>Training time:</strong> 3 hours for 3 epochs on 2K examples</li>
+        <li><strong>OCI Object Storage:</strong> Training data + LoRA adapter artifacts stored securely</li>
+        <li><strong>OCI Model Deployment:</strong> Base LLaMA-7B loaded once, LoRA adapter (28MB) loaded on top</li>
+        <li><strong>Result:</strong> 94.2% extraction accuracy. Document processing: 45 min → 3 min. ROI: ₹1.8 Cr/year saved in legal review costs.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- QLoRA -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#EFF6FF">⚡</div>
+    <div class="topic-title">QLoRA — Quantized LoRA (Fine-Tune 65B Models on One GPU)</div>
+  </div>
+  <div class="topic-body">
+    <p>LoRA still needs the base model in memory. A 7B model in FP16 = 14GB GPU memory. For 70B models, you'd need 140GB — multiple expensive GPUs. <strong>QLoRA</strong> (2023, Tim Dettmers) solves this by loading the base model in <em>4-bit NF4 quantization</em> (~3.5GB for 7B), and training LoRA adapters in 16-bit on top. Result: fine-tune a 65B model on a single 48GB GPU.</p>
+
+    <div class="diagram">
+  LoRA vs QLoRA Memory Comparison for 7B Model:
+
+  LoRA:    Base model in FP16 (14GB) + LoRA adapters (0.1GB) = ~14.5GB needed
+  QLoRA:   Base model in NF4 4-bit (3.5GB) + LoRA adapters in BF16 (0.1GB) = ~4GB needed
+  
+                         ┌────────────────────────────┐
+  Model        FP16 size │ QLoRA GPU needed           │
+  ───────────────────────│────────────────────────────│
+  7B           14 GB     │ 6 GB  ← single A10 (24GB)  │
+  13B          26 GB     │ 10 GB ← single A10         │
+  33B          66 GB     │ 24 GB ← single A100 40GB   │
+  65B          130 GB    │ 48 GB ← single A100 80GB   │
+               ↑                ↑                      │
+               Was impossible   Now possible!          │
+                         └────────────────────────────┘
+  
+  KEY INNOVATIONS in QLoRA:
+  1. NF4 (NormalFloat4): 4-bit data type optimised for weight distributions in LLMs
+  2. Double Quantization: Quantize the quantization constants → saves ~0.4GB more
+  3. Paged Optimizers: CPU offloading of optimizer states when GPU is full</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Feature</th><th>Full Fine-Tuning</th><th>LoRA</th><th>QLoRA</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Base Model Precision</strong></td><td>FP32 or BF16</td><td>BF16 or FP16</td><td>NF4 (4-bit)</td></tr>
+        <tr><td><strong>Adapter Precision</strong></td><td>N/A</td><td>FP16/BF16</td><td>BF16</td></tr>
+        <tr><td><strong>GPU for 7B model</strong></td><td>4× A100 80GB</td><td>1× A100 40GB</td><td>1× A10 24GB</td></tr>
+        <tr><td><strong>Accuracy vs Full FT</strong></td><td>Baseline</td><td>~99% of full FT</td><td>~98% of full FT</td></tr>
+        <tr><td><strong>Training Speed</strong></td><td>Fastest (all parallel)</td><td>Fast</td><td>Slightly slower (dequantization overhead)</td></tr>
+        <tr><td><strong>OCI Shape Needed</strong></td><td>BM.GPU.H100.8</td><td>VM.GPU.A10.1 (2×)</td><td>VM.GPU.A10.1 (1×)</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <strong>Trainer Tip:</strong> In practice, QLoRA is the go-to method for enterprise fine-tuning. It gives ~98% of full fine-tuning quality at ~5% of the cost. Most teams fine-tune 7B and 13B models with QLoRA on a single OCI A10 GPU.
+    </div>
+  </div>
+</div>
+
+<!-- GRPO -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F5F3FF">🏆</div>
+    <div class="topic-title">GRPO — Group Relative Policy Optimization</div>
+  </div>
+  <div class="topic-body">
+    <p>After supervised fine-tuning (SFT), models know your domain — but they may still produce poorly-reasoned, low-quality outputs. To teach a model to <em>reason better</em>, traditional RLHF (Reinforcement Learning from Human Feedback) uses a separate reward model trained on human preference pairs — expensive, complex, and slow.</p>
+    <p><strong>GRPO</strong> (DeepSeek, 2024) eliminates the reward model entirely. It generates a <em>group</em> of responses for each prompt, scores them with an automatic rule-based function (correctness, format, length), and trains the model to prefer responses that score higher relative to the group average.</p>
+
+    <div class="diagram">
+  RLHF vs GRPO:
+
+  RLHF:
+  Prompt → LLM generates response → Human rates quality → Reward model learns preferences
+  → PPO optimises LLM against reward model
+  Problem: Need 2 LLMs running + expensive human labelling
+
+  GRPO:
+  Prompt → LLM generates GROUP of 8 responses → Auto-score each (rule-based)
+          → Compute relative advantage: A_i = (score_i - mean_score) / std_score
+          → Train model to increase probability of high-advantage responses
+  
+  WHY IT WORKS:
+  - No reward model needed (saves 50% compute)
+  - No human labelling needed (saves money)
+  - Verifiable rewards: math = checkable, code = runnable, format = parseable
+  - Used by DeepSeek-R1 to achieve o1-level reasoning at open-source cost</div>
+
+    <div class="grid-3">
+      <div class="card c-blue"><div class="card-label">When to use GRPO</div><ul><li>Teaching step-by-step reasoning</li><li>Math and logic tasks</li><li>Code generation (auto-test)</li><li>Structured output compliance</li></ul></div>
+      <div class="card c-green"><div class="card-label">Reward Functions</div><ul><li>Correctness: does answer match?</li><li>Format: valid JSON? proper structure?</li><li>Length: within specified limits?</li><li>Code: does it compile/run?</li></ul></div>
+      <div class="card c-orange"><div class="card-label">OCI Use Case</div><p>An enterprise code review assistant trained with GRPO — model generates 8 reviews per code snippet, auto-scored on accuracy + structure. No human labelling needed.</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch6 Fine-Tuning -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 7 · MODEL COMPRESSION -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c7" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">7</div><div class="ch-tag">Optimization</div></div>
+  <div class="ch-title">Model Compression — <em>Smaller, Faster, Cheaper</em></div>
+  <div class="ch-sub">Quantization · Pruning · Knowledge Distillation · GGUF · llama.cpp</div>
+</div>
+
+<!-- Quantization -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#ECFEFF">📉</div>
+    <div class="topic-title">Quantization — Reducing Numerical Precision</div>
+  </div>
+  <div class="topic-body">
+    <p>Every weight in a neural network is stored as a floating-point number. By default: FP32 = 32 bits per parameter. A 7B model = 7,000,000,000 × 4 bytes = <strong>28GB</strong>. That requires a GPU with 32GB+ VRAM — expensive and inflexible.</p>
+    <p><strong>Quantization</strong> compresses these 32-bit numbers into 8-bit or 4-bit representations. 7B model in INT4 = 7B × 0.5 bytes = <strong>3.5GB</strong>. The same model now runs on a laptop, a phone, or a cheap cloud VM — with only 1–3% accuracy loss.</p>
+
+    <div class="diagram">
+  PRECISION FORMATS — What the numbers look like:
+
+  FP32 (32-bit): [sign][8-bit exponent][23-bit mantissa]
+  Range: 1.4×10⁻⁴⁵ to 3.4×10³⁸  ← Extremely precise
+  Memory: 4 bytes per weight
+
+  FP16 (16-bit): [sign][5-bit exponent][10-bit mantissa]
+  Range: 6×10⁻⁸ to 65,504        ← Less precise, faster
+  Memory: 2 bytes per weight
+
+  BF16 (16-bit "brain float"): [sign][8-bit exponent][7-bit mantissa]
+  Range: Same as FP32, less mantissa precision — preferred for training!
+  Memory: 2 bytes per weight
+
+  INT8 (8-bit integer):
+  Range: -128 to 127             ← Quantized representation
+  Memory: 1 byte per weight
+
+  INT4 / NF4 (4-bit):
+  Range: -8 to 7 (16 values)    ← Most aggressive compression
+  Memory: 0.5 bytes per weight
+
+  ┌────────────────────────────────────────────────────────┐
+  │ 7B Model Size by Precision:                            │
+  │  FP32 → 28 GB (training)                              │
+  │  FP16 → 14 GB (standard deployment)                   │
+  │  INT8 →  7 GB (quantized deployment)                  │
+  │  INT4 →  3.5 GB (edge/mobile deployment)              │
+  └────────────────────────────────────────────────────────┘</div>
+
+    <h3>🔬 Three Quantization Methods</h3>
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">1️⃣ Dynamic Quantization</div>
+        <h4>Convert at inference time</h4>
+        <p>Weights remain FP32, converted to INT8 on-the-fly during inference. Zero retraining needed. Good for quick deployment.</p>
+        <p><strong>OCI Use:</strong> Quick deploy existing models on smaller VMs</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">2️⃣ Static Quantization</div>
+        <h4>Pre-calibrate with data</h4>
+        <p>Run representative data through model to compute activation ranges, then quantize. Better accuracy than dynamic. Requires calibration dataset.</p>
+        <p><strong>OCI Use:</strong> Production inference with calibrated accuracy</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">3️⃣ QAT (Quantization-Aware Training)</div>
+        <h4>Train with fake quantization</h4>
+        <p>Simulate INT8 operations during training so model learns to work within quantized constraints. Best accuracy — model adapts its weights to quantization.</p>
+        <p><strong>OCI Use:</strong> Mobile/edge deployment requiring best quality</p>
+      </div>
+    </div>
+
+    <h3>📦 GGUF Format & llama.cpp</h3>
+    <div class="grid-2">
+      <div class="card c-cyan">
+        <div class="card-label">📁 GGUF Format</div>
+        <h4>The standard for quantized LLMs</h4>
+        <p>GGUF (GPT-Generated Unified Format) stores quantized model weights, tokenizer, and metadata in a single portable file. File naming convention:</p>
+        <p><code>llama-2-7b.Q4_K_M.gguf</code></p>
+        <ul>
+          <li><strong>Q4:</strong> 4-bit quantization</li>
+          <li><strong>K:</strong> K-means quantization method</li>
+          <li><strong>M:</strong> Medium quality variant (vs S=Small, L=Large)</li>
+        </ul>
+      </div>
+      <div class="card c-cyan">
+        <div class="card-label">⚙️ llama.cpp</div>
+        <h4>Run LLMs on CPU</h4>
+        <p>C++ library that runs GGUF models on CPU — no GPU required. Powers Ollama, LM Studio, GPT4All.</p>
+        <ul>
+          <li>LLaMA-7B Q4: runs on 8GB RAM laptop at ~15 tokens/sec</li>
+          <li>Apple Silicon optimised (Metal GPU acceleration)</li>
+          <li>OCI Ampere ARM A1.Flex: runs efficiently at low cost</li>
+          <li>Full privacy: runs offline, no internet needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">quantization_oci.py</span></div>
+      <pre><span class="cm"># ── INT4 QUANTIZATION: Load 7B model on single A10 GPU ───────────</span>
+<span class="cm"># Without quantization: needs 16GB GPU (FP16)</span>
+<span class="cm"># With 4-bit: needs only ~5GB GPU — fits on OCI A10 with batch room</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> <span class="fn">AutoModelForCausalLM</span>, <span class="fn">AutoTokenizer</span>, <span class="fn">BitsAndBytesConfig</span>
+<span class="kw">import</span> torch
+
+<span class="cm"># ── Step 1: Define quantization config ───────────────────────────</span>
+bnb_config = <span class="fn">BitsAndBytesConfig</span>(
+    load_in_4bit=<span class="kw">True</span>,               <span class="cm"># Use 4-bit quantization</span>
+    bnb_4bit_quant_type=<span class="st">"nf4"</span>,        <span class="cm"># NF4 = optimised for LLM weight distributions</span>
+    bnb_4bit_compute_dtype=torch.bfloat16,  <span class="cm"># Dequantize to BF16 for compute (speed)</span>
+    bnb_4bit_use_double_quant=<span class="kw">True</span>    <span class="cm"># Quantize quantization constants too (~0.4GB saved)</span>
+)
+
+<span class="cm"># ── Step 2: Load model — GPU memory: 16GB → ~5GB ─────────────────</span>
+model = <span class="fn">AutoModelForCausalLM</span>.<span class="fn">from_pretrained</span>(
+    <span class="st">"meta-llama/Llama-2-7b-chat-hf"</span>,
+    quantization_config=bnb_config,
+    device_map=<span class="st">"auto"</span>    <span class="cm"># Smart layer distribution across GPU/CPU</span>
+)
+tokenizer = <span class="fn">AutoTokenizer</span>.<span class="fn">from_pretrained</span>(<span class="st">"meta-llama/Llama-2-7b-chat-hf"</span>)
+
+<span class="cm"># ── Step 3: Inference — works identically to full-precision model ─</span>
+prompt = <span class="st">"[INST] Explain the key differences between OCI Object Storage tiers [/INST]"</span>
+inputs = <span class="fn">tokenizer</span>(prompt, return_tensors=<span class="st">"pt"</span>).<span class="fn">to</span>(<span class="st">"cuda"</span>)
+
+<span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+    output = model.<span class="fn">generate</span>(
+        **inputs,
+        max_new_tokens=<span class="nu">300</span>,
+        temperature=<span class="nu">0.7</span>,
+        do_sample=<span class="kw">True</span>
+    )
+
+answer = <span class="fn">tokenizer</span>.<span class="fn">decode</span>(output[<span class="nu">0</span>], skip_special_tokens=<span class="kw">True</span>)
+<span class="fn">print</span>(answer)
+
+<span class="cm"># MEMORY COMPARISON ON OCI:
+# FP16  (14GB): requires VM.GPU.A10.2 (2× A10) → ₹220/hour
+# INT4  (5GB):  requires VM.GPU.A10.1 (1× A10) → ₹110/hour
+# Monthly saving at 720 hours: ₹79,200/month per deployment</span></pre>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — Quantization Saves ₹79K/Month</div>
+      <h4>Enterprise Developer AI Assistant: GPU Cost Reduction</h4>
+      <ul>
+        <li><strong>Before:</strong> LLaMA-2-7B in FP16 on 2× A10 GPUs (VM.GPU.A10.2) — ₹220/hour, 14GB VRAM needed</li>
+        <li><strong>After:</strong> INT4 quantized model on 1× A10 (VM.GPU.A10.1) — ₹110/hour, 5GB VRAM</li>
+        <li><strong>Accuracy delta:</strong> −1.8% on internal benchmarks (acceptable for developer Q&amp;A)</li>
+        <li><strong>Latency improvement:</strong> 8.2s → 2.4s (INT operations faster than FP operations)</li>
+        <li><strong>Monthly saving: ₹79,200</strong> with same quality for the use case</li>
+        <li><strong>OCI services:</strong> OCI Data Science for quantization pipeline, OCI Model Deployment for serving</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Pruning -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FFF8F3">✂️</div>
+    <div class="topic-title">Pruning — Removing What Doesn't Matter</div>
+  </div>
+  <div class="topic-body">
+    <p>Neural networks are massively over-parameterised — researchers have shown that 30–70% of weights can be set to zero with minimal accuracy loss. Like a garden: pruning dead branches doesn't kill the tree, it focuses its energy.</p>
+
+    <div class="diagram">
+  PRUNING TYPES:
+
+  UNSTRUCTURED PRUNING (Weight-level):
+  Original: [0.82, -0.01, 0.67, 0.003, -0.91, 0.002, 0.55]
+  Pruned:   [0.82,  0,    0.67,  0,    -0.91,  0,    0.55]
+  → Near-zero weights set to 0. Creates sparse model.
+  Problem: Modern GPUs don't accelerate sparse operations well → limited speedup
+
+  STRUCTURED PRUNING (Neuron/Head-level):
+  Remove entire attention heads or neurons with lowest importance score.
+  Remaining structure = dense (smaller) network → real hardware speedup!
+
+  LAYER PRUNING:
+  7B model (32 layers) → Remove 8 lowest-importance layers → ~5.5B effective model
+  Aggressive: needs fine-tuning after pruning to recover accuracy</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Pruning Type</th><th>What's Removed</th><th>Hardware Speedup</th><th>Accuracy Impact</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Weight (Unstructured)</strong></td><td>Individual near-zero weights</td><td><span class="badge by">Low</span> (sparse ops slow)</td><td>Minimal</td><td>Storage reduction</td></tr>
+        <tr><td><strong>Neuron (Structured)</strong></td><td>Entire neurons in FFN</td><td><span class="badge bg">High</span></td><td>Low</td><td>Real inference speedup</td></tr>
+        <tr><td><strong>Attention Head</strong></td><td>Full attention heads</td><td><span class="badge bg">High</span></td><td>Low (heads redundant)</td><td>Smaller attention layers</td></tr>
+        <tr><td><strong>Layer Pruning</strong></td><td>Full Transformer layers</td><td><span class="badge bg">Very High</span></td><td>Moderate → needs re-FT</td><td>Maximum size reduction</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Scenario — Pruning for ARM CPU Deployment</div>
+      <h4>NSE Academy — NCFM Quiz Bot on OCI Ampere A1.Flex (ARM, No GPU)</h4>
+      <ul>
+        <li><strong>Goal:</strong> Run quiz chatbot on ₹1.2/hour OCI Ampere ARM CPU (vs ₹110/hour GPU)</li>
+        <li><strong>Process:</strong> Structured neuron pruning on LLaMA-7B → remove 30% of FFN neurons with lowest activation magnitude → 7B → 4.9B effective params</li>
+        <li><strong>Then:</strong> INT8 quantization → 4.9GB model runs on A1.Flex with 8GB RAM</li>
+        <li><strong>Fine-tune after pruning:</strong> 500 domain examples to recover NCFM accuracy</li>
+        <li><strong>Result:</strong> 6 tokens/sec on CPU — adequate for quiz UX. Cost: ₹864/month vs ₹79,200 for GPU</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Knowledge Distillation -->
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FDF2F8">🧪</div>
+    <div class="topic-title">Knowledge Distillation — The Teacher Trains the Student</div>
+  </div>
+  <div class="topic-body">
+    <p>A junior doctor learns more from shadowing an experienced surgeon than from reading textbooks alone. The surgeon doesn't just say "do this" — they explain their reasoning, show the alternatives they considered, and share their confidence levels. <strong>Knowledge Distillation</strong> applies this to AI: a large, accurate <em>teacher model</em> trains a small, fast <em>student model</em> by sharing not just correct answers but its probability distributions over all answers.</p>
+
+    <div class="diagram">
+  STANDARD TRAINING vs KNOWLEDGE DISTILLATION:
+
+  Standard Training:
+  Input → Student → Output: "cat" (hard label)
+  Loss = CrossEntropy(prediction, "cat")  ← learns only the right answer
+
+  Knowledge Distillation:
+  Input → Teacher → Soft labels: cat=85%, dog=10%, tiger=5%  ← rich signal!
+  Input → Student → Soft prediction: cat=72%, dog=18%, tiger=10%
+  Loss = α × KL_Divergence(student_soft, teacher_soft)   ← match teacher's uncertainty
+       + (1-α) × CrossEntropy(student_pred, hard_label)  ← also learn ground truth
+
+  WHY SOFT LABELS ARE BETTER:
+  Hard label "cat" gives 1 bit of information.
+  Teacher's "cat=85%, dog=10%, tiger=5%" reveals:
+  - This image looks somewhat like a dog too (maybe confused photo)
+  - Tiger and cat share visual features (stripes? eyes?)
+  Student learns the STRUCTURE of similarity, not just correct class!</div>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">Response Distillation</div>
+        <h4>Match output distributions</h4>
+        <p>Student matches teacher's final softmax output. Simplest form. Used by DistilBERT (40% smaller, 97% of BERT accuracy).</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">Feature Distillation</div>
+        <h4>Match intermediate layers</h4>
+        <p>Student also matches teacher's hidden state representations at each layer. More complex but more powerful — student "sees" teacher's thinking process.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">Relation Distillation</div>
+        <h4>Match sample relationships</h4>
+        <p>Student learns how samples relate to each other in the teacher's embedding space — not just individual outputs but the geometry of understanding.</p>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">knowledge_distillation.py</span></div>
+      <pre><span class="cm"># ── KNOWLEDGE DISTILLATION: BERT-large → DistilBERT ─────────────</span>
+<span class="cm"># OCI Use Case: Bajaj Finserv — Credit Risk Classifier on Android Tablets</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.nn.functional <span class="kw">as</span> F
+<span class="kw">from</span> transformers <span class="kw">import</span> <span class="fn">AutoModelForSequenceClassification</span>
+
+<span class="cm"># ── Load Teacher (large, accurate, stays FROZEN during distillation) ──</span>
+teacher = <span class="fn">AutoModelForSequenceClassification</span>.<span class="fn">from_pretrained</span>(
+    <span class="st">"./teacher_bert_large_credit"</span>,  <span class="cm"># Fine-tuned BERT-large (1.3GB)</span>
+    num_labels=<span class="nu">3</span>  <span class="cm"># Low Risk / Medium Risk / High Risk</span>
+)
+teacher.<span class="fn">eval</span>()  <span class="cm"># Teacher is inference-only — no gradient computation</span>
+<span class="kw">for</span> param <span class="kw">in</span> teacher.parameters():
+    param.requires_grad = <span class="kw">False</span>  <span class="cm"># Freeze teacher completely</span>
+
+<span class="cm"># ── Load Student (small, fast, will be trained) ──────────────────</span>
+student = <span class="fn">AutoModelForSequenceClassification</span>.<span class="fn">from_pretrained</span>(
+    <span class="st">"distilbert-base-uncased"</span>,  <span class="cm"># DistilBERT: 66M params (vs BERT-large: 340M)</span>
+    num_labels=<span class="nu">3</span>
+)
+
+<span class="cm"># ── Distillation Loss Function ────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">distillation_loss</span>(student_logits, teacher_logits, true_labels, T=<span class="nu">4.0</span>, alpha=<span class="nu">0.7</span>):
+    <span class="st">"""
+    Combined loss = alpha × KD_Loss + (1 - alpha) × CE_Loss
+    
+    T (temperature): Higher T → softer distributions → more signal transferred
+    alpha: Weight on teacher knowledge (0.7 = 70% teacher, 30% hard labels)
+    """</span>
+    <span class="cm"># Soften both distributions by temperature T</span>
+    teacher_probs = F.<span class="fn">softmax</span>(teacher_logits / T, dim=-<span class="nu">1</span>)
+    student_log_probs = F.<span class="fn">log_softmax</span>(student_logits / T, dim=-<span class="nu">1</span>)
+    
+    <span class="cm"># KL Divergence: how different is student from teacher?</span>
+    kd_loss = nn.<span class="fn">KLDivLoss</span>(reduction=<span class="st">"batchmean"</span>)(student_log_probs, teacher_probs)
+    kd_loss *= (T ** <span class="nu">2</span>)  <span class="cm"># Scale back up (temperature divided gradients)</span>
+    
+    <span class="cm"># Standard cross-entropy against true labels</span>
+    ce_loss = nn.<span class="fn">CrossEntropyLoss</span>()(student_logits, true_labels)
+    
+    <span class="kw">return</span> alpha * kd_loss + (<span class="nu">1</span> - alpha) * ce_loss
+
+<span class="cm"># ── Training Loop (simplified) ────────────────────────────────────</span>
+optimizer = torch.optim.<span class="fn">AdamW</span>(student.parameters(), lr=<span class="nu">5e-5</span>)
+
+<span class="kw">for</span> batch <span class="kw">in</span> train_dataloader:
+    inputs, labels = batch
+    
+    <span class="cm"># Teacher prediction — no gradient needed</span>
+    <span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+        teacher_outputs = <span class="fn">teacher</span>(**inputs)
+    
+    <span class="cm"># Student prediction — gradient flows through here</span>
+    student_outputs = <span class="fn">student</span>(**inputs)
+    
+    <span class="cm"># Compute combined distillation loss</span>
+    loss = <span class="fn">distillation_loss</span>(student_outputs.logits, teacher_outputs.logits, labels)
+    
+    loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+    optimizer.<span class="fn">zero_grad</span>()
+
+<span class="cm"># RESULTS (Bajaj Finserv Credit Risk):
+# Teacher (BERT-large):  93.1% accuracy | 1.3 GB | 210ms inference
+# Student (DistilBERT):  91.4% accuracy | 260 MB | 38ms inference
+# Size: 5× smaller | Speed: 5.5× faster | Accuracy drop: only 1.7%
+# Deployed as ONNX on Android tablets — offline credit decisions in branches!</span></pre>
+    </div>
+
+    <h3>📊 Compression Methods Comparison</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Method</th><th>What It Does</th><th>Size Reduction</th><th>Speed Gain</th><th>Accuracy Loss</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Quantization (INT8)</strong></td><td>Reduce precision FP32→INT8</td><td>4× smaller</td><td>2–3×</td><td>~1%</td><td>Production deployment</td></tr>
+        <tr><td><strong>Quantization (INT4)</strong></td><td>Reduce precision FP32→INT4</td><td>8× smaller</td><td>3–5×</td><td>~3%</td><td>Edge/mobile/cost-sensitive</td></tr>
+        <tr><td><strong>Structured Pruning</strong></td><td>Remove neurons/heads</td><td>2–3×</td><td>2–4×</td><td>2–5%</td><td>CPU deployment, ARM</td></tr>
+        <tr><td><strong>Knowledge Distillation</strong></td><td>Train small model from large</td><td>5–10×</td><td>5–10×</td><td>1–5%</td><td>Mobile/edge, max compression</td></tr>
+        <tr><td><strong>Quant + Prune (combined)</strong></td><td>Both techniques stacked</td><td>10–20×</td><td>5–15×</td><td>5–8%</td><td>Extreme size constraints</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <strong>Stacking Rule:</strong> Apply compression in order: Fine-tune first → then Quantize → then optionally Prune → then optionally Distil. Never quantize before fine-tuning — the INT4 precision constrains the weight updates needed during domain adaptation.
+    </div>
+
+    <div class="summary">
+      <h4>🎯 Compression Key Takeaways</h4>
+      <ul>
+        <li>Quantization (INT4): 8× size reduction, 3× speed, ~3% accuracy loss — the default first step.</li>
+        <li>Structured pruning removes redundant neurons — real hardware speedup (unlike sparse pruning).</li>
+        <li>Knowledge distillation creates a new, genuinely smaller model by teacher-student training.</li>
+        <li>Stacking: quantize + prune + distil can achieve 20× compression with only ~8% accuracy loss.</li>
+        <li>GGUF + llama.cpp enables running LLMs fully offline on CPU with no cloud dependency.</li>
+      </ul>
+    </div>
+
+    <ol class="iq-list">
+      <li>What is the difference between INT8 and INT4 quantization? When would you use each?</li>
+      <li>Why does structured pruning give better hardware speedup than unstructured pruning?</li>
+      <li>Explain knowledge distillation. Why are soft labels better than hard labels for training a student?</li>
+      <li>Calculate the memory needed for a 13B model in FP16 vs INT4.</li>
+      <li>You need to deploy an LLM on an Android device with 4GB RAM. What compression strategy would you use?</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch7 Compression -->
+
+<div class="section-divider"></div>
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 8 · MODEL EVALUATION -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c8" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">8</div><div class="ch-tag">Quality Assurance</div></div>
+  <div class="ch-title">Model Evaluation — <em>How Do You Know If It's Good?</em></div>
+  <div class="ch-sub">Evaluation Metrics · Hallucination · RAGAS · LLM-as-Judge · Benchmarks · Guardrails</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#F5F3FF">📏</div>
+    <div class="topic-title">Evaluating LLMs — Metrics, Methods & Hallucination</div>
+  </div>
+  <div class="topic-body">
+    <p>An LLM that confidently gives wrong answers is worse than one that says "I don't know." Before deploying any LLM in production — especially in finance, healthcare, or legal — you must rigorously evaluate its accuracy, reliability, and safety.</p>
+
+    <div class="grid-4">
+      <div class="card c-blue">
+        <div class="card-label">📊 BLEU / ROUGE</div>
+        <h4>Text overlap metrics</h4>
+        <p>Compare generated text to reference. BLEU for translation. ROUGE for summarisation. Limitation: penalise valid paraphrases.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">🎯 Perplexity</div>
+        <h4>Language model confidence</h4>
+        <p>How surprised is the model by the test text? Lower perplexity = model understands this domain well. Used during pre-training evaluation.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">🏆 RAGAS</div>
+        <h4>RAG evaluation framework</h4>
+        <p>Evaluates: Faithfulness (stays in context?), Answer Relevancy, Context Recall, Context Precision. Gold standard for RAG systems.</p>
+      </div>
+      <div class="card c-purple">
+        <div class="card-label">🤖 LLM-as-Judge</div>
+        <h4>Model evaluates model</h4>
+        <p>Use GPT-4 or Claude to rate another model's outputs on accuracy, helpfulness, safety. More nuanced than automated metrics.</p>
+      </div>
+    </div>
+
+    <h3>⚠️ Hallucination — The #1 LLM Risk in Enterprise</h3>
+    <p><strong>Hallucination</strong>: An LLM confidently generates false information that sounds plausible. In a customer-facing banking chatbot, a hallucinated interest rate can cause regulatory violations. In a medical assistant, a hallucinated drug dosage can be life-threatening.</p>
+
+    <div class="diagram">
+  TYPES OF HALLUCINATION:
+
+  1. FACTUAL HALLUCINATION:
+  User: "What is the current repo rate set by RBI?"
+  Model: "The RBI repo rate is 5.75%" ← WRONG (confidently stated fiction)
+  
+  2. SOURCE HALLUCINATION:
+  Model: "According to RBI circular DBOD.No.BP.BC.2024/21.04.048/2024-25..."
+  ← Circular reference may not exist!
+  
+  3. CONTEXT HALLUCINATION (in RAG):
+  Retrieved doc says: "Maximum loan tenure: 20 years"
+  Model answers: "Maximum loan tenure: 25 years" ← Ignored/misread context!
+  
+  HOW TO MEASURE IT:
+  Hallucination Rate = (Wrong factual claims) / (Total factual claims) × 100%
+  
+  HOW TO REDUCE IT:
+  → RAG (ground in documents) — most effective
+  → Temperature = 0.0 (deterministic, less creative, less hallucinatory)
+  → System prompts: "Only answer from provided context"
+  → Fine-tuning on domain to reduce uncertainty
+  → Post-generation fact checking pipeline
+  → Guardrails (filter outputs before user sees them)</div>
+
+    <h3>🛡️ Guardrails & Responsible AI</h3>
+    <div class="grid-3">
+      <div class="card c-red">
+        <div class="card-label">🚫 Output Guardrails</div>
+        <p>Filter model outputs before sending to user. Block: PII leakage, harmful content, off-topic responses, competitor mentions, regulatory violations.</p>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-label">🔒 Input Guardrails</div>
+        <p>Filter user inputs before sending to model. Block: prompt injection attacks, jailbreak attempts, sensitive data input (credit card numbers, passwords).</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">✅ Responsible AI</div>
+        <p>Fairness (no bias in credit decisions), Transparency (explain AI decisions), Privacy (no training on personal data), Accountability (human oversight for high-stakes decisions).</p>
+      </div>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Benchmark</th><th>What It Tests</th><th>Domain</th><th>Score Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MMLU</strong></td><td>57 academic subjects</td><td>General knowledge</td><td>Human expert ~89%, GPT-4 ~87%</td></tr>
+        <tr><td><strong>HumanEval</strong></td><td>Python coding problems</td><td>Code generation</td><td>Pass@1 rate (% solved first try)</td></tr>
+        <tr><td><strong>HellaSwag</strong></td><td>Common sense completion</td><td>Reasoning</td><td>Human 95%, LLaMA-70B 87%</td></tr>
+        <tr><td><strong>TruthfulQA</strong></td><td>Avoid hallucination on known-false beliefs</td><td>Truthfulness</td><td>Higher = less hallucinatory</td></tr>
+        <tr><td><strong>MT-Bench</strong></td><td>Multi-turn conversation quality</td><td>Chat quality</td><td>GPT-4: 8.99/10, Claude-3: 8.83/10</td></tr>
+        <tr><td><strong>RAGAS</strong></td><td>RAG pipeline faithfulness + relevance</td><td>Enterprise RAG</td><td>0–1 scale, >0.85 = production ready</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Evaluation Scenario</div>
+      <h4>Enterprise LLM Quality Gate Before Production Deployment</h4>
+      <ul>
+        <li><strong>OCI Data Science:</strong> Automated evaluation pipeline runs after every fine-tuning job</li>
+        <li><strong>Evaluation Suite:</strong> 500 domain Q&amp;A pairs (banking), 200 RAG faithfulness tests, 100 adversarial prompts</li>
+        <li><strong>OCI Functions:</strong> Serverless function computes RAGAS scores, hallucination rate, PII leakage tests</li>
+        <li><strong>OCI Monitoring:</strong> Production monitoring — alert if hallucination rate exceeds 3% threshold</li>
+        <li><strong>Gate:</strong> Model only proceeds to OCI Model Deployment if accuracy >92%, hallucination <3%, no PII leaks detected</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch8 Evaluation -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 9 · EFFICIENT & PRODUCTION DEPLOYMENT -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c9" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">9</div><div class="ch-tag">Engineering</div></div>
+  <div class="ch-title">Production Deployment — <em>From Notebook to Enterprise Scale</em></div>
+  <div class="ch-sub">Inference Pipeline · Serving · Latency · Throughput · GPU vs CPU · REST APIs · Monitoring</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#EFF6FF">🚀</div>
+    <div class="topic-title">Complete Deployment Pipeline</div>
+  </div>
+  <div class="topic-body">
+
+    <h3>🔄 End-to-End Deployment Flow</h3>
+    <div class="pipe">
+      <div class="pipe-step"><div class="ps-n">01</div><div class="ps-l">Data Collection</div><div class="ps-s">OCI Object Storage</div></div>
+      <div class="pipe-step"><div class="ps-n">02</div><div class="ps-l">Pre-training / Select Base</div><div class="ps-s">LLaMA / Cohere / Custom</div></div>
+      <div class="pipe-step"><div class="ps-n">03</div><div class="ps-l">Prompt Engineering</div><div class="ps-s">System prompts, templates</div></div>
+      <div class="pipe-step"><div class="ps-n">04</div><div class="ps-l">RAG (if needed)</div><div class="ps-s">OCI Vector Search</div></div>
+      <div class="pipe-step"><div class="ps-n">05</div><div class="ps-l">Fine-Tuning</div><div class="ps-s">LoRA / QLoRA on OCI GPU</div></div>
+      <div class="pipe-step"><div class="ps-n">06</div><div class="ps-l">Evaluation</div><div class="ps-s">RAGAS, hallucination tests</div></div>
+      <div class="pipe-step"><div class="ps-n">07</div><div class="ps-l">Compression</div><div class="ps-s">Quantize / Prune / Distil</div></div>
+      <div class="pipe-step"><div class="ps-n">08</div><div class="ps-l">Deploy</div><div class="ps-s">OCI Model Deployment</div></div>
+      <div class="pipe-step"><div class="ps-n">09</div><div class="ps-l">API + Guardrails</div><div class="ps-s">OCI API Gateway</div></div>
+      <div class="pipe-step"><div class="ps-n">10</div><div class="ps-l">Monitor</div><div class="ps-s">OCI Monitoring + Logging</div></div>
+    </div>
+
+    <h3>⚡ Latency vs Throughput</h3>
+    <div class="grid-2">
+      <div class="card c-blue">
+        <div class="card-label">⏱️ Latency</div>
+        <h4>Time to first token (TTFT)</h4>
+        <p>How fast a single user gets their first response. Critical for interactive chatbots.</p>
+        <ul>
+          <li>Target: &lt;1 second TTFT for chat UX</li>
+          <li>Reduced by: smaller models, quantization, KV-cache, Flash Attention</li>
+          <li>OCI: VM.GPU.A10.1 → ~0.8s TTFT for 7B INT4 model</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">📈 Throughput</div>
+        <h4>Tokens generated per second</h4>
+        <p>How many users can be served simultaneously. Critical for batch workloads.</p>
+        <ul>
+          <li>Target: >100 tokens/sec for good UX</li>
+          <li>Increased by: batch processing, vLLM, tensor parallelism, larger GPUs</li>
+          <li>vLLM with PagedAttention: 20–24× throughput vs naive serving</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>🖥️ GPU vs CPU Deployment</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Aspect</th><th>GPU (NVIDIA A10/A100/H100)</th><th>CPU (AMD / ARM Ampere)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Speed</strong></td><td>50–200 tokens/sec (A10 for 7B model)</td><td>5–20 tokens/sec (llama.cpp INT4)</td></tr>
+        <tr><td><strong>Cost (OCI)</strong></td><td>₹110–₹3,500/hour</td><td>₹1.2–₹12/hour</td></tr>
+        <tr><td><strong>Max Model Size</strong></td><td>A100 80GB → 70B INT4 model</td><td>8GB RAM → 7B INT4, 32GB → 13B INT4</td></tr>
+        <tr><td><strong>Use When</strong></td><td>Real-time chat, high-volume APIs, interactive</td><td>Background processing, nightly batch, edge</td></tr>
+        <tr><td><strong>OCI Shape</strong></td><td>VM.GPU.A10.1, BM.GPU.A100-v2.8</td><td>VM.Standard.A1.Flex (ARM), VM.Standard.E4.Flex</td></tr>
+        <tr><td><strong>Quantization</strong></td><td>INT4/INT8 via BitsAndBytes, GPTQ</td><td>GGUF Q4_K_M via llama.cpp</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>💾 Memory Optimization — VRAM Planning</h3>
+    <div class="diagram">
+  GPU VRAM REQUIREMENTS — Rule of Thumb:
+
+  Required VRAM = model_size_GB × precision_multiplier × 1.25 (overhead)
+
+  Where precision_multiplier:
+  FP32 → 4 bytes/param  |  FP16 → 2  |  INT8 → 1  |  INT4 → 0.5
+
+  Examples:
+  7B  FP16:  7B × 2 bytes × 1.25 = ~17.5 GB  → need A100 40GB
+  7B  INT4:  7B × 0.5 bytes × 1.25 = ~4.4 GB  → need A10 24GB ✓
+  70B INT4:  70B × 0.5 × 1.25 = ~43.75 GB     → need A100 80GB
+  
+  KV-CACHE (add for inference batching):
+  KV_cache_GB = 2 × layers × heads × head_dim × batch_size × seq_len × precision
+  For 7B model, batch=8, seq=2048, FP16: ~2GB extra VRAM needed
+
+  TOTAL for production serving:
+  Model weights + KV cache + Optimizer states (for training) + Activations</div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">oci_model_deployment.py</span></div>
+      <pre><span class="cm"># ── COMPLETE OCI MODEL DEPLOYMENT ────────────────────────────────</span>
+<span class="cm"># Register fine-tuned model → Deploy REST endpoint → Monitor</span>
+<span class="kw">import</span> oci
+<span class="kw">from</span> oci.data_science <span class="kw">import</span> <span class="fn">DataScienceClient</span>
+<span class="kw">from</span> oci.data_science.models <span class="kw">import</span> (
+    <span class="fn">CreateModelDetails</span>, <span class="fn">CreateModelDeploymentDetails</span>,
+    <span class="fn">InstanceConfiguration</span>, <span class="fn">SingleModelDeploymentConfigurationDetails</span>,
+    <span class="fn">ModelConfigurationDetails</span>
+)
+
+config = oci.config.<span class="fn">from_file</span>()
+ds_client = <span class="fn">DataScienceClient</span>(config)
+COMPARTMENT = <span class="st">"ocid1.compartment.oc1..your_compartment"</span>
+PROJECT = <span class="st">"ocid1.datascienceproject.oc1..your_project"</span>
+
+<span class="cm"># ── Step 1: Register model in OCI Model Catalog ───────────────────</span>
+model_response = ds_client.<span class="fn">create_model</span>(<span class="fn">CreateModelDetails</span>(
+    compartment_id=COMPARTMENT,
+    project_id=PROJECT,
+    display_name=<span class="st">"llama2-7b-qlora-int4-legal-v1"</span>,
+    description=<span class="st">"LLaMA-2-7B fine-tuned on legal docs via QLoRA, INT4 quantized"</span>,
+    freeform_tags={<span class="st">"team"</span>: <span class="st">"ai"</span>, <span class="st">"domain"</span>: <span class="st">"legal"</span>, <span class="st">"version"</span>: <span class="st">"1.0"</span>}
+))
+model_id = model_response.data.id
+
+<span class="cm"># Upload model artifact (ZIP containing model weights + score.py)</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"model_artifact.zip"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+    ds_client.<span class="fn">create_model_artifact</span>(
+        model_id=model_id,
+        model_artifact=f,
+        content_disposition=<span class="st">"attachment; filename=model_artifact.zip"</span>
+    )
+
+<span class="cm"># ── Step 2: Deploy model as REST endpoint ─────────────────────────</span>
+deployment = ds_client.<span class="fn">create_model_deployment</span>(<span class="fn">CreateModelDeploymentDetails</span>(
+    compartment_id=COMPARTMENT,
+    project_id=PROJECT,
+    display_name=<span class="st">"legal-bot-prod-v1"</span>,
+    model_deployment_configuration_details=<span class="fn">SingleModelDeploymentConfigurationDetails</span>(
+        deployment_type=<span class="st">"SINGLE_MODEL"</span>,
+        model_configuration_details=<span class="fn">ModelConfigurationDetails</span>(
+            model_id=model_id,
+            instance_configuration=<span class="fn">InstanceConfiguration</span>(
+                instance_shape_name=<span class="st">"VM.GPU.A10.1"</span>,  <span class="cm"># 1× A10 24GB — enough for 7B INT4</span>
+            ),
+            scaling_policy={
+                <span class="st">"policyType"</span>: <span class="st">"FIXED_SIZE"</span>,
+                <span class="st">"instanceCount"</span>: <span class="nu">2</span>  <span class="cm"># 2 replicas for high availability</span>
+            },
+            bandwidth_mbps=<span class="nu">10</span>
+        )
+    )
+))
+<span class="fn">print</span>(<span class="st">f"Deployment OCID: {deployment.data.id}"</span>)
+<span class="fn">print</span>(<span class="st">"Endpoint: https://modeldeployment.ap-mumbai-1.oci.customer-oci.com/.../predict"</span>)
+
+<span class="cm"># ── Step 3: Query the deployed model ─────────────────────────────</span>
+<span class="kw">import</span> requests
+<span class="kw">from</span> oci.signer <span class="kw">import</span> <span class="fn">Signer</span>
+
+auth = <span class="fn">Signer</span>(config)  <span class="cm"># OCI request signing (IAM authentication)</span>
+endpoint = <span class="st">"https://modeldeployment.ap-mumbai-1.oci.customer-oci.com/&lt;deployment_id&gt;/predict"</span>
+
+response = requests.<span class="fn">post</span>(
+    endpoint,
+    json={<span class="st">"prompt"</span>: <span class="st">"Extract the foreclosure clause from: [contract text here]"</span>, <span class="st">"max_tokens"</span>: <span class="nu">200</span>},
+    auth=auth
+)
+<span class="fn">print</span>(response.<span class="fn">json</span>()[<span class="st">"generated_text"</span>])</pre>
+    </div>
+
+    <h3>🌐 Deployment Scenarios</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Scenario</th><th>Where</th><th>OCI Services</th><th>Best For</th><th>Monthly Cost (7B model)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Managed Cloud API</strong></td><td>OCI GenAI Service</td><td>OCI Generative AI (On-Demand)</td><td>Variable load, no GPU ops</td><td>Pay-per-token (~₹8,000–₹80,000)</td></tr>
+        <tr><td><strong>Self-Hosted GPU</strong></td><td>OCI Data Science Model Deployment</td><td>VM.GPU.A10.1 + Model Catalog</td><td>Custom models, consistent load</td><td>~₹79,200 (1× A10, 24/7)</td></tr>
+        <tr><td><strong>On-Premise (Data Privacy)</strong></td><td>OCI Dedicated Region / Alloy</td><td>OCI Data Science on-prem</td><td>BFSI, Healthcare, Govt</td><td>CapEx + OCI subscription</td></tr>
+        <tr><td><strong>Edge/Offline</strong></td><td>ARM devices, tablets, servers</td><td>GGUF + llama.cpp or ONNX</td><td>Branch offices, field workers</td><td>~₹864 (A1.Flex CPU)</td></tr>
+        <tr><td><strong>Containerised (OKE)</strong></td><td>OCI Kubernetes Engine</td><td>OKE + vLLM container + GPU nodes</td><td>High-throughput, auto-scaling</td><td>₹50,000+ (auto-scale saves cost)</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="code-wrap">
+      <div class="code-hd"><span class="code-lang">Python</span><span class="code-file">streaming_api.py</span></div>
+      <pre><span class="cm"># ── STREAMING RESPONSES — Real-time token streaming ───────────────</span>
+<span class="cm"># Users see tokens appear one by one — better UX than waiting for full response</span>
+<span class="kw">import</span> oci
+<span class="kw">from</span> oci.generative_ai_inference <span class="kw">import</span> <span class="fn">GenerativeAiInferenceClient</span>
+<span class="kw">from</span> oci.generative_ai_inference.models <span class="kw">import</span> <span class="fn">ChatDetails</span>, <span class="fn">CohereChatRequest</span>, <span class="fn">OnDemandServingMode</span>
+
+config = oci.config.<span class="fn">from_file</span>()
+client = <span class="fn">GenerativeAiInferenceClient</span>(config)
+
+<span class="cm"># OCI GenAI supports streaming — tokens arrive in real-time</span>
+response = client.<span class="fn">chat</span>(<span class="fn">ChatDetails</span>(
+    compartment_id=<span class="st">"ocid1.compartment.oc1..your_compartment"</span>,
+    serving_mode=<span class="fn">OnDemandServingMode</span>(model_id=<span class="st">"cohere.command-r-plus"</span>),
+    chat_request=<span class="fn">CohereChatRequest</span>(
+        message=<span class="st">"Explain how OCI Object Storage lifecycle policies work in detail."</span>,
+        max_tokens=<span class="nu">500</span>,
+        temperature=<span class="nu">0.5</span>,
+        stream=<span class="kw">True</span>  <span class="cm"># ← Enable streaming response</span>
+    )
+))
+
+<span class="cm"># Process streaming events as they arrive</span>
+<span class="fn">print</span>(<span class="st">"Streaming response: "</span>, end=<span class="st">""</span>, flush=<span class="kw">True</span>)
+<span class="kw">for</span> event <span class="kw">in</span> response.data.events():
+    <span class="kw">if</span> hasattr(event.data, <span class="st">"text"</span>):
+        <span class="fn">print</span>(event.data.text, end=<span class="st">""</span>, flush=<span class="kw">True</span>)  <span class="cm"># Print each token as it arrives</span>
+<span class="fn">print</span>()  <span class="cm"># Newline when done</span></pre>
+    </div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ Complete OCI Architecture — Enterprise GenAI Platform</div>
+      <h4>Enterprise Banking AI Platform: Full Stack Architecture</h4>
+      <div class="diagram">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    CLIENTS (Users)                              │
+  │  Web Portal  │  Mobile App  │  WhatsApp  │  Internal Slack      │
+  └──────────────┬──────────────┴────────────────────────────────── ┘
+                 │  HTTPS
+  ┌──────────────▼──────────────────────────────────────────────── ┐
+  │           OCI API GATEWAY (Rate limiting, Auth, Logging)        │
+  └──────────────┬──────────────────────────────────────────────── ┘
+                 │
+  ┌──────────────▼──────────────────────────────────────────────── ┐
+  │           OCI FUNCTIONS (Orchestration Layer)                   │
+  │  • Classify intent (which model to call?)                       │
+  │  • Select prompt template                                       │
+  │  • Route: Chat / RAG / Classification / Summarisation           │
+  └──┬─────────────┬──────────────┬────────────────────────────── ┘
+     │             │              │
+  ┌──▼──┐      ┌──▼──────────┐  ┌▼─────────────────────────────┐
+  │OCI  │      │OCI AI Vector│  │OCI Generative AI Service      │
+  │Data │      │Search(23ai) │  │• Cohere Command R+ (Chat/RAG) │
+  │Sci. │      │2.3M vectors │  │• Cohere Embed (Embeddings)    │
+  │Model│      │Semantic     │  │• LLaMA 3 70B (Open model)     │
+  │Dep. │      │Search       │  │• Dedicated AI Cluster (custom)│
+  │(FT  │      └──────────── ┘  └──────────────────────────────┘
+  │model│
+  └─────┘
+  
+  ┌──────────────────────────────────────────────────────────────── ┐
+  │                  DATA LAYER                                      │
+  │  OCI Object Storage: 50TB data lake (documents, models, logs)   │
+  │  OCI Autonomous DB: Structured data (customer, transactions)     │
+  └──────────────────────────────────────────────────────────────── ┘
+  
+  ┌──────────────────────────────────────────────────────────────── ┐
+  │              OCI MONITORING + LOGGING (Observability)           │
+  │  • Real-time latency dashboards  • Hallucination rate alerts    │
+  │  • Token usage and cost tracking • Model accuracy drift alerts  │
+  └──────────────────────────────────────────────────────────────── ┘</div>
+    </div>
+
+    <ol class="iq-list">
+      <li>What is the difference between latency and throughput in LLM serving? How do you optimise each?</li>
+      <li>Calculate the VRAM needed to serve a 13B model in INT4 with batch size 4 and 2048 token context.</li>
+      <li>When would you choose OCI Model Deployment over OCI GenAI Service (On-Demand)?</li>
+      <li>What is KV-Cache and why does it dramatically speed up autoregressive text generation?</li>
+      <li>Describe a complete production architecture for a banking AI assistant that must comply with Indian data localisation requirements.</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch9 Deployment -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 10 · OCI AI SERVICES -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c10" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">10</div><div class="ch-tag">Platform</div></div>
+  <div class="ch-title">OCI AI Services — <em>The Complete Oracle AI Stack</em></div>
+  <div class="ch-sub">OCI GenAI · Data Science · Vector Search · OKE · Functions · API Gateway · Monitoring</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#FFF8F3">☁️</div>
+    <div class="topic-title">OCI AI & ML Services — Full Reference</div>
+  </div>
+  <div class="topic-body">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>OCI Service</th><th>What It Does</th><th>When to Use</th><th>Key Feature</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>OCI Generative AI Service</strong></td>
+          <td>Managed LLM API (Cohere, LLaMA). No GPU management needed.</td>
+          <td>Building chat, RAG, summarisation apps quickly</td>
+          <td>On-Demand + Dedicated AI Cluster options</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Data Science</strong></td>
+          <td>Managed ML platform: notebooks, jobs, experiments, model catalog</td>
+          <td>Custom model training, fine-tuning, experimentation</td>
+          <td>MLflow integration, GPU job scheduling</td>
+        </tr>
+        <tr>
+          <td><strong>OCI AI Vector Search</strong></td>
+          <td>Vector similarity search built into Oracle Database 23ai</td>
+          <td>RAG systems, semantic search, recommendation engines</td>
+          <td>HNSW + IVF indexes, SQL + vector in one query</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Object Storage</strong></td>
+          <td>Scalable blob storage for data, models, artifacts</td>
+          <td>Training data lake, model artifact storage, log archival</td>
+          <td>11 9's durability, lifecycle policies, versioning</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Functions</strong></td>
+          <td>Serverless compute (FaaS) — pay only when triggered</td>
+          <td>Event-driven AI pipelines, preprocessing, routing</td>
+          <td>Auto-scale to zero, integrates with all OCI services</td>
+        </tr>
+        <tr>
+          <td><strong>OCI API Gateway</strong></td>
+          <td>Managed API layer — rate limiting, auth, routing, CORS</td>
+          <td>Expose AI models securely to web/mobile apps</td>
+          <td>JWT/OAuth auth, per-client rate limits, logging</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Kubernetes Engine (OKE)</strong></td>
+          <td>Managed Kubernetes for containerised AI workloads</td>
+          <td>High-throughput LLM serving with vLLM, auto-scaling</td>
+          <td>GPU node pools, cluster auto-scaler, Helm charts</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Model Deployment</strong></td>
+          <td>Managed REST endpoint for OCI Data Science models</td>
+          <td>Deploy custom fine-tuned models as scalable APIs</td>
+          <td>Auto-scaling, A/B testing, blue-green deployment</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Monitoring</strong></td>
+          <td>Metrics, alarms, dashboards for all OCI services</td>
+          <td>Track latency, throughput, accuracy drift, GPU utilisation</td>
+          <td>Custom metrics API, PagerDuty/email alerts</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Logging</strong></td>
+          <td>Centralised log management and analysis</td>
+          <td>Audit trails, prompt/response logging, debugging</td>
+          <td>Structured logs, 30-day retention, search</td>
+        </tr>
+        <tr>
+          <td><strong>OCI Compute (GPU)</strong></td>
+          <td>Bare metal and VM instances with NVIDIA GPUs</td>
+          <td>Custom LLM training, inference servers, fine-tuning</td>
+          <td>A10 24GB, A100 80GB, H100 80GB shapes</td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <div class="diagram">
+  OCI AI SERVICE DECISION TREE:
+
+  Need to use LLMs?
+  │
+  ├── Don't want to manage infrastructure → OCI Generative AI Service (On-Demand)
+  │
+  ├── Need custom fine-tuned model?
+  │   ├── Fine-tune in OCI Data Science (GPU job)
+  │   ├── Register in OCI Model Catalog
+  │   └── Deploy via OCI Model Deployment OR OCI GenAI Dedicated AI Cluster
+  │
+  ├── Need semantic search on private documents?
+  │   └── OCI AI Vector Search (Oracle 23ai) + Cohere Embed
+  │
+  ├── Need high-throughput (1000s of concurrent users)?
+  │   └── OCI Kubernetes Engine (OKE) + vLLM container + GPU node pool
+  │
+  ├── Need offline/edge AI?
+  │   └── GGUF + llama.cpp on OCI ARM A1.Flex (or on-premise)
+  │
+  └── Need to connect everything with an API?
+      └── OCI API Gateway + OCI Functions (orchestration)</div>
+
+    <div class="oci">
+      <div class="oci-lbl">☁️ OCI Cost Reference for AI Workloads (2025)</div>
+      <h4>Approximate OCI Compute Costs for AI</h4>
+      <ul>
+        <li><strong>VM.GPU.A10.1</strong> (1× A10 24GB): ~₹110/hour → suitable for 7B INT4 inference</li>
+        <li><strong>VM.GPU.A10.2</strong> (2× A10 48GB): ~₹220/hour → 13B INT4 or 7B FP16</li>
+        <li><strong>BM.GPU.A100-v2.8</strong> (8× A100 80GB): ~₹2,800/hour → 70B models, distributed training</li>
+        <li><strong>VM.Standard.A1.Flex</strong> (ARM, CPU only): ~₹1.2/hour → SLM inference (llama.cpp)</li>
+        <li><strong>OCI GenAI (On-Demand)</strong>: Pay per million tokens — no infra cost, scales to zero</li>
+        <li><strong>Dedicated AI Cluster</strong>: Reserved GPU units for consistent capacity</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch10 OCI -->
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 11 · FUTURE TRENDS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="c11" class="ch">
+<div class="wrap">
+<div class="ch-inner">
+  <div class="ch-eyebrow"><div class="ch-num">11</div><div class="ch-tag">Horizon</div></div>
+  <div class="ch-title">Future Trends — <em>What's Coming Next in GenAI</em></div>
+  <div class="ch-sub">Agentic AI · Multimodal · Reasoning Models · Efficiency · Regulation</div>
+</div>
+
+<div class="topic">
+  <div class="topic-hd">
+    <div class="topic-icon" style="background:#ECFEFF">🔮</div>
+    <div class="topic-title">The Next Wave — 2025 and Beyond</div>
+  </div>
+  <div class="topic-body">
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-label">🤖 Agentic AI</div>
+        <h4>AI that acts autonomously</h4>
+        <p>AI agents that plan, use tools, execute multi-step workflows, and self-correct. Not just question answering — but doing. Finance: AI agent that researches, analyses, writes, and files a regulatory report autonomously.</p>
+        <p><strong>Now:</strong> OpenAI Operator, Claude Computer Use, LangGraph agents</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-label">🖼️ Multimodal LLMs</div>
+        <h4>Text + Image + Audio + Video</h4>
+        <p>Single model processes text, images, tables, charts, PDFs, audio, video. GPT-4V, Claude 3 vision, Gemini 1.5 Pro. Enterprise: analyse invoices, contracts, and X-rays without separate models.</p>
+      </div>
+      <div class="card c-orange">
+        <div class="card-label">🧮 Reasoning Models</div>
+        <h4>"Thinking" before answering</h4>
+        <p>o1, o3, DeepSeek-R1 — models that generate internal chain-of-thought before answering. 2× to 10× better on math, coding, scientific reasoning. Cost: 5–10× more tokens consumed per query.</p>
+      </div>
+      <div class="card c-purple">
+        <div class="card-label">⚡ Efficient Models</div>
+        <h4>Doing more with less</h4>
+        <p>Phi-3, Gemma-2, Qwen-2.5 proving SLMs approach LLM quality on specific tasks. MoE (Mixture of Experts): activate only 2 of 8 expert networks per token — Mixtral 8×7B inference cost = 12B, not 56B.</p>
+      </div>
+      <div class="card c-cyan">
+        <div class="card-label">📋 Regulation</div>
+        <h4>AI governance is arriving</h4>
+        <p>EU AI Act (2024): risk-based regulation. India DPDP Act. SEBI AI guidelines for BFSI. Enterprise AI teams need audit trails, explainability, and human oversight frameworks built in — not added later.</p>
+      </div>
+      <div class="card c-pink">
+        <div class="card-label">🔬 Test-Time Compute</div>
+        <h4>Spend more tokens = smarter answers</h4>
+        <p>Instead of bigger models, spend more compute at inference time. Generate multiple solution paths, vote on best, backtrack, self-verify. Same model, dramatically better accuracy on hard problems.</p>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <strong>For Enterprise AI Teams:</strong> The shift from "use an LLM API" to "orchestrate AI agents over enterprise data" is happening now. The winners will be teams that combine: (1) RAG for real-time knowledge, (2) fine-tuned domain models, (3) agentic workflows, (4) guardrails and governance — all on a secure, compliant infrastructure like OCI.
+    </div>
+
+    <div class="summary">
+      <h4>🎯 Programme Summary — What You've Mastered</h4>
+      <ul>
+        <li><strong>AI → ML → DL → Transformers:</strong> The foundational progression that leads to LLMs</li>
+        <li><strong>LLM Architecture:</strong> Next-token prediction at scale, Encoder/Decoder/Encoder-Decoder types</li>
+        <li><strong>Prompt Engineering:</strong> Zero-shot, few-shot, CoT, ReAct — the free-cost adaptation layer</li>
+        <li><strong>RAG:</strong> Grounding LLMs in real-time private data via embeddings + vector search</li>
+        <li><strong>Fine-Tuning (LoRA/QLoRA/GRPO):</strong> Efficient domain adaptation — 0.06% of parameters, 98% of quality</li>
+        <li><strong>Compression (Quantization/Pruning/Distillation):</strong> 8× smaller, 5× faster, ~3% accuracy loss</li>
+        <li><strong>Evaluation:</strong> RAGAS, hallucination measurement, guardrails, responsible AI</li>
+        <li><strong>OCI Deployment:</strong> Complete stack from training to production API with monitoring</li>
+      </ul>
+    </div>
+
+    <ol class="iq-list">
+      <li>What is an AI agent? How does it differ from a standard LLM chatbot?</li>
+      <li>What is Mixture of Experts (MoE) architecture and why does it improve efficiency?</li>
+      <li>How does the EU AI Act categorise AI risk levels? What does it mean for enterprise AI?</li>
+      <li>Explain test-time compute. How does spending more tokens at inference improve reasoning quality?</li>
+      <li>Design a complete 2025 enterprise AI strategy for an Indian bank: which models, which OCI services, which adaptation techniques, and which guardrails would you use?</li>
+    </ol>
+
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</div><!-- /ch11 Future -->
+
+<!-- FOOTER -->
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:32px 24px;margin-top:48px;text-align:center">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="font-size:13px;color:var(--text-3);line-height:1.9">
+      <strong style="color:var(--primary)">⚡ Enterprise GenAI Training</strong><br>
+      Complete guide covering AI Foundations → LLMs → Prompt Engineering → RAG → Fine-Tuning → Compression → OCI Deployment<br>
+      <span style="font-size:12px;color:var(--text-4)">For corporate classroom use. All OCI cost figures are indicative estimates for training purposes.</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

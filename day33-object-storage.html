@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 38 — OCI Object Storage | LTIMindtree OCI GenAI Programme</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');
+:root{
+  --bg:#05060c;--surface:#0b0d16;--card:#101320;--card2:#13162a;
+  --border:#181c2e;--border2:#1f2440;--green:#20e5a8;--orange:#ff9d45;
+  --yellow:#fcd34d;--red:#ff7070;--cyan:#38e4ff;--pink:#f97fc8;
+  --teal:#2fd9c8;--lime:#a8f060;--text:#e2eaff;--muted:#8090b8;
+  --faint:#3a4466;--code-bg:#07080f;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;font-size:15px;line-height:1.85;overflow-x:hidden;}
+
+/* HERO */
+.hero{min-height:360px;background:linear-gradient(135deg,#04050e 0%,#080a1a 35%,#060415 70%,#030710 100%);border-bottom:1px solid var(--border2);padding:64px 60px 56px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;top:-100px;right:-60px;width:750px;height:750px;background:radial-gradient(circle,rgba(255,157,69,.1),rgba(252,211,77,.05) 40%,transparent 65%);border-radius:50%;pointer-events:none;}
+.hero::after{content:"";position:absolute;bottom:-80px;left:100px;width:500px;height:500px;background:radial-gradient(circle,rgba(32,229,168,.07),rgba(56,228,255,.04) 40%,transparent 65%);border-radius:50%;pointer-events:none;}
+.hero-accent{position:absolute;top:40%;left:-40px;width:300px;height:300px;background:radial-gradient(circle,rgba(79,158,255,.06),transparent 65%);border-radius:50%;pointer-events:none;}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;}
+.bd{background:linear-gradient(135deg,rgba(255,157,69,.15),rgba(252,211,77,.08));color:#ff9d45;border:1px solid rgba(255,157,69,.3);box-shadow:0 0 8px rgba(255,157,69,.1);}
+.b1{background:linear-gradient(135deg,rgba(79,158,255,.15),rgba(56,228,255,.08));color:#4f9eff;border:1px solid rgba(79,158,255,.3);}
+.b2{background:linear-gradient(135deg,rgba(183,139,250,.15),rgba(249,127,200,.08));color:#b78bfa;border:1px solid rgba(183,139,250,.3);}
+.b3{background:linear-gradient(135deg,rgba(32,229,168,.15),rgba(56,228,255,.08));color:#20e5a8;border:1px solid rgba(32,229,168,.3);}
+.b4{background:linear-gradient(135deg,rgba(249,127,200,.15),rgba(183,139,250,.08));color:#f97fc8;border:1px solid rgba(249,127,200,.3);}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(30px,5vw,56px);font-weight:800;letter-spacing:-.03em;line-height:1.05;background:linear-gradient(135deg,#ffffff 0%,#ffd4a0 20%,#ff9d45 45%,#b78bfa 70%,#38e4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.hero-sub{color:#6d7fa8;font-size:15px;max-width:620px;line-height:1.75;}
+
+/* NAV */
+.nav-wrap{background:rgba(5,6,12,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 60px;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{padding:13px 15px;font-size:11px;font-weight:600;color:var(--faint);white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:.2s;letter-spacing:.04em;text-transform:uppercase;}
+.nav a:hover{color:var(--text);border-bottom-color:var(--border2);}
+.nav a.active{color:#ff9d45;border-bottom-color:#ff9d45;background:linear-gradient(180deg,transparent,rgba(255,157,69,.04));}
+
+/* MAIN */
+main{max-width:1040px;margin:0 auto;padding:60px 44px;}
+
+/* SESSION HEADERS */
+.sh{display:flex;align-items:center;gap:18px;margin-bottom:38px;padding:20px 26px;border-radius:14px;border-left:4px solid;position:relative;overflow:hidden;}
+.sh::after{content:'';position:absolute;right:0;top:0;bottom:0;width:200px;border-radius:0 14px 14px 0;opacity:.04;}
+.sh.s1{background:linear-gradient(135deg,rgba(255,157,69,.07),rgba(252,211,77,.03));border-color:#ff9d45;}.sh.s1::after{background:linear-gradient(90deg,transparent,#ff9d45);}
+.sh.s2{background:linear-gradient(135deg,rgba(79,158,255,.07),rgba(183,139,250,.03));border-color:#4f9eff;}.sh.s2::after{background:linear-gradient(90deg,transparent,#4f9eff);}
+.sh.s3{background:linear-gradient(135deg,rgba(32,229,168,.07),rgba(56,228,255,.03));border-color:#20e5a8;}.sh.s3::after{background:linear-gradient(90deg,transparent,#20e5a8);}
+.sh.s4{background:linear-gradient(135deg,rgba(183,139,250,.07),rgba(249,127,200,.03));border-color:#b78bfa;}.sh.s4::after{background:linear-gradient(90deg,transparent,#b78bfa);}
+.sh-icon{font-size:30px;position:relative;z-index:1;}
+.sh-title{font-size:18px;font-weight:700;color:#fff;position:relative;z-index:1;}
+.sh-sub{font-size:12px;color:var(--muted);margin-top:3px;position:relative;z-index:1;}
+
+/* SECTIONS */
+.section{margin-bottom:72px;}
+.ey{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;background:linear-gradient(90deg,#ff9d45,#b78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+h2{font-family:"Syne",sans-serif;font-size:27px;font-weight:800;color:#fff;margin-bottom:16px;letter-spacing:-.025em;}
+h3{font-size:13.5px;font-weight:700;margin:30px 0 10px;letter-spacing:.04em;text-transform:uppercase;background:linear-gradient(90deg,#ff9d45,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+h4{font-size:13.5px;font-weight:600;color:#b78bfa;margin:20px 0 8px;}
+p{color:var(--muted);margin-bottom:12px;line-height:1.85;}
+ul,ol{color:var(--muted);padding-left:22px;margin-bottom:12px;}
+li{margin-bottom:6px;line-height:1.8;}
+li strong{color:var(--text);}
+hr.div{border:none;border-top:1px solid var(--border);margin:32px 0;}
+
+/* STORY BOX */
+.story{background:linear-gradient(135deg,rgba(255,157,69,.04),rgba(183,139,250,.04));border:1px solid rgba(255,157,69,.15);border-radius:14px;padding:24px 28px;margin:20px 0;position:relative;}
+.story::before{content:"📖 BUSINESS STORY";font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#ff9d45;display:block;margin-bottom:14px;}
+.story p{color:var(--text);font-size:14px;margin-bottom:10px;}
+.story p:last-child{margin:0;}
+
+/* CALLOUTS */
+.callout{border-radius:9px;padding:14px 18px;margin:14px 0;display:flex;gap:12px;align-items:flex-start;font-size:13.5px;}
+.ci{font-size:18px;flex-shrink:0;margin-top:1px;}
+.callout p{margin:0;color:var(--text);line-height:1.7;}
+.callout.info{background:rgba(79,158,255,.07);border-left:3px solid #4f9eff;}
+.callout.good{background:rgba(32,229,168,.07);border-left:3px solid #20e5a8;}
+.callout.warn{background:rgba(255,157,69,.07);border-left:3px solid #ff9d45;}
+.callout.danger{background:rgba(255,112,112,.07);border-left:3px solid #ff7070;}
+.callout.purple{background:rgba(183,139,250,.07);border-left:3px solid #b78bfa;}
+.callout.pink{background:rgba(249,127,200,.07);border-left:3px solid #f97fc8;}
+.callout.orange{background:rgba(255,157,69,.07);border-left:3px solid #ff9d45;}
+
+/* ANALOGY */
+.analogy{background:linear-gradient(135deg,rgba(255,157,69,.06),rgba(183,139,250,.04));border:1px solid rgba(255,157,69,.16);border-radius:12px;padding:20px 24px;margin:18px 0;position:relative;}
+.analogy::before{content:"💡";position:absolute;top:-13px;left:18px;background:var(--bg);padding:0 7px;font-size:18px;}
+.at{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff9d45;margin-bottom:10px;}
+.analogy p{color:var(--text);font-size:13.5px;margin-bottom:8px;}
+.analogy p:last-child{margin:0;}
+
+/* CODE BLOCKS */
+.cw{background:var(--code-bg);border:1px solid var(--border);border-radius:11px;overflow:hidden;margin:18px 0;}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border);}
+.cl{font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;}
+.dots{display:flex;gap:5px;}
+.dots span{width:9px;height:9px;border-radius:50%;display:block;}
+.dots span:nth-child(1){background:#ff5f57;}.dots span:nth-child(2){background:#febc2e;}.dots span:nth-child(3){background:#28c840;}
+pre{padding:20px 24px;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:2;color:#b0bec5;}
+.kw{color:#f07178;}.fn{color:#82aaff;}.str{color:#c3e88d;}.cm{color:#3f4a66;font-style:italic;}.cls{color:#89ddff;}.num{color:#f78c6c;}.dec{color:#ffcb6b;}
+
+/* OUTPUT BLOCK */
+.output{background:#060810;border:1px solid rgba(32,229,168,.18);border-radius:10px;overflow:hidden;margin:16px 0;}
+.out-h{background:rgba(32,229,168,.06);padding:8px 16px;border-bottom:1px solid rgba(32,229,168,.12);display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#20e5a8;}
+.out-body{padding:16px 22px;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:2;color:#7c8db0;}
+.out-body .ok{color:#20e5a8;}.out-body .hi{color:#4f9eff;}.out-body .warn{color:#ff9d45;}.out-body .ans{color:#b78bfa;}
+
+/* TABLES */
+.tw{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:linear-gradient(135deg,rgba(255,157,69,.06),rgba(252,211,77,.03));color:#ffa560;font-weight:700;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:11px 16px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;line-height:1.7;}
+td:first-child{color:var(--text);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0;}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;transition:.2s;}
+.gc:hover{transform:translateY(-2px);}
+.gc.ca{border-top:3px solid #4f9eff;background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));}
+.gc.cb{border-top:3px solid #b78bfa;background:linear-gradient(135deg,rgba(183,139,250,.06),var(--card));}
+.gc.cc{border-top:3px solid #20e5a8;background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));}
+.gc.cd{border-top:3px solid #ff9d45;background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));}
+.gc.ce{border-top:3px solid #f97fc8;background:linear-gradient(135deg,rgba(249,127,200,.06),var(--card));}
+.gc.cf{border-top:3px solid #38e4ff;background:linear-gradient(135deg,rgba(56,228,255,.06),var(--card));}
+.gct{font-size:13px;font-weight:700;margin-bottom:8px;}
+.gc.ca .gct{color:#4f9eff;}.gc.cb .gct{color:#b78bfa;}.gc.cc .gct{color:#20e5a8;}.gc.cd .gct{color:#ff9d45;}.gc.ce .gct{color:#f97fc8;}.gc.cf .gct{color:#38e4ff;}
+.gc p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.7;}
+
+/* PIPELINE */
+.pipeline{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin:18px 0;}
+.pipe-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.pipe-row{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;}
+.pipe-step{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;text-align:center;flex:1;min-width:110px;}
+.pipe-step.blue{border-color:rgba(79,158,255,.35);background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(56,228,255,.04));}
+.pipe-step.purple{border-color:rgba(183,139,250,.35);background:linear-gradient(135deg,rgba(183,139,250,.08),rgba(249,127,200,.04));}
+.pipe-step.green{border-color:rgba(32,229,168,.35);background:linear-gradient(135deg,rgba(32,229,168,.08),rgba(56,228,255,.04));}
+.pipe-step.orange{border-color:rgba(255,157,69,.35);background:linear-gradient(135deg,rgba(255,157,69,.08),rgba(252,211,77,.04));}
+.pipe-step.pink{border-color:rgba(249,127,200,.35);background:linear-gradient(135deg,rgba(249,127,200,.08),rgba(183,139,250,.04));}
+.pipe-icon{font-size:22px;margin-bottom:6px;}
+.pipe-label{font-size:11.5px;font-weight:600;color:var(--text);line-height:1.3;}
+.pipe-sub{font-size:10px;color:var(--faint);margin-top:4px;}
+.pipe-arrow{display:flex;align-items:center;padding:0 8px;color:var(--faint);font-size:18px;flex-shrink:0;}
+
+/* STEP CARDS */
+.steps{margin:16px 0;}
+.step{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;}
+.step-num{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,rgba(255,157,69,.15),rgba(252,211,77,.1));border:1px solid rgba(255,157,69,.3);font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;color:#ff9d45;box-shadow:0 0 12px rgba(255,157,69,.15);}
+.step-body{flex:1;}
+.step-title{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:4px;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* LAB BLOCK */
+.lab{background:linear-gradient(135deg,rgba(32,229,168,.05),rgba(79,158,255,.04),rgba(183,139,250,.02));border:1px solid rgba(32,229,168,.18);border-radius:16px;padding:26px 30px;margin:20px 0;position:relative;overflow:hidden;}
+.lab::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ff9d45,#4f9eff,#b78bfa);}
+.lab-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lab-num{background:linear-gradient(135deg,rgba(255,157,69,.18),rgba(252,211,77,.1));border:1px solid rgba(255,157,69,.3);font-size:11px;font-weight:800;padding:4px 13px;border-radius:20px;letter-spacing:.07em;color:#ff9d45;box-shadow:0 0 10px rgba(255,157,69,.12);}
+.lab-title{font-size:15px;font-weight:700;color:#fff;}
+.lab-why{background:linear-gradient(135deg,rgba(255,157,69,.06),rgba(79,158,255,.03));border-left:3px solid #ff9d45;border-radius:0 8px 8px 0;padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--muted);}
+
+/* INTERVIEW BLOCK */
+.iq{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:10px 0;transition:.2s;}
+.iq:hover{background:var(--card2);}
+.iq-q{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:8px;display:flex;gap:10px;}
+.iq-q::before{content:"Q";background:linear-gradient(135deg,rgba(255,157,69,.2),rgba(252,211,77,.15));color:#ff9d45;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;flex-shrink:0;margin-top:1px;border:1px solid rgba(255,157,69,.25);}
+.iq-a{font-size:13px;color:var(--muted);padding-left:28px;line-height:1.75;}
+
+/* EXERCISE */
+.exercise{background:linear-gradient(135deg,rgba(255,157,69,.03),rgba(183,139,250,.03));border:1px solid rgba(255,157,69,.15);border-radius:12px;padding:20px 24px;margin:16px 0;}
+.ex-head{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff9d45;margin-bottom:12px;}
+.ex-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;font-size:13px;color:var(--muted);}
+.ex-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;letter-spacing:.05em;}
+.easy{background:rgba(32,229,168,.12);color:#20e5a8;}.medium{background:rgba(255,157,69,.12);color:#ff9d45;}.hard{background:rgba(255,112,112,.12);color:#ff7070;}
+
+/* CHEATSHEET */
+.cheat{background:linear-gradient(135deg,rgba(255,157,69,.05),rgba(79,158,255,.03));border:1px solid rgba(255,157,69,.2);border-radius:14px;padding:22px 26px;margin:18px 0;}
+.cheat-title{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;background:linear-gradient(90deg,#ff9d45,#b78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cheat-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-size:13px;}
+.cheat-key{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#ff9d45;background:rgba(255,157,69,.07);padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.cheat-val{color:var(--muted);line-height:1.6;}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+@media(max-width:600px){.stat-row{grid-template-columns:1fr;}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;text-align:center;}
+.stat-num{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;}
+.stat-label{font-size:11px;color:var(--faint);letter-spacing:.05em;}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr;}}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;}
+.sum-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.sum-card.s1{background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));border-top:2px solid #ff9d45;}.sum-card.s1 .sum-title{background:linear-gradient(90deg,#ff9d45,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s2{background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));border-top:2px solid #4f9eff;}.sum-card.s2 .sum-title{background:linear-gradient(90deg,#4f9eff,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s3{background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));border-top:2px solid #20e5a8;}.sum-card.s3 .sum-title{background:linear-gradient(90deg,#20e5a8,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card.s4{background:linear-gradient(135deg,rgba(183,139,250,.06),var(--card));border-top:2px solid #b78bfa;}.sum-card.s4 .sum-title{background:linear-gradient(90deg,#b78bfa,#f97fc8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sum-card ul{padding-left:16px;margin:0;}
+.sum-card li{font-size:12.5px;color:var(--muted);margin-bottom:5px;}
+
+/* STORAGE HIERARCHY */
+.hier{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin:18px 0;}
+.hier-row{display:flex;align-items:center;gap:0;margin-bottom:6px;}
+.hier-indent{width:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12px;}
+.hier-box{flex:1;border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:10px;border:1px solid;}
+.hier-icon{font-size:18px;}
+.hier-label{font-size:13px;font-weight:600;}
+.hier-detail{font-size:11px;margin-left:auto;font-family:"JetBrains Mono",monospace;}
+.hb-namespace{background:linear-gradient(135deg,rgba(255,157,69,.08),rgba(252,211,77,.04));border-color:rgba(255,157,69,.3);}.hb-namespace .hier-label{color:#ff9d45;}.hb-namespace .hier-detail{color:rgba(255,157,69,.6);}
+.hb-bucket{background:linear-gradient(135deg,rgba(79,158,255,.08),rgba(56,228,255,.04));border-color:rgba(79,158,255,.3);}.hb-bucket .hier-label{color:#4f9eff;}.hb-bucket .hier-detail{color:rgba(79,158,255,.6);}
+.hb-object{background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));border-color:rgba(32,229,168,.2);}.hb-object .hier-label{color:#20e5a8;}.hb-object .hier-detail{color:rgba(32,229,168,.6);}
+
+/* URL BAR */
+.urlbar{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:14px 20px;margin:14px 0;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:2.2;overflow-x:auto;}
+.url-seg{padding:2px 8px;border-radius:5px;font-weight:600;}
+.us-host{background:rgba(79,158,255,.1);color:#4f9eff;}
+.us-ns{background:rgba(255,157,69,.1);color:#ff9d45;}
+.us-bucket{background:rgba(32,229,168,.1);color:#20e5a8;}
+.us-object{background:rgba(183,139,250,.1);color:#b78bfa;}
+
+/* TIER COMPARISON */
+.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+@media(max-width:600px){.tier-grid{grid-template-columns:1fr;}}
+.tier-card{border-radius:14px;overflow:hidden;}
+.tier-card.std{border:1px solid rgba(32,229,168,.25);}
+.tier-card.arc{border:1px solid rgba(79,158,255,.25);}
+.tier-head{padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.tier-card.std .tier-head{background:linear-gradient(135deg,rgba(32,229,168,.1),rgba(56,228,255,.05));}
+.tier-card.arc .tier-head{background:linear-gradient(135deg,rgba(79,158,255,.1),rgba(183,139,250,.05));}
+.tier-head-icon{font-size:24px;}
+.tier-head-title{font-size:14px;font-weight:800;}
+.tier-card.std .tier-head-title{color:#20e5a8;}
+.tier-card.arc .tier-head-title{color:#4f9eff;}
+.tier-body{background:var(--card);padding:18px 20px;}
+.tier-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+.tier-row:last-child{margin:0;}
+.tier-key{color:var(--faint);width:90px;flex-shrink:0;font-size:11.5px;}
+.tier-val{color:var(--text);font-weight:500;}
+
+/* ACCESS METHODS */
+.access-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+@media(max-width:700px){.access-grid{grid-template-columns:1fr 1fr;}}
+.access-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:.2s;}
+.access-card:hover{transform:translateY(-3px);}
+.access-icon{font-size:28px;margin-bottom:8px;}
+.access-name{font-size:12px;font-weight:700;margin-bottom:6px;}
+.access-when{font-size:10.5px;color:var(--faint);line-height:1.5;}
+.ac1{border-top:3px solid #ff9d45;background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));}.ac1 .access-name{color:#ff9d45;}
+.ac2{border-top:3px solid #4f9eff;background:linear-gradient(135deg,rgba(79,158,255,.06),var(--card));}.ac2 .access-name{color:#4f9eff;}
+.ac3{border-top:3px solid #20e5a8;background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));}.ac3 .access-name{color:#20e5a8;}
+.ac4{border-top:3px solid #b78bfa;background:linear-gradient(135deg,rgba(183,139,250,.06),var(--card));}.ac4 .access-name{color:#b78bfa;}
+
+/* AI PATTERNS */
+.pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0;}
+@media(max-width:700px){.pattern-grid{grid-template-columns:1fr;}}
+.pattern-card{border-radius:14px;overflow:hidden;}
+.pattern-head{padding:14px 18px;display:flex;align-items:center;gap:10px;}
+.pattern-num{font-size:22px;font-weight:800;font-family:"Syne",sans-serif;opacity:.3;}
+.pattern-title{font-size:13px;font-weight:700;}
+.pc1{border:1px solid rgba(255,157,69,.25);}.pc1 .pattern-head{background:linear-gradient(135deg,rgba(255,157,69,.1),rgba(252,211,77,.05));}.pc1 .pattern-title{color:#ff9d45;}
+.pc2{border:1px solid rgba(79,158,255,.25);}.pc2 .pattern-head{background:linear-gradient(135deg,rgba(79,158,255,.1),rgba(56,228,255,.05));}.pc2 .pattern-title{color:#4f9eff;}
+.pc3{border:1px solid rgba(183,139,250,.25);}.pc3 .pattern-head{background:linear-gradient(135deg,rgba(183,139,250,.1),rgba(249,127,200,.05));}.pc3 .pattern-title{color:#b78bfa;}
+.pattern-body{background:var(--card);padding:16px 18px;font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* JOURNEY (Before vs After) */
+.journey{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0;}
+@media(max-width:700px){.journey{grid-template-columns:1fr;}}
+.journey-panel{border-radius:14px;overflow:hidden;}
+.journey-panel.before{border:1px solid rgba(255,112,112,.25);}
+.journey-panel.after{border:1px solid rgba(32,229,168,.25);}
+.journey-head{padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.journey-panel.before .journey-head{background:linear-gradient(135deg,rgba(255,112,112,.12),rgba(255,157,69,.06));}
+.journey-panel.after .journey-head{background:linear-gradient(135deg,rgba(32,229,168,.12),rgba(79,158,255,.06));}
+.journey-head-icon{font-size:20px;}
+.journey-head-title{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.journey-panel.before .journey-head-title{color:#ff7070;}
+.journey-panel.after .journey-head-title{color:#20e5a8;}
+.journey-head-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
+.journey-panel.before .journey-head-badge{background:rgba(255,112,112,.12);color:#ff7070;border:1px solid rgba(255,112,112,.25);}
+.journey-panel.after .journey-head-badge{background:rgba(32,229,168,.12);color:#20e5a8;border:1px solid rgba(32,229,168,.25);}
+.journey-body{background:var(--card);padding:20px;}
+.jstep{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:4px;}
+.jstep-box{width:100%;border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;text-align:left;}
+.journey-panel.before .jstep-box{background:rgba(255,112,112,.06);border:1px solid rgba(255,112,112,.15);}
+.journey-panel.after .jstep-box{background:rgba(32,229,168,.06);border:1px solid rgba(32,229,168,.15);}
+.jstep-icon{font-size:18px;flex-shrink:0;}
+.jstep-text{flex:1;}
+.jstep-label{font-size:12.5px;font-weight:600;line-height:1.3;}
+.journey-panel.before .jstep-label{color:#e8a0a0;}
+.journey-panel.after .jstep-label{color:#a0e8d0;}
+.jstep-sub{font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.4;}
+.jstep-time{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.journey-panel.before .jstep-time{background:rgba(255,112,112,.12);color:#ff7070;}
+.journey-panel.after .jstep-time{background:rgba(32,229,168,.12);color:#20e5a8;}
+.jarrow{font-size:16px;padding:3px 0;line-height:1;}
+.journey-panel.before .jarrow{color:rgba(255,112,112,.4);}
+.journey-panel.after .jarrow{color:rgba(32,229,168,.4);}
+.jresult{border-radius:9px;padding:12px 14px;margin-top:12px;font-size:12px;font-weight:600;text-align:center;line-height:1.5;}
+.journey-panel.before .jresult{background:rgba(255,112,112,.07);border:1px solid rgba(255,112,112,.18);color:#ff8080;}
+.journey-panel.after .jresult{background:rgba(32,229,168,.07);border:1px solid rgba(32,229,168,.18);color:#20e5a8;}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:32px 60px;text-align:center;color:var(--faint);font-size:12px;margin-top:20px;background:linear-gradient(135deg,rgba(255,157,69,.02),rgba(183,139,250,.02));}
+.footer strong{background:linear-gradient(90deg,#ff9d45,#b78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-accent"></div>
+  <div class="badges">
+    <span class="badge bd">Day 38</span>
+    <span class="badge b1">OCI Object Storage</span>
+    <span class="badge b2">SDK</span>
+    <span class="badge b3">RAG Integration</span>
+    <span class="badge b4">OCI Events</span>
+  </div>
+  <h1>OCI Object Storage<br>for AI Applications</h1>
+  <p class="hero-sub">Store policy PDFs in the cloud. RAG reads them automatically. Reports saved forever. HR uploads a new policy — agent updates instantly. No code change needed.</p>
+</div>
+
+<!-- STICKY NAV -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#story">Business Story</a>
+    <a href="#why-local-fails">Why Not Local</a>
+    <a href="#what-is-storage">What is Object Storage</a>
+    <a href="#vs-storage">vs Block vs File</a>
+    <a href="#hierarchy">Namespace → Bucket → Object</a>
+    <a href="#no-folders">No Real Folders</a>
+    <a href="#metadata">Metadata</a>
+    <a href="#lifecycle">Lifecycle</a>
+    <a href="#tiers">Storage Tiers</a>
+    <a href="#access">Access Methods</a>
+    <a href="#sdk-vs-rest">SDK vs REST</a>
+    <a href="#iam">IAM & Security</a>
+    <a href="#par">PAR & Signed URLs</a>
+    <a href="#ai-patterns">AI Patterns</a>
+    <a href="#events">OCI Events</a>
+    <a href="#lab1">Lab 1</a>
+    <a href="#lab2">Lab 2</a>
+    <a href="#lab3">Lab 3</a>
+    <a href="#lab4">Lab 4</a>
+    <a href="#interview">Interview Q&A</a>
+    <a href="#summary">Summary</a>
+  </nav>
+</div>
+
+<main>
+
+<!-- BUSINESS STORY -->
+<section class="section" id="story">
+  <div class="sh s1">
+    <span class="sh-icon">📖</span>
+    <div>
+      <div class="sh-title">The Business Problem</div>
+      <div class="sh-sub">Arjun's RAG works — but policy text is hardcoded in Python</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p><strong>Day 37 recap:</strong> We built a RAG-powered policy bot for LTIMindtree. Arjun's colleagues can now ask policy questions and get instant answers. The CTO was impressed. "Deploy it," he said.</p>
+    <p>But then the HR team asked: <em>"Can we update the leave policy next month?"</em> The answer revealed a critical flaw.</p>
+    <p><strong>The hardcoded problem:</strong> In Day 37, the entire policy text was written inside the Python file as a string: <code>policy_text = """SECTION 1: ANNUAL LEAVE..."""</code>. This means every time HR updates a policy, a developer must open the Python file, paste new text, and redeploy the system. That defeats the entire purpose.</p>
+    <p><strong>The real requirement:</strong> HR team uploads a new PDF to a shared folder. The RAG system reads it automatically. No developer involved. No code change. No redeployment. Available in 5 minutes. Old version kept for audit.</p>
+    <p>That requirement is solved by <strong>OCI Object Storage</strong> — Oracle's cloud storage service that lets any application, from anywhere, read and write files programmatically.</p>
+  </div>
+
+  <!-- JOURNEY BEFORE vs AFTER -->
+  <h3>The Storage Journey — Before vs After</h3>
+  <div class="journey">
+    <div class="journey-panel before">
+      <div class="journey-head">
+        <span class="journey-head-icon">😓</span>
+        <span class="journey-head-title">Before Object Storage</span>
+        <span class="journey-head-badge">Day 37 Limitation</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">👩‍💼</span>
+            <div class="jstep-text">
+              <div class="jstep-label">HR team updates leave policy</div>
+              <div class="jstep-sub">New rules approved by management</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">📧</span>
+            <div class="jstep-text">
+              <div class="jstep-label">HR emails developer Arjun</div>
+              <div class="jstep-sub">"Please update the policy in the system"</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">💻</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Developer edits Python file</div>
+              <div class="jstep-sub">Pastes new policy text into code string</div>
+            </div>
+            <span class="jstep-time">2–3 hours</span>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">🚀</span>
+            <div class="jstep-text">
+              <div class="jstep-label">Redeploy the application</div>
+              <div class="jstep-sub">Downtime. Testing. Approval cycle.</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult">
+          ❌ Developer bottleneck every policy update<br>
+          1500 pages can't fit in a Python string
+        </div>
+      </div>
+    </div>
+
+    <div class="journey-panel after">
+      <div class="journey-head">
+        <span class="journey-head-icon">🚀</span>
+        <span class="journey-head-title">After Object Storage</span>
+        <span class="journey-head-badge">Day 38 Solution</span>
+      </div>
+      <div class="journey-body">
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">👩‍💼</span>
+            <div class="jstep-text">
+              <div class="jstep-label">HR team updates leave policy</div>
+              <div class="jstep-sub">New rules approved by management</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">⬆️</span>
+            <div class="jstep-text">
+              <div class="jstep-label">HR uploads PDF to OCI bucket</div>
+              <div class="jstep-sub">Via OCI Console — no developer needed</div>
+            </div>
+            <span class="jstep-time">2 minutes</span>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">⚡</span>
+            <div class="jstep-text">
+              <div class="jstep-label">OCI Event fires automatically</div>
+              <div class="jstep-sub">Triggers ingestion pipeline</div>
+            </div>
+          </div>
+          <span class="jarrow">↓</span>
+        </div>
+        <div class="jstep">
+          <div class="jstep-box">
+            <span class="jstep-icon">✅</span>
+            <div class="jstep-text">
+              <div class="jstep-label">RAG updated. Employees get new answers.</div>
+              <div class="jstep-sub">Old version preserved for audit trail</div>
+            </div>
+          </div>
+        </div>
+        <div class="jresult">
+          ✅ No developer needed · Old versions kept<br>
+          Available in 5 minutes · Full audit trail
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat" style="background:linear-gradient(135deg,rgba(255,112,112,.06),var(--card));border-color:rgba(255,112,112,.2);border-top:2px solid #ff7070;"><div class="stat-num" style="background:linear-gradient(135deg,#ff7070,#ff9d45);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">1,500+</div><div class="stat-label">Pages of policy documents</div></div>
+    <div class="stat" style="background:linear-gradient(135deg,rgba(255,157,69,.06),var(--card));border-color:rgba(255,157,69,.2);border-top:2px solid #ff9d45;"><div class="stat-num" style="background:linear-gradient(135deg,#ff9d45,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">11 9s</div><div class="stat-label">Object Storage durability</div></div>
+    <div class="stat" style="background:linear-gradient(135deg,rgba(32,229,168,.06),var(--card));border-color:rgba(32,229,168,.2);border-top:2px solid #20e5a8;"><div class="stat-num" style="background:linear-gradient(135deg,#20e5a8,#38e4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div><div class="stat-label">Developers needed for content update</div></div>
+  </div>
+</section>
+
+<!-- WHY NOT LOCAL -->
+<section class="section" id="why-local-fails">
+  <div class="ey">Root Cause</div>
+  <h2>Why Not Store PDFs Locally?</h2>
+  <p>Students always ask this. The answer has five clear reasons.</p>
+  <div class="g2">
+    <div class="gc" style="border-top:3px solid #ff7070;background:linear-gradient(135deg,rgba(255,112,112,.05),var(--card));">
+      <div class="gct" style="color:#ff7070;">❌ Problem 1 — Single Machine</div>
+      <p>RAG pipeline runs on an OCI server. Arjun's laptop is in Hyderabad. The OCI server in the cloud cannot access a file on Arjun's personal laptop. Files trapped on one machine.</p>
+    </div>
+    <div class="gc" style="border-top:3px solid #ff7070;background:linear-gradient(135deg,rgba(255,112,112,.05),var(--card));">
+      <div class="gct" style="color:#ff7070;">❌ Problem 2 — Limited Disk Space</div>
+      <p>Arjun's laptop has 512GB. LTIMindtree has 10 years of policy history — hundreds of GBs of documents, email archives, and audit logs. Laptop fills up. Then what?</p>
+    </div>
+    <div class="gc" style="border-top:3px solid #ff9d45;background:linear-gradient(135deg,rgba(255,157,69,.05),var(--card));">
+      <div class="gct" style="color:#ff9d45;">❌ Problem 3 — Single Point of Failure</div>
+      <p>Arjun's laptop hard drive fails. All policy documents gone. RAG system stops working. No backup. Employees cannot get policy answers. Compliance risk.</p>
+    </div>
+    <div class="gc" style="border-top:3px solid #ff9d45;background:linear-gradient(135deg,rgba(255,157,69,.05),var(--card));">
+      <div class="gct" style="color:#ff9d45;">❌ Problem 4 — No Collaboration</div>
+      <p>HR team in Delhi needs to upload a policy. They cannot access Arjun's laptop in Hyderabad. Every update requires Arjun's involvement. Developer bottleneck for every content change.</p>
+    </div>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Aspect</th><th>Local Storage</th><th>OCI Object Storage</th></tr></thead>
+      <tbody>
+        <tr><td>Accessibility</td><td>Only one machine</td><td>Globally accessible via API</td></tr>
+        <tr><td>Capacity</td><td>Limited disk space</td><td>Virtually unlimited</td></tr>
+        <tr><td>Durability</td><td>Hard drive failure = data loss</td><td>99.999999999% (11 nines)</td></tr>
+        <tr><td>Backup</td><td>Manual backup needed</td><td>Managed automatically by OCI</td></tr>
+        <tr><td>Collaboration</td><td>One person at a time</td><td>Shared access via IAM policies</td></tr>
+        <tr><td>Versioning</td><td>No built-in versioning</td><td>Full version history built in</td></tr>
+        <tr><td>Audit trail</td><td>No access logging</td><td>Complete audit log in OCI Logging</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- WHAT IS OBJECT STORAGE -->
+<section class="section" id="what-is-storage">
+  <div class="ey">Definition</div>
+  <h2>What is OCI Object Storage?</h2>
+
+  <div class="g2">
+    <div class="gc cd">
+      <div class="gct">For Common Man</div>
+      <p>Think of Google Drive or Dropbox — you upload files, they live in the cloud, you can access them from anywhere. OCI Object Storage is Oracle's enterprise version, but designed for applications reading and writing files programmatically, not humans browsing folders.</p>
+    </div>
+    <div class="gc ca">
+      <div class="gct">For Business Person</div>
+      <p>Unlimited cloud file storage. Store any file — PDF, image, video, JSON, CSV, log. Access from anywhere in the world. Pay only for what you use. 11 nines durability means files virtually never get corrupted or lost. HR uploads a policy; RAG reads it instantly.</p>
+    </div>
+    <div class="gc cb">
+      <div class="gct">For Technical Person</div>
+      <p>A flat key-value store for binary data. Key = object name (acts like a file path). Value = actual file content in bytes. No real filesystem hierarchy. Accessed via REST API, OCI SDK, CLI, or Console. Scales to exabytes with no performance degradation.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">Formal Definition</div>
+      <p>OCI Object Storage is a regional, highly available, highly durable cloud storage service that stores unstructured data as discrete units called objects within containers called buckets, accessible via standard REST APIs and managed through OCI Identity and Access Management.</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="at">Analogy — Post Office vs Filing Cabinet</div>
+    <p><strong>Filing Cabinet (local storage):</strong> Physical folders in a physical drawer. You must be in the office to access it. Limited space. Gets full. One person accesses at a time. Only you can use it.</p>
+    <p><strong>Post Office (Object Storage):</strong> You send a package with an address label. The post office stores it indefinitely. Anyone with the correct address (and permission) can pick it up from any branch in the world. Unlimited packages. Multiple people access simultaneously.</p>
+    <p>Object name = address label. Object content = the package. Bucket = the post office branch. Namespace = your company's account with the postal system.</p>
+  </div>
+</section>
+
+<!-- VS BLOCK VS FILE -->
+<section class="section" id="vs-storage">
+  <div class="ey">Interview Critical</div>
+  <h2>Object Storage vs Block Storage vs File Storage</h2>
+  <p>The most common OCI interview question. Know exactly when to use each.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Service</th><th>What It Stores</th><th>How Accessed</th><th>Best For</th><th>LTIMindtree Use</th></tr></thead>
+      <tbody>
+        <tr><td>Object Storage</td><td>Files (PDF, images, JSON, video)</td><td>REST API / SDK / CLI</td><td>AI docs, backups, logs, reports</td><td>✅ Policy PDFs, agent reports</td></tr>
+        <tr><td>Block Storage</td><td>Virtual hard disks</td><td>Mounted as disk (like a hard drive)</td><td>Compute instance OS disk, databases</td><td>VM hard drive</td></tr>
+        <tr><td>File Storage</td><td>Shared folders (NFS)</td><td>NFS mount across multiple servers</td><td>Multiple servers sharing same files</td><td>Dev team shared project folder</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="g3">
+    <div class="gc cd">
+      <div class="gct">Policy PDF → Object Storage</div>
+      <p>HR uploads PDF. RAG reads via SDK. Any server, anywhere, can access it. API-based. No mounting needed. This is OCI Object Storage.</p>
+    </div>
+    <div class="gc ca">
+      <div class="gct">VM OS Disk → Block Storage</div>
+      <p>OCI Compute instance needs a hard drive for its operating system. Block Storage is mounted as disk. Only that one VM uses it. Like a laptop's internal hard drive.</p>
+    </div>
+    <div class="gc cb">
+      <div class="gct">Dev Team Folder → File Storage</div>
+      <p>10 developer VMs need to share the same code repository folder. File Storage provides NFS shared filesystem. All 10 VMs mount the same folder. Like an office shared drive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NAMESPACE BUCKET OBJECT -->
+<section class="section" id="hierarchy">
+  <div class="ey">Core Concepts</div>
+  <h2>Namespace → Bucket → Object</h2>
+  <p>Three levels of organisation in OCI Object Storage. Understand each before writing any code.</p>
+
+  <div class="hier">
+    <div class="hier-row">
+      <div class="hier-box hb-namespace">
+        <span class="hier-icon">🌐</span>
+        <div style="flex:1;">
+          <div class="hier-label">Namespace — ocigenai58</div>
+          <div style="font-size:11px;color:var(--faint);margin-top:2px;">Your unique OCI tenancy identifier. All buckets live under this. One per OCI account. Globally unique.</div>
+        </div>
+        <div class="hier-detail">oci os ns get</div>
+      </div>
+    </div>
+    <div class="hier-row" style="padding-left:24px;">
+      <div class="hier-indent">└─</div>
+      <div class="hier-box hb-bucket" style="flex:1;">
+        <span class="hier-icon">🪣</span>
+        <div style="flex:1;">
+          <div class="hier-label">Bucket — ltimindtree-policies</div>
+          <div style="font-size:11px;color:var(--faint);margin-top:2px;">Container for related objects. Name unique within your namespace. Region-specific. Unlimited objects per bucket.</div>
+        </div>
+        <div class="hier-detail">per compartment</div>
+      </div>
+    </div>
+    <div class="hier-row" style="padding-left:48px;">
+      <div class="hier-indent">└─</div>
+      <div class="hier-box hb-object" style="flex:1;">
+        <span class="hier-icon">📄</span>
+        <div style="flex:1;">
+          <div class="hier-label">Object — hr_policy/annual_leave_2026.pdf</div>
+          <div style="font-size:11px;color:var(--faint);margin-top:2px;">The actual file. Has content (bytes), metadata (key-value pairs), and version ID. Up to 10TB per object.</div>
+        </div>
+        <div class="hier-detail">key + value + metadata</div>
+      </div>
+    </div>
+    <div class="hier-row" style="padding-left:48px;margin-top:6px;">
+      <div class="hier-indent">└─</div>
+      <div class="hier-box hb-object" style="flex:1;">
+        <span class="hier-icon">📄</span>
+        <div style="flex:1;">
+          <div class="hier-label">Object — it_policy/laptop_replacement.pdf</div>
+          <div style="font-size:11px;color:var(--faint);margin-top:2px;">Another object in the same bucket. "/" in the name simulates a folder — but it's not a real folder.</div>
+        </div>
+        <div class="hier-detail">same bucket</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Full URL of an Object</h3>
+  <div class="urlbar">
+    <span class="url-seg us-host">https://objectstorage.ap-hyderabad-1.oraclecloud.com</span>
+    /n/<span class="url-seg us-ns">ocigenai58</span>
+    /b/<span class="url-seg us-bucket">ltimindtree-policies</span>
+    /o/<span class="url-seg us-object">hr_policy%2Fannual_leave_2026.pdf</span>
+    <br><br>
+    <span style="color:var(--faint);font-size:11px;">
+    🌐 endpoint = OCI region service URL &nbsp;|&nbsp;
+    🟠 /n/ = namespace &nbsp;|&nbsp;
+    🟢 /b/ = bucket &nbsp;|&nbsp;
+    🟣 /o/ = object name (%2F = "/" encoded)
+    </span>
+  </div>
+</section>
+
+<!-- NO REAL FOLDERS -->
+<section class="section" id="no-folders">
+  <div class="ey">Common Misconception</div>
+  <h2>There Are No Real Folders in Object Storage</h2>
+
+  <div class="callout warn">
+    <span class="ci">⚠️</span>
+    <p><strong>Students always get confused by this.</strong> The OCI Console shows what looks like folders. They are NOT real folders. Object Storage is a flat key-value store. The "/" in the object name is just part of the name string — not an actual directory separator.</p>
+  </div>
+
+  <div class="g2">
+    <div class="gc" style="border-top:3px solid #ff9d45;">
+      <div class="gct" style="color:#ff9d45;">What You See in Console</div>
+      <pre style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin:0;padding:0;background:none;">📁 hr_policy/
+  📄 annual_leave.pdf
+  📄 sick_leave.pdf
+📁 it_policy/
+  📄 laptop_policy.pdf</pre>
+      <p style="margin-top:10px;font-size:12px;">Looks like folders with files inside. But this is just the Console's visual presentation.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">What Is Actually Stored</div>
+      <pre style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin:0;padding:0;background:none;"><span style="color:#20e5a8;">Key:</span> "hr_policy/annual_leave.pdf"
+<span style="color:#20e5a8;">Key:</span> "hr_policy/sick_leave.pdf"
+<span style="color:#20e5a8;">Key:</span> "it_policy/laptop_policy.pdf"</pre>
+      <p style="margin-top:10px;font-size:12px;">Three flat objects. The "/" is part of the key name string. No actual directory structure exists underneath.</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="at">Analogy — Library Books with Labels</div>
+    <p>Imagine a library with no shelves. All books are on the floor. Each book has a label: <em>"Fiction/Mystery/Book1"</em>, <em>"Fiction/Romance/Book2"</em>, <em>"NonFiction/Science/Book3"</em>.</p>
+    <p>There are no real shelves. The label contains "/" but that doesn't create actual sections. The librarian just groups books by label prefix when you ask. Object Storage works exactly this way.</p>
+    <p><strong>Practical consequence:</strong> In Python SDK, filtering by "folder" means filtering by prefix: <code>client.list_objects(namespace, bucket, prefix="hr_policy/")</code> — this returns all objects whose key starts with "hr_policy/".</p>
+  </div>
+</section>
+
+<!-- METADATA -->
+<section class="section" id="metadata">
+  <div class="ey">Object Properties</div>
+  <h2>Object Metadata — Why It Matters for AI</h2>
+  <p>Every object can have custom metadata: key-value pairs you attach to the file. This is what makes intelligent filtering possible in RAG systems.</p>
+
+  <div class="cw">
+    <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">Adding metadata when uploading</div></div>
+    <pre>
+<span class="cm"># Upload policy PDF with rich metadata</span>
+client.<span class="fn">put_object</span>(
+    namespace_name=namespace,
+    bucket_name=<span class="str">"ltimindtree-policies"</span>,
+    object_name=<span class="str">"hr_policy/annual_leave_2026.pdf"</span>,
+    put_object_body=pdf_bytes,
+    opc_meta={
+        <span class="str">"department"</span>:   <span class="str">"HR"</span>,
+        <span class="str">"year"</span>:         <span class="str">"2026"</span>,
+        <span class="str">"status"</span>:       <span class="str">"Approved"</span>,
+        <span class="str">"owner"</span>:        <span class="str">"hr_team@ltimindtree.com"</span>,
+        <span class="str">"version"</span>:      <span class="str">"3"</span>
+    }
+)</pre>
+  </div>
+
+  <div class="g3">
+    <div class="gc ca">
+      <div class="gct">Use Case 1 — Filter by Department</div>
+      <p>Employee from Finance asks a question. RAG filters: <code>WHERE department=Finance</code>. Only Finance policy chunks retrieved. HR and IT chunks skipped. More precise answers.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">Use Case 2 — Only Approved Policies</div>
+      <p>Draft policies should not appear in RAG answers. Filter: <code>WHERE status=Approved</code>. Draft documents are stored but never retrieved. Compliance maintained automatically.</p>
+    </div>
+    <div class="gc cd">
+      <div class="gct">Use Case 3 — Audit Trail</div>
+      <p>Compliance audit: "Which policy was active on March 15, 2026?" Metadata shows upload date, version, owner. Every upload is traceable. Required for ISO and regulatory compliance.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LIFECYCLE -->
+<section class="section" id="lifecycle">
+  <div class="ey">Object Management</div>
+  <h2>Object Versioning & Lifecycle</h2>
+  <div class="g2">
+    <div class="gc cb">
+      <div class="gct">Object Versioning</div>
+      <p><strong>What:</strong> Keep all versions of every object when enabled. Upload new file with same name → new version created, old version preserved with version ID.</p>
+      <p style="margin-top:8px;"><strong>Why:</strong> HR updates leave policy in January. Old 2025 version must be kept for compliance audit. If new version has errors, restore old version instantly.</p>
+      <p style="margin-top:8px;font-family:monospace;font-size:11px;color:var(--faint);">oci os bucket update --name ltimindtree-policies --versioning Enabled</p>
+    </div>
+    <div class="gc ca">
+      <div class="gct">Lifecycle Rules</div>
+      <p><strong>What:</strong> Automatic rules that move or delete objects after a set time period.</p>
+      <p style="margin-top:8px;"><strong>LTIMindtree example:</strong></p>
+      <ul style="font-size:12.5px;margin-top:6px;">
+        <li>Policy PDFs: Standard tier for 2 years</li>
+        <li>After 2 years → auto-move to Archive (10x cheaper)</li>
+        <li>After 10 years → auto-delete</li>
+      </ul>
+      <p style="margin-top:8px;font-size:12px;color:var(--faint);">Set once. Runs automatically forever. No manual work.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STORAGE TIERS -->
+<section class="section" id="tiers">
+  <div class="ey">Cost Optimisation</div>
+  <h2>Storage Tiers — Standard vs Archive</h2>
+  <div class="tier-grid">
+    <div class="tier-card std">
+      <div class="tier-head">
+        <span class="tier-head-icon">⚡</span>
+        <div><div class="tier-head-title">Standard Tier</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Active data — accessed frequently</div></div>
+      </div>
+      <div class="tier-body">
+        <div class="tier-row"><div class="tier-key">Access time</div><div class="tier-val">Milliseconds — instant</div></div>
+        <div class="tier-row"><div class="tier-key">Storage cost</div><div class="tier-val">Higher per GB</div></div>
+        <div class="tier-row"><div class="tier-key">Min storage</div><div class="tier-val">No minimum</div></div>
+        <div class="tier-row"><div class="tier-key">For RAG</div><div class="tier-val" style="color:#20e5a8;">✅ Yes — PDFs read daily</div></div>
+        <div class="tier-row"><div class="tier-key">Use for</div><div class="tier-val">Active policy PDFs, reports this week, current month logs</div></div>
+      </div>
+    </div>
+    <div class="tier-card arc">
+      <div class="tier-head">
+        <span class="tier-head-icon">🗃️</span>
+        <div><div class="tier-head-title">Archive Tier</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Rarely accessed — long-term retention</div></div>
+      </div>
+      <div class="tier-body">
+        <div class="tier-row"><div class="tier-key">Access time</div><div class="tier-val">1 hour restore required first</div></div>
+        <div class="tier-row"><div class="tier-key">Storage cost</div><div class="tier-val">~10× cheaper than Standard</div></div>
+        <div class="tier-row"><div class="tier-key">Min storage</div><div class="tier-val">90 days minimum</div></div>
+        <div class="tier-row"><div class="tier-key">For RAG</div><div class="tier-val" style="color:#ff7070;">❌ Too slow for live queries</div></div>
+        <div class="tier-row"><div class="tier-key">Use for</div><div class="tier-val">Old policy versions, audit logs from last year, compliance archives</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout good">
+    <span class="ci">💰</span>
+    <p><strong>Cost impact for LTIMindtree:</strong> 2 years of policy history in Standard tier costs ₹X per month. After 2 years, auto-move to Archive saves 90% of storage cost while keeping files for compliance. Set the lifecycle rule once — it saves money forever.</p>
+  </div>
+</section>
+
+<!-- ACCESS METHODS -->
+<section class="section" id="access">
+  <div class="ey">Access Methods</div>
+  <h2>Four Ways to Access Object Storage</h2>
+  <div class="access-grid">
+    <div class="access-card ac1">
+      <div class="access-icon">🖥️</div>
+      <div class="access-name">OCI Console</div>
+      <div class="access-when">Manual uploads. One-time tasks. Visual browsing. HR team uploading quarterly PDFs. Admin creating buckets.</div>
+    </div>
+    <div class="access-card ac2">
+      <div class="access-icon">⌨️</div>
+      <div class="access-name">OCI CLI</div>
+      <div class="access-when">Shell scripts. Batch uploads. One-time operations. Testing and verification from Cloud Shell.</div>
+    </div>
+    <div class="access-card ac3">
+      <div class="access-icon">🐍</div>
+      <div class="access-name">Python SDK</div>
+      <div class="access-when">Applications and AI agents. RAG reading PDFs. Agent saving reports. Any Python app needing file storage.</div>
+    </div>
+    <div class="access-card ac4">
+      <div class="access-icon">🌐</div>
+      <div class="access-name">REST API</div>
+      <div class="access-when">Any language or platform. APEX PL/SQL. Java apps. Node.js services. SDK internally calls this.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SDK VS REST -->
+<section class="section" id="sdk-vs-rest">
+  <div class="ey">How SDK Works</div>
+  <h2>SDK vs REST — The Relationship</h2>
+  <div class="callout info">
+    <span class="ci">🔗</span>
+    <p><strong>Students always ask: "What does the SDK use internally?"</strong> The Python SDK is a convenient wrapper around the REST API. Every SDK call becomes an HTTP request behind the scenes. The SDK handles RSA authentication signing, request formatting, response parsing, and retry logic so you don't have to.</p>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-title">SDK → REST → Object Storage — the full call chain</div>
+    <div class="pipe-row">
+      <div class="pipe-step orange"><div class="pipe-icon">🐍</div><div class="pipe-label">Your Python Code</div><div class="pipe-sub">client.get_object(...)</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step purple"><div class="pipe-icon">📦</div><div class="pipe-label">OCI Python SDK</div><div class="pipe-sub">Signs request with RSA key</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step blue"><div class="pipe-icon">🌐</div><div class="pipe-label">REST API Call</div><div class="pipe-sub">GET /n/ns/b/bucket/o/file</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step green"><div class="pipe-icon">🗄️</div><div class="pipe-label">Object Storage</div><div class="pipe-sub">Returns file bytes</div></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="gc" style="border-top:3px solid #ff7070;">
+      <div class="gct" style="color:#ff7070;">Without SDK (Raw REST)</div>
+      <p>You write RSA signature manually. Format HTTP headers manually. Parse JSON response manually. Handle retries manually. Complex. Error-prone. 50+ lines for one file download.</p>
+    </div>
+    <div class="gc cc">
+      <div class="gct">With SDK (One Line)</div>
+      <p><code>response = client.get_object(namespace, bucket, name)</code><br>SDK handles everything else. Auth signing. Headers. Parsing. Retries. Same result. Much simpler.</p>
+    </div>
+  </div>
+</section>
+
+<!-- IAM -->
+<section class="section" id="iam">
+  <div class="ey">Security</div>
+  <h2>IAM Policies — Who Can Access What</h2>
+  <div class="callout danger">
+    <span class="ci">🔒</span>
+    <p><strong>Without IAM:</strong> Anyone who knows the URL can access your files. Policy PDFs exposed to the internet. Compliance disaster. <strong>With IAM:</strong> Only authorised users and services can access. Granular control: who can read, write, or delete. Full audit log of every access.</p>
+  </div>
+
+  <h3>IAM Policy Format</h3>
+  <div class="cw">
+    <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">IAM Policy Statements for LTIMindtree</div></div>
+    <pre>
+<span class="cm"># RAG Agent can READ policy PDFs (not write, not delete)</span>
+<span class="str">Allow dynamic-group AgentGroup to read objects
+in compartment ltimindtree
+where target.bucket.name='ltimindtree-policies'</span>
+
+<span class="cm"># HR team can UPLOAD policies (but not delete)</span>
+<span class="str">Allow group HRTeam to use objects
+in compartment ltimindtree
+where target.bucket.name='ltimindtree-policies'</span>
+
+<span class="cm"># Agent can WRITE output reports</span>
+<span class="str">Allow dynamic-group AgentGroup to manage objects
+in compartment ltimindtree
+where target.bucket.name='ltimindtree-agent-outputs'</span></pre>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>IAM Verb</th><th>What It Allows</th><th>Use For</th></tr></thead>
+      <tbody>
+        <tr><td>inspect</td><td>List buckets only — no content access</td><td>Monitoring and auditing tools</td></tr>
+        <tr><td>read</td><td>List + read objects</td><td>RAG agent reading policy PDFs</td></tr>
+        <tr><td>use</td><td>Read + write + delete objects</td><td>HR team uploading new policies</td></tr>
+        <tr><td>manage</td><td>Full control including delete bucket</td><td>Admin operations only</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PAR -->
+<section class="section" id="par">
+  <div class="ey">External Sharing</div>
+  <h2>Pre-Authenticated Requests (PAR) & Signed URLs</h2>
+  <div class="g2">
+    <div class="gc ca">
+      <div class="gct">Pre-Authenticated Request (PAR)</div>
+      <p><strong>Problem:</strong> External auditor needs to access a policy PDF. No OCI account. Bucket is private.</p>
+      <p style="margin-top:8px;"><strong>Solution:</strong> Generate a time-limited URL. Anyone with the URL can access the file. No OCI account needed. URL expires after the set time.</p>
+      <p style="margin-top:8px;font-size:11.5px;color:var(--faint);">Created in Console or CLI. Stored in OCI. Admin-created sharing.</p>
+    </div>
+    <div class="gc cb">
+      <div class="gct">Signed URL</div>
+      <p><strong>Use case:</strong> Agent generates a report. Creates a signed URL. Emails URL to CFO. CFO clicks URL and downloads. URL expires in 1 hour.</p>
+      <p style="margin-top:8px;"><strong>Difference from PAR:</strong> Generated by application code on the fly. Not stored in OCI. More suitable for programmatic, automated sharing workflows.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AI PATTERNS -->
+<section class="section" id="ai-patterns">
+  <div class="ey">AI Integration</div>
+  <h2>Why Object Storage is the Backbone of AI Applications</h2>
+
+  <div class="callout purple">
+    <span class="ci">🤖</span>
+    <p><strong>AI systems need:</strong> Read PDFs · Read images · Read CSVs · Save reports · Store logs · Share outputs · Version documents · Scale to TBs. Object Storage satisfies ALL of these needs in one service — the single shared data layer connecting every component of an AI pipeline.</p>
+  </div>
+
+  <h3>Three AI Integration Patterns</h3>
+  <div class="pattern-grid">
+    <div class="pattern-card pc1">
+      <div class="pattern-head">
+        <span class="pattern-num">01</span>
+        <span class="pattern-title">Input Pattern — Storage → AI</span>
+      </div>
+      <div class="pattern-body">
+        Documents stored in bucket. AI reads them for RAG or processing. HR uploads PDF → RAG reads it automatically. The ingestion pipeline runs. ChromaDB updated. Employees get new answers.
+        <br><br>
+        <strong style="color:#ff9d45;">LTIMindtree:</strong> Policy PDFs in ltimindtree-policies → RAG ingestion function → ChromaDB.
+      </div>
+    </div>
+    <div class="pattern-card pc2">
+      <div class="pattern-head">
+        <span class="pattern-num">02</span>
+        <span class="pattern-title">Output Pattern — AI → Storage</span>
+      </div>
+      <div class="pattern-body">
+        AI generates output. Saved to bucket permanently. Ramesh generates monthly IT cost report. Agent saves it. CFO downloads via signed URL. Report available forever. Full audit trail.
+        <br><br>
+        <strong style="color:#4f9eff;">LTIMindtree:</strong> IT cost agent → ltimindtree-agent-outputs → CFO email with signed URL.
+      </div>
+    </div>
+    <div class="pattern-card pc3">
+      <div class="pattern-head">
+        <span class="pattern-num">03</span>
+        <span class="pattern-title">Event Pattern — Upload → Trigger → AI</span>
+      </div>
+      <div class="pattern-body">
+        File uploaded to bucket → OCI Event fires → OCI Function triggered → AI processes file. Fully automated. No human intervention. HR uploads PDF → RAG updates in 5 minutes.
+        <br><br>
+        <strong style="color:#b78bfa;">LTIMindtree:</strong> PDF upload → OCI Event → ingestion Function → ChromaDB updated.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OCI EVENTS -->
+<section class="section" id="events">
+  <div class="ey">Automation</div>
+  <h2>OCI Events — Auto-Trigger on File Upload</h2>
+
+  <div class="pipeline" style="border-color:rgba(183,139,250,.2);">
+    <div class="pipe-title" style="color:#b78bfa;">⚡ Event-Driven Ingestion — Fully Automated</div>
+    <div class="pipe-row">
+      <div class="pipe-step orange"><div class="pipe-icon">👩‍💼</div><div class="pipe-label">HR Uploads PDF</div><div class="pipe-sub">ltimindtree-policies bucket</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step purple"><div class="pipe-icon">⚡</div><div class="pipe-label">OCI Event Fires</div><div class="pipe-sub">createobject event</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step blue"><div class="pipe-icon">⚙️</div><div class="pipe-label">OCI Function</div><div class="pipe-sub">run_ingestion()</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step green"><div class="pipe-icon">🧠</div><div class="pipe-label">ChromaDB Updated</div><div class="pipe-sub">New chunks stored</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step pink"><div class="pipe-icon">📧</div><div class="pipe-label">Email to Arjun</div><div class="pipe-sub">"Policy updated"</div></div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <span class="ci">🎯</span>
+    <p><strong>Zero human intervention:</strong> HR uploads PDF on Monday morning. By Monday morning + 5 minutes, all employees are getting answers based on the new policy. Arjun doesn't need to do anything. No manual ingestion command. No code change. Fully automated.</p>
+  </div>
+</section>
+
+<!-- LAB 1 -->
+<section class="section" id="lab1">
+  <div class="sh s3">
+    <span class="sh-icon">🧪</span>
+    <div>
+      <div class="sh-title">Live Coding</div>
+      <div class="sh-sub">Four incremental labs — from CLI to complete RAG + Storage pipeline</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="ci">📦</span>
+    <p><strong>Setup:</strong> Run in OCI Cloud Shell. OCI CLI is pre-installed. SDK is pre-authenticated.</p>
+  </div>
+
+  <div class="lab" id="lab1">
+    <div class="lab-head">
+      <span class="lab-num">LAB 1</span>
+      <span class="lab-title">Create Bucket and Upload File Using CLI</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> Before writing Python code, understand the CLI operations. Bucket create, file upload, list, download — these are the four fundamental operations you will automate with the SDK in the next labs.
+    </div>
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">lab1_cli.sh — CLI operations</div></div>
+      <pre>
+<span class="cm"># Get your namespace first — unique to your OCI tenancy</span>
+<span class="dec">NAMESPACE</span>=$(<span class="fn">oci os ns get</span> --query <span class="str">'data'</span> --raw-output)
+<span class="fn">echo</span> <span class="str">"Namespace: $NAMESPACE"</span>
+
+<span class="cm"># CREATE BUCKET with versioning enabled</span>
+<span class="cm"># Versioning = keep all versions when same file is overwritten</span>
+<span class="fn">oci os bucket create</span> \
+  --name <span class="str">ltimindtree-policies</span> \
+  --compartment-id <span class="str">ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea</span> \
+  --versioning Enabled
+<span class="fn">echo</span> <span class="str">"Bucket created."</span>
+
+<span class="cm"># CREATE a sample policy file locally</span>
+<span class="fn">cat</span> > sample_policy.txt << <span class="str">'POLICY'</span>
+SECTION 1: ANNUAL LEAVE POLICY
+Employees are entitled to 18 days of paid annual leave per calendar year.
+All leave requests must be submitted at least 5 working days in advance.
+Unused annual leave cannot be carried forward to the next year.
+POLICY
+
+<span class="cm"># UPLOAD file to bucket — object name uses / to simulate folder</span>
+<span class="fn">oci os object put</span> \
+  --bucket-name <span class="str">ltimindtree-policies</span> \
+  --file sample_policy.txt \
+  --name <span class="str">hr_policy/sample_policy.txt</span>
+<span class="fn">echo</span> <span class="str">"File uploaded."</span>
+
+<span class="cm"># LIST objects in bucket</span>
+<span class="fn">oci os object list</span> \
+  --bucket-name <span class="str">ltimindtree-policies</span> \
+  --query <span class="str">'data[].name'</span>
+
+<span class="cm"># DOWNLOAD file back to verify</span>
+<span class="fn">oci os object get</span> \
+  --bucket-name <span class="str">ltimindtree-policies</span> \
+  --name <span class="str">hr_policy/sample_policy.txt</span> \
+  --file downloaded_policy.txt
+
+<span class="fn">cat</span> downloaded_policy.txt</pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+Namespace: <span class="hi">ocigenai58</span>
+<span class="ok">Bucket created.</span>
+<span class="ok">File uploaded.</span>
+
+Objects in bucket:
+[<span class="ans">"hr_policy/sample_policy.txt"</span>]
+
+<span class="ok">SECTION 1: ANNUAL LEAVE POLICY
+Employees are entitled to 18 days of paid annual leave per calendar year...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB 2 -->
+  <div class="lab" id="lab2">
+    <div class="lab-head">
+      <span class="lab-num">LAB 2</span>
+      <span class="lab-title">Upload and Download Using Python SDK</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> Applications and AI agents use the SDK, not the CLI. This is how RAG will read policy PDFs — via <code>client.get_object()</code>. Note how metadata is added on upload and read back on download.
+    </div>
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">lab2_sdk.py — Python SDK operations</div></div>
+      <pre>
+<span class="kw">import</span> <span class="cls">oci</span>
+
+<span class="cm"># Connect using ~/.oci/config (auto-authenticated in Cloud Shell)</span>
+<span class="dec">config</span>    = oci.config.<span class="fn">from_file</span>()
+<span class="dec">client</span>    = oci.object_storage.<span class="fn">ObjectStorageClient</span>(config)
+<span class="dec">namespace</span> = client.<span class="fn">get_namespace</span>().data
+
+<span class="dec">BUCKET</span> = <span class="str">"ltimindtree-policies"</span>
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Connected. Namespace: {namespace}"</span>)
+
+<span class="cm"># UPLOAD with metadata
+# Metadata helps filter in RAG and audit in compliance</span>
+<span class="dec">policy_content</span> = <span class="str">"""SECTION 1: ANNUAL LEAVE POLICY
+Employees are entitled to 18 days of paid annual leave per year.
+Leave must be approved by the reporting manager.
+Unused leave cannot be carried forward.
+
+SECTION 2: WFH POLICY
+Employees can work from home up to 2 days per week.
+WFH not allowed on Mondays and Fridays without special approval."""</span>
+
+client.<span class="fn">put_object</span>(
+    namespace_name=namespace,
+    bucket_name=BUCKET,
+    object_name=<span class="str">"hr_policy/sdk_policy.txt"</span>,
+    put_object_body=policy_content.<span class="fn">encode</span>(),
+    opc_meta={
+        <span class="str">"department"</span>: <span class="str">"HR"</span>,
+        <span class="str">"year"</span>:       <span class="str">"2026"</span>,
+        <span class="str">"status"</span>:     <span class="str">"Approved"</span>
+    }
+)
+<span class="fn">print</span>(<span class="str">"Uploaded: hr_policy/sdk_policy.txt"</span>)
+
+<span class="cm"># LIST objects in bucket</span>
+<span class="dec">response</span> = client.<span class="fn">list_objects</span>(namespace_name=namespace, bucket_name=BUCKET)
+<span class="fn">print</span>(<span class="str">"\nAll objects in bucket:"</span>)
+<span class="kw">for</span> obj <span class="kw">in</span> response.data.objects:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  {obj.name}"</span>)
+
+<span class="cm"># DOWNLOAD and read back</span>
+<span class="dec">response</span> = client.<span class="fn">get_object</span>(
+    namespace_name=namespace,
+    bucket_name=BUCKET,
+    object_name=<span class="str">"hr_policy/sdk_policy.txt"</span>
+)
+<span class="dec">content</span> = response.data.content.<span class="fn">decode</span>()
+<span class="fn">print</span>(<span class="str">"\nDownloaded content:"</span>)
+<span class="fn">print</span>(content)
+
+<span class="cm"># READ METADATA</span>
+<span class="fn">print</span>(<span class="str">"\nMetadata:"</span>)
+<span class="fn">print</span>(<span class="str">"Department:"</span>, response.headers.<span class="fn">get</span>(<span class="str">"opc-meta-department"</span>))
+<span class="fn">print</span>(<span class="str">"Status:"</span>,     response.headers.<span class="fn">get</span>(<span class="str">"opc-meta-status"</span>))</pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+Connected. Namespace: <span class="hi">ocigenai58</span>
+<span class="ok">Uploaded: hr_policy/sdk_policy.txt</span>
+
+All objects in bucket:
+  <span class="ans">hr_policy/sample_policy.txt</span>
+  <span class="ans">hr_policy/sdk_policy.txt</span>
+
+Downloaded content:
+<span class="ok">SECTION 1: ANNUAL LEAVE POLICY
+Employees are entitled to 18 days of paid annual leave per year...</span>
+
+Metadata:
+Department: <span class="hi">HR</span>
+Status:     <span class="hi">Approved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB 3 -->
+  <div class="lab" id="lab3">
+    <div class="lab-head">
+      <span class="lab-num">LAB 3</span>
+      <span class="lab-title">RAG Pipeline Reading from Object Storage</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> This is the key upgrade from Day 37. Instead of policy text hardcoded in Python, we now read the actual file from OCI Object Storage. One line of code replaces the entire hardcoded string. HR team can update the PDF without touching code.
+    </div>
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">lab3_rag_storage.py — RAG reading from OCI bucket</div></div>
+      <pre>
+<span class="kw">import</span> <span class="cls">oci</span>
+<span class="kw">from</span> <span class="cls">langchain_community.chat_models.oci_generative_ai</span> <span class="kw">import</span> <span class="fn">ChatOCIGenAI</span>
+<span class="kw">from</span> <span class="cls">langchain.text_splitter</span> <span class="kw">import</span> <span class="fn">RecursiveCharacterTextSplitter</span>
+<span class="kw">import</span> <span class="cls">chromadb</span>
+
+<span class="cm"># OCI connections</span>
+<span class="dec">config</span>    = oci.config.<span class="fn">from_file</span>()
+<span class="dec">storage</span>   = oci.object_storage.<span class="fn">ObjectStorageClient</span>(config)
+<span class="dec">namespace</span> = storage.<span class="fn">get_namespace</span>().data
+
+<span class="dec">BUCKET</span> = <span class="str">"ltimindtree-policies"</span>
+
+<span class="dec">llm</span> = <span class="fn">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.1</span>, <span class="str">"max_tokens"</span>: <span class="num">400</span>}
+)
+
+<span class="cm"># STEP 1: READ FROM OBJECT STORAGE
+# This one line replaces the entire hardcoded policy_text string from Day 37!
+# Now HR can update the PDF without any code change.</span>
+<span class="fn">print</span>(<span class="str">"Reading policy from OCI Object Storage..."</span>)
+<span class="dec">resp</span>        = storage.<span class="fn">get_object</span>(namespace_name=namespace, bucket_name=BUCKET,
+                              object_name=<span class="str">"hr_policy/sample_policy.txt"</span>)
+<span class="dec">policy_text</span> = resp.data.content.<span class="fn">decode</span>()
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Read {len(policy_text)} characters from bucket.\n"</span>)
+
+<span class="cm"># STEP 2: CHUNK AND STORE IN CHROMADB (same as Day 37)</span>
+<span class="dec">splitter</span>   = <span class="fn">RecursiveCharacterTextSplitter</span>(chunk_size=<span class="num">300</span>, chunk_overlap=<span class="num">50</span>)
+<span class="dec">chunks</span>     = splitter.<span class="fn">split_text</span>(policy_text)
+<span class="dec">client</span>     = chromadb.<span class="fn">Client</span>()
+<span class="dec">collection</span> = client.<span class="fn">create_collection</span>(<span class="str">"ltimindtree_rag"</span>)
+collection.<span class="fn">add</span>(documents=chunks, ids=[<span class="fn">f</span><span class="str">"chunk_{i}"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(chunks))])
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Ingested {len(chunks)} chunks into ChromaDB.\n"</span>)
+
+<span class="cm"># STEP 3: ANSWER QUESTIONS (same as Day 37)</span>
+<span class="kw">def</span> <span class="fn">ask</span>(question):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Q: {question}"</span>)
+    <span class="dec">results</span>  = collection.<span class="fn">query</span>(query_texts=[question], n_results=<span class="num">3</span>)
+    <span class="dec">context</span>  = <span class="str">"\n\n"</span>.<span class="fn">join</span>(results[<span class="str">"documents"</span>][<span class="num">0</span>])
+    <span class="dec">prompt</span>   = <span class="fn">f</span><span class="str">"""You are LTIMindtree HR Policy Assistant.
+Answer ONLY from the policy text provided. Do not make up information.
+
+POLICY TEXT:
+{context}
+
+QUESTION: {question}
+ANSWER:"""</span>
+    <span class="dec">result</span> = llm.<span class="fn">invoke</span>(prompt)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"A: {result.content}\n"</span>)
+
+<span class="fn">ask</span>(<span class="str">"How many leave days per year?"</span>)
+<span class="fn">ask</span>(<span class="str">"Can I WFH on Friday?"</span>)</pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+Reading policy from OCI Object Storage...
+Read <span class="hi">892</span> characters from bucket.
+
+Ingested <span class="hi">5</span> chunks into ChromaDB.
+
+Q: How many leave days per year?
+A: <span class="ok">You are entitled to 18 days of paid annual leave per calendar year.</span>
+
+Q: Can I WFH on Friday?
+A: <span class="warn">WFH is NOT allowed on Fridays without special approval.</span>
+      </div>
+    </div>
+    <div class="callout good">
+      <span class="ci">✅</span>
+      <p><strong>What changed from Day 37:</strong> Only one thing — the source of <code>policy_text</code>. Instead of a hardcoded string in the Python file, it now comes from OCI Object Storage via <code>storage.get_object()</code>. Everything else (chunking, ChromaDB, LLM) is identical. HR can now update the policy PDF without touching Python code.</p>
+    </div>
+  </div>
+
+  <!-- LAB 4 -->
+  <div class="lab" id="lab4">
+    <div class="lab-head">
+      <span class="lab-num">LAB 4</span>
+      <span class="lab-title">Save Agent Output Report to Object Storage</span>
+    </div>
+    <div class="lab-why">
+      <strong>Why this lab:</strong> Agent-generated reports currently just print to terminal. When the Cloud Shell session ends, they're gone. Saving to Object Storage makes reports permanent, shareable, and auditable. CFO can download the report directly via a signed URL.
+    </div>
+    <div class="cw">
+      <div class="ch"><div class="dots"><span></span><span></span><span></span></div><div class="cl">lab4_save_output.py — Save report to bucket</div></div>
+      <pre>
+<span class="kw">import</span> <span class="cls">oci</span>
+<span class="kw">import</span> <span class="cls">json</span>
+<span class="kw">from</span> <span class="cls">datetime</span> <span class="kw">import</span> <span class="fn">datetime</span>
+<span class="kw">from</span> <span class="cls">langchain_community.chat_models.oci_generative_ai</span> <span class="kw">import</span> <span class="fn">ChatOCIGenAI</span>
+
+<span class="dec">config</span>    = oci.config.<span class="fn">from_file</span>()
+<span class="dec">storage</span>   = oci.object_storage.<span class="fn">ObjectStorageClient</span>(config)
+<span class="dec">namespace</span> = storage.<span class="fn">get_namespace</span>().data
+
+<span class="dec">OUTPUT_BUCKET</span> = <span class="str">"ltimindtree-agent-outputs"</span>
+
+<span class="cm"># Create output bucket if it doesn't exist</span>
+<span class="kw">try</span>:
+    storage.<span class="fn">create_bucket</span>(
+        namespace_name=namespace,
+        create_bucket_details=oci.object_storage.models.<span class="fn">CreateBucketDetails</span>(
+            name=OUTPUT_BUCKET,
+            compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>
+        )
+    )
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Created bucket: {OUTPUT_BUCKET}"</span>)
+<span class="kw">except</span>:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Bucket exists: {OUTPUT_BUCKET}"</span>)
+
+<span class="dec">llm</span> = <span class="fn">ChatOCIGenAI</span>(
+    model_id=<span class="str">"cohere.command-a-03-2025"</span>,
+    service_endpoint=<span class="str">"https://inference.generativeai.ap-hyderabad-1.oci.oraclecloud.com"</span>,
+    compartment_id=<span class="str">"ocid1.compartment.oc1..aaaaaaaawsdiuqgqqkxt7wavfbqnqvf2b5kvqmmbghisajmcoqaeqhozbiea"</span>,
+    auth_type=<span class="str">"API_KEY"</span>,
+    model_kwargs={<span class="str">"temperature"</span>: <span class="num">0.3</span>, <span class="str">"max_tokens"</span>: <span class="num">500</span>}
+)
+
+<span class="cm"># GENERATE REPORT via LLM</span>
+<span class="fn">print</span>(<span class="str">"\nGenerating IT cost report..."</span>)
+<span class="dec">report</span> = llm.<span class="fn">invoke</span>(<span class="str">"""Generate a professional IT cost report for October 2026.
+Include: Team 35 employees, Software licenses 65000 INR,
+OCI cloud 48000 INR, Grand total and cost per employee."""</span>).content
+<span class="fn">print</span>(<span class="str">"Report generated."</span>)
+
+<span class="cm"># SAVE TO OBJECT STORAGE
+# Object name includes date for organised versioning</span>
+<span class="dec">timestamp</span>   = datetime.<span class="fn">now</span>().<span class="fn">strftime</span>(<span class="str">"%Y-%m-%d_%H-%M-%S"</span>)
+<span class="dec">object_name</span> = <span class="fn">f</span><span class="str">"reports/2026-10/it_cost_report_{timestamp}.txt"</span>
+
+storage.<span class="fn">put_object</span>(
+    namespace_name=namespace,
+    bucket_name=OUTPUT_BUCKET,
+    object_name=object_name,
+    put_object_body=report.<span class="fn">encode</span>(),
+    opc_meta={<span class="str">"generated_by"</span>: <span class="str">"IT Cost Agent"</span>, <span class="str">"month"</span>: <span class="str">"October 2026"</span>}
+)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Saved to: {OUTPUT_BUCKET}/{object_name}"</span>)
+
+<span class="cm"># VERIFY by downloading back</span>
+<span class="dec">verify</span> = storage.<span class="fn">get_object</span>(namespace_name=namespace,
+                              bucket_name=OUTPUT_BUCKET, object_name=object_name)
+<span class="fn">print</span>(<span class="str">"\n=== SAVED REPORT ==="</span>)
+<span class="fn">print</span>(verify.data.content.<span class="fn">decode</span>())</pre>
+    </div>
+    <div class="output">
+      <div class="out-h">✅ Expected Output</div>
+      <div class="out-body">
+<span class="ok">Bucket exists: ltimindtree-agent-outputs</span>
+
+Generating IT cost report...
+<span class="ok">Report generated.</span>
+<span class="hi">Saved to: ltimindtree-agent-outputs/reports/2026-10/it_cost_report_2026-10-01_09-15-32.txt</span>
+
+=== SAVED REPORT ===
+<span class="ans">IT Cost Analysis Report — LTIMindtree, October 2026
+
+Team Size: 35 employees across 3 projects
+Software Licenses: INR 65,000
+OCI Cloud Spend: INR 48,000
+Grand Total: INR 1,13,000
+Cost Per Employee: INR 3,228 per month
+
+Recommendation: Consider reviewing unused Jira licenses
+to save approximately INR 5,000 per month.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERVIEW QUESTIONS -->
+<section class="section" id="interview">
+  <div class="ey">Interview Preparation</div>
+  <h2>Interview Questions — Beginner to Advanced</h2>
+
+  <h3>Beginner Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">What is OCI Object Storage and when would you use it?</div>
+    <div class="iq-a">OCI Object Storage is a cloud service for storing any type of file (PDF, image, JSON, CSV) at unlimited scale. You use it when you need files accessible from anywhere via API, need unlimited storage capacity, require high durability (11 nines), want multiple applications or users to share the same files, or need built-in versioning and lifecycle management. Common use cases: storing AI training data, policy documents for RAG pipelines, application logs, backups, and generated reports.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is a namespace in OCI Object Storage?</div>
+    <div class="iq-a">A namespace is a unique identifier for your OCI tenancy within Object Storage. Every OCI account has exactly one namespace — it is globally unique across all OCI regions. All your buckets exist under this namespace. It forms part of every Object Storage URL: /n/{namespace}/b/{bucket}/o/{object}. Find yours with: <code>oci os ns get</code></div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is the difference between Object Storage, Block Storage, and File Storage?</div>
+    <div class="iq-a">Object Storage: stores files (PDFs, images, JSON) accessed via REST API. Best for AI documents, backups, application data. Block Storage: stores virtual hard disks, mounted as a disk by a single VM. Best for OS disks, databases. File Storage: stores shared NFS folders, mounted by multiple servers simultaneously. Best for shared project code or configuration. For RAG systems: policy PDFs go in Object Storage because they need to be accessed by API from anywhere.</div>
+  </div>
+
+  <h3>Intermediate Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">Do buckets have real folders? How does the "/" work?</div>
+    <div class="iq-a">No — Object Storage is a flat key-value store. There are no real folders. The "/" in an object name like "hr_policy/annual_leave.pdf" is just part of the key string. OCI Console displays objects with "/" as if they are in folders, but this is purely a visual presentation. In the SDK, filtering by "folder" means filtering by prefix: list_objects(prefix="hr_policy/"). This returns all objects whose key starts with "hr_policy/" regardless of any actual directory structure.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is the difference between Standard and Archive storage tiers?</div>
+    <div class="iq-a">Standard tier: immediate access in milliseconds, higher storage cost. Use for actively accessed files like current policy PDFs for RAG. Archive tier: requires a 1-hour restore before access, approximately 10x cheaper than Standard. Use for old policy versions, audit logs from previous years, or backup files rarely accessed. Use lifecycle rules to automatically move objects from Standard to Archive after a specified period, reducing costs without manual intervention.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What is object metadata and why is it useful for AI systems?</div>
+    <div class="iq-a">Object metadata is a set of custom key-value pairs attached to each object when uploading. For example: {"department": "HR", "status": "Approved", "year": "2026"}. In AI/RAG systems: metadata enables filtering retrieval to only Approved policies, filtering by department so Finance employees only get Finance policy answers, tracking which version was active on a specific date for audit, and knowing who uploaded what and when for compliance. Metadata is read back via response headers after get_object().</div>
+  </div>
+
+  <h3>Advanced Level</h3>
+
+  <div class="iq">
+    <div class="iq-q">How does the SDK relate to the REST API internally?</div>
+    <div class="iq-a">The Python SDK is a wrapper around the Object Storage REST API. Every SDK method call (get_object, put_object, list_objects) generates an HTTP request internally. The SDK adds value by handling RSA request signing (authentication), formatting HTTP headers correctly, parsing JSON responses into Python objects, implementing retry logic for transient failures, and providing a Pythonic interface instead of raw HTTP calls. The end result is identical — you could build everything the SDK does with raw HTTP requests, but it would require 50+ lines for what the SDK does in one line.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">What IAM is needed for an AI agent to access Object Storage?</div>
+    <div class="iq-a">First, create a Dynamic Group that includes your compute resource (OCI Function, Container Instance, or VM) using a matching rule like <code>resource.type = 'fnfunc'</code>. Then create IAM policies: "Allow dynamic-group AgentGroup to read objects in compartment X where target.bucket.name='input-bucket'" for reading input documents, and "Allow dynamic-group AgentGroup to manage objects in compartment X where target.bucket.name='output-bucket'" for writing reports. This uses Instance Principal authentication — no API keys needed in the agent code, which is the most secure production approach.</div>
+  </div>
+
+  <div class="iq">
+    <div class="iq-q">Explain the three AI integration patterns with Object Storage.</div>
+    <div class="iq-a">Pattern 1 — Input: Object Storage feeds AI. Policy PDFs uploaded to a bucket are read by the RAG ingestion pipeline, chunked, embedded, and stored in ChromaDB. AI answers from the document content. Pattern 2 — Output: AI writes to Object Storage. Agent generates a report, saves it to an output bucket, generates a signed URL, and emails it to stakeholders. Report is permanent and auditable. Pattern 3 — Event-driven: Upload triggers AI. When a PDF is uploaded, OCI Events fires a createobject event, which invokes an OCI Function that runs the ingestion pipeline. RAG updates automatically without human intervention. All three patterns use the same SDK operations — the difference is the direction and trigger of data flow.</div>
+  </div>
+</section>
+
+<!-- EXERCISES -->
+<section class="section">
+  <div class="ey">Practice</div>
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="ex-head">Practice Questions</div>
+    <div class="ex-item"><span class="ex-badge easy">Easy</span><span>Run Lab 1 CLI commands. Create a bucket named "my-test-bucket". Upload any text file. List objects. Download it back. Delete the object.</span></div>
+    <div class="ex-item"><span class="ex-badge easy">Easy</span><span>Modify Lab 2 to also upload a second file called "it_policy.txt" with IT-related content. List all objects and verify both appear.</span></div>
+    <div class="ex-item"><span class="ex-badge medium">Medium</span><span>Modify Lab 3 to read from BOTH hr_policy/sample_policy.txt and hr_policy/sdk_policy.txt. Combine both texts and ingest all chunks together. Ask questions that span both files.</span></div>
+    <div class="ex-item"><span class="ex-badge medium">Medium</span><span>Add metadata filtering to Lab 3. Only retrieve chunks from objects with metadata status=Approved. Test that objects with status=Draft are ignored.</span></div>
+    <div class="ex-item"><span class="ex-badge hard">Hard</span><span>Build a complete pipeline: upload 3 different policy text files to the bucket with different department metadata. Build a RAG system that filters by department when answering. HR questions only return HR chunks. IT questions only return IT chunks.</span></div>
+    <div class="ex-item"><span class="ex-badge hard">Hard</span><span>Implement object versioning: enable versioning on a bucket, upload the same file twice with different content, list both versions, download version 1 specifically using the version ID, verify you get the old content back.</span></div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="section" id="summary">
+  <div class="ey">Key Takeaways</div>
+  <h2>Day 38 Summary</h2>
+
+  <div class="summary-grid">
+    <div class="sum-card s1">
+      <div class="sum-title">🏗️ Core Concepts</div>
+      <ul>
+        <li>Object Storage = flat key-value store for binary files</li>
+        <li>Namespace → Bucket → Object (three levels)</li>
+        <li>No real folders — "/" is part of the key name</li>
+        <li>Metadata = key-value pairs attached to each object</li>
+        <li>Standard tier = instant access, higher cost</li>
+        <li>Archive tier = 1 hour restore, 10x cheaper</li>
+        <li>Versioning = keep all versions for audit</li>
+        <li>Lifecycle rules = auto-move and auto-delete</li>
+      </ul>
+    </div>
+    <div class="sum-card s2">
+      <div class="sum-title">🔧 Technical Rules</div>
+      <ul>
+        <li>SDK = wrapper around REST API</li>
+        <li>All buckets PRIVATE — never public for sensitive data</li>
+        <li>Instance Principal = no keys in production code</li>
+        <li>PAR = time-limited URL for external sharing</li>
+        <li>IAM verb: read for input buckets, manage for output</li>
+        <li>Dynamic Group needed for agent access</li>
+        <li>Multipart upload for files over 100MB</li>
+        <li>OCI Events → auto-trigger ingestion on upload</li>
+      </ul>
+    </div>
+    <div class="sum-card s3">
+      <div class="sum-title">🏢 Business Outcomes</div>
+      <ul>
+        <li>No more hardcoded policy text in Python files</li>
+        <li>HR uploads PDF → RAG updates in 5 minutes</li>
+        <li>Zero developer involvement for content updates</li>
+        <li>Reports saved permanently (not just terminal output)</li>
+        <li>All versions kept for compliance audit</li>
+        <li>CFO gets signed URL to download reports</li>
+        <li>Full audit trail: who uploaded what and when</li>
+        <li>Lifecycle rules save 90% on old document storage</li>
+      </ul>
+    </div>
+    <div class="sum-card s4">
+      <div class="sum-title">⚠️ Common Mistakes</div>
+      <ul>
+        <li>Making buckets public accidentally — security risk</li>
+        <li>Forgetting .oci/ credentials in Docker image</li>
+        <li>Using Standard tier for 10-year archive — expensive</li>
+        <li>Assuming Object Storage = Vector Database (they're different)</li>
+        <li>Confusing namespace with bucket name</li>
+        <li>Not enabling versioning on policy buckets</li>
+        <li>Using CLI path syntax with "/" expecting real folders</li>
+        <li>Using same embedding model for ingestion and query</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CHEATSHEET -->
+<section class="section">
+  <div class="ey">Quick Reference</div>
+  <h2>OCI Object Storage Cheat Sheet</h2>
+  <div class="cheat">
+    <div class="cheat-title">Commands & SDK Methods</div>
+    <div class="cheat-row"><div class="cheat-key">oci os ns get</div><div class="cheat-val">Get your tenancy namespace. Required for all SDK calls.</div></div>
+    <div class="cheat-row"><div class="cheat-key">oci os bucket create --name X --compartment-id Y</div><div class="cheat-val">Create a new bucket in CLI.</div></div>
+    <div class="cheat-row"><div class="cheat-key">oci os object put --bucket-name X --file Y --name Z</div><div class="cheat-val">Upload file via CLI. Z is the object name (key).</div></div>
+    <div class="cheat-row"><div class="cheat-key">oci os object get --bucket-name X --name Y --file Z</div><div class="cheat-val">Download object to local file Z via CLI.</div></div>
+    <div class="cheat-row"><div class="cheat-key">client.put_object(namespace, bucket, name, body, opc_meta={})</div><div class="cheat-val">Upload with metadata via Python SDK.</div></div>
+    <div class="cheat-row"><div class="cheat-key">client.get_object(namespace, bucket, name)</div><div class="cheat-val">Download object. Content in response.data.content</div></div>
+    <div class="cheat-row"><div class="cheat-key">client.list_objects(namespace, bucket, prefix="folder/")</div><div class="cheat-val">List objects. Use prefix to filter by "folder".</div></div>
+    <div class="cheat-row"><div class="cheat-key">response.headers.get("opc-meta-department")</div><div class="cheat-val">Read metadata after get_object(). Keys prefixed with opc-meta-.</div></div>
+    <div class="cheat-row"><div class="cheat-key">oci os bucket update --versioning Enabled</div><div class="cheat-val">Enable versioning on a bucket.</div></div>
+    <div class="cheat-row"><div class="cheat-key">oci os preauth-request create --access-type ObjectRead</div><div class="cheat-val">Create Pre-Authenticated Request for external sharing.</div></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer">
+  <strong>LTIMindtree OCI GenAI Foundation Programme</strong> — Day 38: OCI Object Storage
+</div>
+
+<script>
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + entry.target.id) link.classList.add('active');
+      });
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+navLinks.forEach(link => {
+  link.addEventListener('click', function() {
+    const nav = document.querySelector('.nav');
+    nav.scrollTo({ left: this.offsetLeft - nav.offsetWidth / 2 + this.offsetWidth / 2, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>

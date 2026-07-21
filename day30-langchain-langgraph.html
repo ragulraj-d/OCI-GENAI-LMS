@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 35 — LangChain, LangGraph & Semantic Kernel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+:root{
+  --bg:#0b0e1a;--surface:#111425;--card:#161a2e;--border:#232845;--border2:#2e3560;
+  --accent:#5b8af0;--accent2:#a78bfa;--green:#34d399;--orange:#fb923c;--yellow:#fbbf24;
+  --red:#f87171;--text:#e2e8f0;--muted:#94a3b8;--faint:#475569;--code:#0d1117;
+  --c1:#22d3ee;--c2:#a78bfa;--c3:#34d399;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.75;overflow-x:hidden;}
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1230,#0b0e1a 50%,#120d2a);border-bottom:1px solid var(--border2);padding:60px 48px 52px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-120px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(91,138,240,.10),transparent 65%);border-radius:50%;}
+.tag{display:inline-block;background:rgba(91,138,240,.12);color:var(--accent);border:1px solid rgba(91,138,240,.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;}
+.hero h1{font-size:clamp(26px,4vw,42px);font-weight:700;letter-spacing:-.02em;line-height:1.15;background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px;}
+.hero-sub{color:var(--muted);font-size:15px;max-width:600px;}
+/* NAV */
+.toc{background:var(--surface);border-bottom:1px solid var(--border);padding:0 48px;display:flex;overflow-x:auto;scrollbar-width:none;}
+.toc::-webkit-scrollbar{display:none;}
+.toc a{padding:13px 16px;font-size:12px;font-weight:500;color:var(--faint);white-space:nowrap;border-bottom:2px solid transparent;transition:.2s;text-decoration:none;display:block;}
+.toc a:hover{color:var(--text);border-bottom-color:var(--border2);}
+/* MAIN */
+main{max-width:980px;margin:0 auto;padding:52px 40px;}
+.section{margin-bottom:68px;}
+.ey{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+h2{font-size:24px;font-weight:700;color:#fff;margin-bottom:14px;}
+h3{font-size:15px;font-weight:600;color:var(--accent);margin:24px 0 10px;}
+p,.muted{color:var(--muted);margin-bottom:10px;}
+hr.sep{border:none;border-top:1px solid var(--border);margin:24px 0;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin:16px 0;}
+.card-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;}
+.blue{color:var(--accent);}.purple{color:var(--accent2);}.green{color:var(--green);}.orange{color:var(--orange);}
+/* CALLOUT */
+.callout{border-radius:8px;padding:13px 17px;margin:14px 0;display:flex;gap:12px;align-items:flex-start;font-size:13.5px;}
+.ci{font-size:18px;flex-shrink:0;margin-top:1px;}
+.callout.info{background:rgba(91,138,240,.10);border-left:3px solid var(--accent);}
+.callout.good{background:rgba(52,211,153,.10);border-left:3px solid var(--green);}
+.callout.warn{background:rgba(251,146,60,.10);border-left:3px solid var(--orange);}
+.callout.purple{background:rgba(167,139,250,.10);border-left:3px solid var(--accent2);}
+.callout p{margin:0;color:var(--text);}
+/* CODE */
+.cw{background:var(--code);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);}
+.cl{font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;}
+.cd span{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:5px;}
+.cd span:nth-child(1){background:#ff5f57;}.cd span:nth-child(2){background:#febc2e;}.cd span:nth-child(3){background:#28c840;}
+pre{padding:18px 22px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;color:#c9d1d9;}
+.kw{color:#ff7b72;}.fn{color:#79c0ff;}.str{color:#a5d6ff;}.cm{color:#484f58;font-style:italic;}.var{color:#ffa657;}.cls{color:#7ee787;}.num{color:#f2cc60;}.op{color:#89ddff;}
+/* TABLE */
+.tw{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--surface);color:var(--accent);font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:10px 15px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:10px 15px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top;}
+td:first-child{color:var(--text);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+/* GRID 3 */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0;}
+@media(max-width:680px){.g3{grid-template-columns:1fr;}}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.gc.c1{border-top:3px solid var(--c1);}.gc.c2{border-top:3px solid var(--c2);}.gc.c3{border-top:3px solid var(--c3);}
+.gch{font-size:14px;font-weight:700;margin-bottom:10px;}
+.gch.c1{color:var(--c1);}.gch.c2{color:var(--c2);}.gch.c3{color:var(--c3);}
+.gc ul{list-style:none;padding:0;}
+.gc li{color:var(--muted);font-size:12.5px;padding:3px 0;border-bottom:1px solid var(--border);}
+.gc li:last-child{border-bottom:none;}
+.gc li::before{content:'→ ';color:var(--faint);}
+/* COMP GRID */
+.cg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0;}
+@media(max-width:560px){.cg{grid-template-columns:1fr;}}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:17px 19px;}
+.cn{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:8px;}
+.cn.b{background:rgba(91,138,240,.12);color:var(--accent);}
+.cn.p{background:rgba(167,139,250,.12);color:var(--accent2);}
+.cn.g{background:rgba(52,211,153,.12);color:var(--green);}
+.cn.o{background:rgba(251,146,60,.12);color:var(--orange);}
+.cname{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
+.cdesc{font-size:12.5px;color:var(--muted);margin:0;}
+/* ANALOGY */
+.analogy{background:linear-gradient(135deg,rgba(167,139,250,.07),rgba(91,138,240,.05));border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:18px 22px;margin:16px 0;position:relative;}
+.analogy::before{content:'💡';position:absolute;top:-11px;left:18px;font-size:19px;background:var(--bg);padding:0 4px;}
+.at{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;}
+.analogy p{color:var(--text);font-size:14px;margin-bottom:6px;}
+.analogy p:last-child{margin-bottom:0;}
+/* FLOW */
+.flow{margin:18px 0;}
+.fs{display:flex;align-items:flex-start;gap:14px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;font-size:13.5px;}
+.fn2{flex-shrink:0;width:24px;height:24px;background:rgba(91,138,240,.13);border:1px solid rgba(91,138,240,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);margin-top:2px;}
+.fa{text-align:center;color:var(--faint);font-size:15px;padding:2px 0 2px 24px;}
+.fs span{color:var(--muted);}
+.fs span strong{color:var(--text);}
+/* STACK */
+.stack{margin:18px 0;display:flex;flex-direction:column;gap:3px;max-width:500px;}
+.sr{padding:11px 18px;border-radius:6px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:space-between;}
+.sr .lbl{color:var(--muted);font-size:11px;}
+.s1{background:rgba(91,138,240,.13);color:var(--accent);border:1px solid rgba(91,138,240,.22);}
+.s2{background:rgba(167,139,250,.13);color:var(--accent2);border:1px solid rgba(167,139,250,.22);}
+.s3{background:rgba(52,211,153,.10);color:var(--green);border:1px solid rgba(52,211,153,.18);}
+.s4{background:rgba(251,146,60,.10);color:var(--orange);border:1px solid rgba(251,146,60,.18);}
+.sa{text-align:center;color:var(--faint);font-size:13px;padding:2px 0;}
+/* QA */
+.qa{border-bottom:1px solid var(--border);padding:16px 0;}
+.qa:last-child{border-bottom:none;}
+.qq{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:7px;}
+.qq::before{content:'Q  ';font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.6;}
+.qa-a{font-size:13px;color:var(--muted);}
+.qa-a::before{content:'A  ';font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);}
+/* STORY BOX */
+.story{background:linear-gradient(135deg,rgba(91,138,240,.07),rgba(167,139,250,.05));border:1px solid rgba(91,138,240,.2);border-left:4px solid var(--accent);border-radius:12px;padding:24px 28px;margin:18px 0;}
+.story p{color:var(--text);font-size:14px;margin-bottom:8px;}
+.story p:last-child{margin:0;}
+/* PROGRESS */
+.prog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0;}
+@media(max-width:560px){.prog-grid{grid-template-columns:1fr;}}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.prog-step{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px;}
+.prog-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;}
+.prog-desc{font-size:12.5px;color:var(--muted);margin:0;}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+footer span{color:var(--faint);font-size:12px;}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="tag">Day 35 &middot; GenAI Application Frameworks</div>
+  <h1>LangChain &middot; LangGraph<br>Semantic Kernel</h1>
+  <p class="hero-sub">From a single API call to intelligent, multi-step AI workflows &mdash; complete guide with real-world examples, code, and assessment solutions.</p>
+</header>
+
+<!-- NAV -->
+<nav class="toc">
+  <a href="#story">The Story</a>
+  <a href="#why">Why LangChain</a>
+  <a href="#stack">Where It Fits</a>
+  <a href="#components">8 Components</a>
+  <a href="#lcel">LCEL</a>
+  <a href="#memory">Memory</a>
+  <a href="#parser">Output Parser</a>
+  <a href="#tools">Tools</a>
+  <a href="#agents">Agents</a>
+  <a href="#compare">Chain vs Agent</a>
+  <a href="#langgraph">LangGraph</a>
+  <a href="#sk">Semantic Kernel</a>
+  <a href="#tokens">Tokens &amp; Cost</a>
+  <a href="#rag">RAG Preview</a>
+  <a href="#labs">Labs</a>
+  <a href="#errors">Errors</a>
+  <a href="#interview">Q&amp;A</a>
+</nav>
+
+<main>
+
+<!-- THE STORY -->
+<section class="section" id="story">
+  <div class="ey">The Business Problem</div>
+  <h2>Monday Morning at LTIMindtree</h2>
+
+  <div class="story">
+    <p><strong>Mrs. Kavitha, HR Manager &mdash; Monday 9 AM. 47 emails waiting.</strong></p>
+    <p>Email 1: "Please hire Java Developer for IT." &nbsp; Email 2: "We need Python Engineer urgently." &nbsp; Email 3: "DevOps person needed by next month." &nbsp; Email 4: 38 resumes for screening.</p>
+    <p>Kavitha spends her entire day reading, writing JDs manually (2 hours each), screening resumes one by one. By 6 PM: only 2 JDs written, 18 resumes screened, 29 still remaining.</p>
+    <p><strong>Mr. Ramesh calls:</strong> "Kavitha, can AI handle this? I give one instruction. AI does all the steps automatically. You just review and approve."</p>
+    <p style="color:var(--green);font-weight:600;">That is exactly what today's session builds. LangChain + LangGraph = AI that works like a full HR assistant team.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+    <div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:14px;font-size:13px;color:var(--muted);">
+      <div style="color:var(--red);font-weight:600;margin-bottom:6px;">Without AI Automation</div>
+      JD writing: 2 hrs &times; 8 = 16 hrs/month<br>
+      Screening 50 resumes: 4 hrs<br>
+      Interview invites: manual<br>
+      <strong style="color:var(--red);">Total: full day, every week</strong>
+    </div>
+    <div style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:8px;padding:14px;font-size:13px;color:var(--muted);">
+      <div style="color:var(--green);font-weight:600;margin-bottom:6px;">With LangChain + Agent</div>
+      One instruction to AI agent<br>
+      Extracts &rarr; checks budget &rarr; writes JD<br>
+      Posts LinkedIn &rarr; screens resumes<br>
+      <strong style="color:var(--green);">Total: 45 seconds per hire</strong>
+    </div>
+  </div>
+</section>
+
+<!-- WHY LANGCHAIN -->
+<section class="section" id="why">
+  <div class="ey">01 &mdash; Motivation</div>
+  <h2>Why LangChain Exists</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Building a House</div>
+    <p><strong>Cement, bricks, steel</strong> = Raw materials (like OCI Gen AI &mdash; the actual AI power)</p>
+    <p><strong>Architect + Blueprint</strong> = Framework (like LangChain &mdash; organises how things connect)</p>
+    <p><strong>The House</strong> = Your final application (the HR Portal, chatbot, JD Generator)</p>
+    <p>LangChain is NOT the AI. LangChain is the <strong>architect</strong> that organises how your application uses the AI.</p>
+  </div>
+
+  <h3>Without vs With LangChain</h3>
+  <div class="tw"><table>
+    <tr><th>Without LangChain</th><th>With LangChain</th></tr>
+    <tr><td>Manual JSON body for every call</td><td>LLM Wrapper &mdash; 3 lines</td></tr>
+    <tr><td>Repeat full prompt string everywhere</td><td>Prompt Template &mdash; define once, reuse</td></tr>
+    <tr><td>Manual JSON parsing of response</td><td>Output Parser &mdash; automatic</td></tr>
+    <tr><td>Manual context passing between calls</td><td>Memory &mdash; built-in</td></tr>
+    <tr><td>Manual step connection and data flow</td><td>Chains &mdash; automatic pipeline</td></tr>
+    <tr><td>Rewrite everything when model changes</td><td>Model agnostic &mdash; one line switch</td></tr>
+  </table></div>
+
+  <h3>The Real Problem at Scale</h3>
+  <p>Kavitha needs 5 AI calls per hire: extract requirements &rarr; check budget &rarr; generate JD &rarr; screen 50 resumes &rarr; send emails. Without LangChain: 500+ lines, repeated auth, parsing, and JSON building. Breaks if OCI changes API. Nightmare to maintain.</p>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">With LangChain &mdash; One Line</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="cm"># Kavitha's entire hiring workflow — one line</span>
+hiring_chain.invoke({<span class="str">"email"</span>: <span class="str">"Hire Senior Java Developer for IT"</span>})
+
+<span class="cm"># All 5 steps handled automatically inside the chain</span></pre>
+  </div>
+
+  <div class="callout good">
+    <div class="ci">&#9989;</div>
+    <p><strong>Model Agnostic &mdash; The Biggest Win:</strong> Switch from OCI Cohere to OpenAI to Gemini by changing <em>one line</em>. Chains, memory, tools, parsers &mdash; all unchanged.</p>
+  </div>
+</section>
+
+<!-- WHERE IT FITS -->
+<section class="section" id="stack">
+  <div class="ey">02 &mdash; Architecture</div>
+  <h2>Where LangChain Fits in the Stack</h2>
+
+  <div class="callout warn">
+    <div class="ci">&#9888;&#65039;</div>
+    <p><strong>Students always ask:</strong> "Is LangChain an AI model like ChatGPT? Is it OCI?" &mdash; NO. LangChain is a <strong>framework</strong> that sits between your app and the AI model. Like WhatsApp uses the internet but is NOT the internet.</p>
+  </div>
+
+  <div class="stack">
+    <div class="sr s1"><span>Your Application</span><span class="lbl">APEX / Python / Web App</span></div>
+    <div class="sa">&#8595; uses</div>
+    <div class="sr s2"><span>LangChain</span><span class="lbl">Prompts &middot; Chains &middot; Agents &middot; Memory &middot; Tools</span></div>
+    <div class="sa">&#8595; calls</div>
+    <div class="sr s3"><span>OCI SDK / REST API</span><span class="lbl">Authentication &middot; HTTP</span></div>
+    <div class="sa">&#8595; runs on</div>
+    <div class="sr s4"><span>OCI Gen AI &mdash; cohere.command-a-03-2025</span><span class="lbl">The actual AI brain</span></div>
+  </div>
+
+  <h3>Package Structure (Why So Many langchain_* Packages?)</h3>
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Microsoft Office</div>
+    <p>Before: One CD, install everything (2GB). Now: Install only what you need &mdash; Word, Excel, Teams separately. LangChain did the same in 2024.</p>
+  </div>
+  <div class="cw">
+    <div class="ch"><span class="cl">Shell &mdash; Install for OCI</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="cm"># Core framework</span>
+pip install langchain
+
+<span class="cm"># All integrations (OCI, FAISS, PDF loaders...)</span>
+pip install langchain-community
+
+<span class="cm"># Cohere SDK</span>
+pip install cohere
+
+<span class="cm"># Graph workflows (separate package)</span>
+pip install langgraph</pre>
+  </div>
+</section>
+
+<!-- 8 COMPONENTS -->
+<section class="section" id="components">
+  <div class="ey">03 &mdash; Building Blocks</div>
+  <h2>All 8 Components at a Glance</h2>
+
+  <div class="cg">
+    <div class="cc"><div class="cn b">1 &mdash; Core</div><div class="cname">LLM Connector</div><p class="cdesc">Universal plug to any AI model. OCI Cohere, OpenAI, Gemini &mdash; same code. Change model = change one line.</p></div>
+    <div class="cc"><div class="cn b">2 &mdash; Core</div><div class="cname">Prompt Template</div><p class="cdesc">Fill-in-the-blank prompt. Define once with variables. Reuse with different values every time.</p></div>
+    <div class="cc"><div class="cn p">3 &mdash; Pipeline</div><div class="cname">Chains / LCEL</div><p class="cdesc">Connect steps. Output of step 1 feeds step 2 automatically. <code>prompt | llm | parser</code></p></div>
+    <div class="cc"><div class="cn p">4 &mdash; Context</div><div class="cname">Memory</div><p class="cdesc">AI remembers conversation history. Follow-up questions work without repeating context.</p></div>
+    <div class="cc"><div class="cn g">5 &mdash; Action</div><div class="cname">Tools</div><p class="cdesc">Python functions AI can call. Database, search, email, APIs. AI decides when to use them.</p></div>
+    <div class="cc"><div class="cn g">6 &mdash; Structure</div><div class="cname">Output Parser</div><p class="cdesc">Converts AI free text to structured Python dict or typed object. Reliable, machine-readable.</p></div>
+    <div class="cc"><div class="cn o">7 &mdash; Autonomous</div><div class="cname">Agents</div><p class="cdesc">AI decides what to do next dynamically. Observes &rarr; Thinks &rarr; Acts &rarr; Repeats until done.</p></div>
+    <div class="cc"><div class="cn o">8 &mdash; Interface</div><div class="cname">Runnable</div><p class="cdesc">Standard interface: <code>invoke()</code> &middot; <code>batch()</code> &middot; <code>stream()</code>. Every component uses same three methods.</p></div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- LLM CONNECTOR -->
+  <h3>Component 1 &mdash; LLM Connector</h3>
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Universal TV Remote</div>
+    <p>You have Sony, Samsung, LG TVs. Without universal remote: three different remotes. With universal remote: one remote, same buttons, works with all.</p>
+    <p><strong>LangChain LLM Connector = Universal AI Remote.</strong> Switch from OCI Cohere to OpenAI to Gemini with one line change.</p>
+  </div>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain_community.chat_models <span class="kw">import</span> <span class="cls">ChatCohere</span>
+
+llm = <span class="cls">ChatCohere</span>(
+    model=<span class="str">"command-a-03-2025"</span>,
+    temperature=<span class="num">0.5</span>,
+    max_tokens=<span class="num">500</span>,
+    cohere_api_key=<span class="str">"your_key"</span>
+)
+
+<span class="cm"># Switch to OpenAI — ONE LINE CHANGE:</span>
+<span class="cm"># llm = ChatOpenAI(model="gpt-4", temperature=0.5)</span>
+
+response = llm.invoke(<span class="str">"What is annual leave policy?"</span>)
+<span class="fn">print</span>(response.content)</pre>
+  </div>
+
+  <hr class="sep">
+
+  <!-- PROMPT TEMPLATE -->
+  <h3>Component 2 &mdash; Prompt Template</h3>
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Offer Letter Template in HR</div>
+    <p>Kavitha has a Word template: "Dear <em>[Name]</em>, we offer you <em>[Role]</em> at <em>[Salary]</em>." Fill 3 fields. Different letter every time. Template stays the same.</p>
+    <p><strong>ONE TEMPLATE. INFINITE VARIATIONS.</strong></p>
+  </div>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.prompts <span class="kw">import</span> <span class="cls">PromptTemplate</span>
+
+jd_template = <span class="cls">PromptTemplate</span>(
+    input_variables=[<span class="str">"job_title"</span>, <span class="str">"department"</span>, <span class="str">"experience"</span>],
+    template=<span class="str">"""
+    Write a professional job description for:
+    Job Title: {job_title}
+    Department: {department}
+    Experience: {experience}
+    Company: LTIMindtree, Hyderabad.
+    Include: Summary, Responsibilities, Skills, Benefits.
+    """</span>
+)
+
+<span class="cm"># Same template, different values every time</span>
+prompt = jd_template.format(
+    job_title=<span class="str">"Senior Java Developer"</span>,
+    department=<span class="str">"IT"</span>,
+    experience=<span class="str">"5-7 years"</span>
+)</pre>
+  </div>
+</section>
+
+<!-- LCEL -->
+<section class="section" id="lcel">
+  <div class="ey">04 &mdash; Pipelines</div>
+  <h2>LCEL &mdash; The Pipe Operator</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Swiggy Order Pipeline</div>
+    <p>You order &rarr; Restaurant confirms &rarr; Kitchen prepares &rarr; Delivery picks up &rarr; Arrives. Each step's output feeds the next <strong>automatically</strong>. You don't manage each step separately. Swiggy manages the chain.</p>
+    <p><strong>LangChain chain = Swiggy for AI calls.</strong></p>
+  </div>
+
+  <div class="callout info">
+    <div class="ci">&#8505;&#65039;</div>
+    <p><strong>The | pipe symbol</strong> means "output of left flows into input of right." Like water through pipes: Input &rarr; Template &rarr; LLM &rarr; Parser &rarr; Output.</p>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; LCEL New Way (Preferred)</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="cm"># NEW WAY — LCEL pipe operator (preferred)</span>
+chain = template <span class="op">|</span> llm <span class="op">|</span> parser
+result = chain.invoke({<span class="str">"job_title"</span>: <span class="str">"Java Developer"</span>})
+
+<span class="cm"># OLD WAY (still works, but not recommended for new code)</span>
+<span class="cm"># chain = LLMChain(llm=llm, prompt=template)</span>
+<span class="cm"># result = chain.run("Java Developer")</span>
+
+<span class="cm"># ── SEQUENTIAL CHAIN — two LLM calls connected ──</span>
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> LLMChain, SimpleSequentialChain
+
+extract_chain = <span class="cls">LLMChain</span>(llm=llm, prompt=extract_template)
+jd_chain      = <span class="cls">LLMChain</span>(llm=llm, prompt=jd_template)
+
+hiring_pipeline = <span class="cls">SimpleSequentialChain</span>(
+    chains=[extract_chain, jd_chain],
+    verbose=<span class="kw">True</span>   <span class="cm"># shows each step output</span>
+)
+
+result = hiring_pipeline.invoke(
+    <span class="str">"We need a Senior Java Developer for IT team"</span>
+)
+<span class="fn">print</span>(result[<span class="str">"output"</span>])
+<span class="cm"># OBSERVE: Step 1 output prints, Step 2 uses it automatically</span></pre>
+  </div>
+
+  <h3>Three Runnable Methods</h3>
+  <div class="tw"><table>
+    <tr><th>Method</th><th>What It Does</th><th>When to Use</th></tr>
+    <tr><td>invoke()</td><td>Single call, complete response</td><td>Most cases &mdash; one question, one answer</td></tr>
+    <tr><td>batch()</td><td>Multiple calls in parallel</td><td>Screen 50 resumes at once &mdash; 10s vs 2.5 min</td></tr>
+    <tr><td>stream()</td><td>Progressive word-by-word output</td><td>UI typing effect &mdash; like ChatGPT</td></tr>
+  </table></div>
+</section>
+
+<!-- MEMORY -->
+<section class="section" id="memory">
+  <div class="ey">05 &mdash; Context</div>
+  <h2>Memory &mdash; AI That Remembers</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Fresh Intern vs Experienced Executive</div>
+    <p><strong>Without memory (Fresh intern):</strong> You explain your issue. Next day: "What issue?" Starts from scratch. Frustrating.</p>
+    <p><strong>With memory (Experienced executive):</strong> "Yes, your casual leave rejection from Thursday &mdash; I spoke to your manager..." Remembers everything.</p>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.memory <span class="kw">import</span> ConversationBufferMemory
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> ConversationChain
+
+memory = <span class="cls">ConversationBufferMemory</span>()
+convo  = <span class="cls">ConversationChain</span>(llm=llm, memory=memory)
+
+r1 = convo.predict(input=<span class="str">"What is notice period at LTIMindtree?"</span>)
+<span class="cm"># Answer: "60 days for all permanent employees."</span>
+
+r2 = convo.predict(input=<span class="str">"And for probation employees?"</span>)
+<span class="cm"># AI knows "And for" refers to notice period from Q1</span>
+<span class="cm"># Answer: "For probation: 30 days."</span>
+
+r3 = convo.predict(input=<span class="str">"What if someone doesn't serve it?"</span>)
+<span class="cm"># AI still knows "it" = notice period</span>
+<span class="cm"># Answer: "Salary deducted for remaining days."</span></pre>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>Memory Type</th><th>Stores</th><th>Best For</th></tr>
+    <tr><td>ConversationBufferMemory</td><td>ALL messages</td><td>Short conversations (&lt;10 turns)</td></tr>
+    <tr><td>ConversationWindowMemory</td><td>Last N messages only</td><td>Medium conversations &mdash; controls cost</td></tr>
+    <tr><td>ConversationSummaryMemory</td><td>Summarises old messages</td><td>Long conversations &mdash; saves tokens</td></tr>
+  </table></div>
+</section>
+
+<!-- OUTPUT PARSER -->
+<section class="section" id="parser">
+  <div class="ey">06 &mdash; Structured Output</div>
+  <h2>Output Parser &mdash; AI to Structured Data</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Hospital Data Entry Clerk</div>
+    <p>Doctor writes free-form notes: "Patient 45yr male, fever 3 days, 102F, Paracetamol..." Hospital system needs: Age: 45 | Symptom: Fever | Medication: Paracetamol.</p>
+    <p><strong>Data entry clerk converts notes to structured form. Output Parser = that clerk for AI.</strong></p>
+  </div>
+
+  <div class="callout info">
+    <div class="ci">&#8505;&#65039;</div>
+    <p><strong>Real World:</strong> Kavitha gets 50 employee complaints as free text. Without parser: 2 hrs manual work. With parser: each complaint &rarr; structured dict with issue_type, urgency, action &rarr; system sorts and assigns automatically. <strong>This is your Complaint Extraction Assessment.</strong></p>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; StructuredOutputParser</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.output_parsers <span class="kw">import</span> StructuredOutputParser, ResponseSchema
+
+schemas = [
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"issue_type"</span>,
+        description=<span class="str">"LEAVE / SALARY / POLICY / OTHER"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"urgency"</span>,
+        description=<span class="str">"HIGH / MEDIUM / LOW"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"summary"</span>,
+        description=<span class="str">"One sentence summary of the complaint"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"action"</span>,
+        description=<span class="str">"Recommended HR action"</span>)
+]
+
+parser = <span class="cls">StructuredOutputParser</span>.from_response_schemas(schemas)
+
+template = <span class="cls">PromptTemplate</span>(
+    template=<span class="str">"Analyze complaint: {complaint}\n\n{format_instructions}"</span>,
+    input_variables=[<span class="str">"complaint"</span>],
+    partial_variables={<span class="str">"format_instructions"</span>: parser.get_format_instructions()}
+)
+
+chain  = template <span class="op">|</span> llm <span class="op">|</span> parser  <span class="cm"># LCEL pipe!</span>
+result = chain.invoke({<span class="str">"complaint"</span>: <span class="str">"Salary not credited for 2 months. Urgent."</span>})
+
+<span class="fn">print</span>(result[<span class="str">"issue_type"</span>])  <span class="cm"># "SALARY"</span>
+<span class="fn">print</span>(result[<span class="str">"urgency"</span>])    <span class="cm"># "HIGH"</span>
+<span class="fn">print</span>(result[<span class="str">"action"</span>])     <span class="cm"># "Escalate to Finance immediately"</span></pre>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="section" id="tools">
+  <div class="ey">07 &mdash; Actions</div>
+  <h2>Tools &mdash; AI That Acts</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; HR Executive with Full System Access</div>
+    <p><strong>Without tools:</strong> Brilliant expert who can only TALK. Knows all policies. Cannot check your actual leave balance. Cannot send emails. Cannot look up real data.</p>
+    <p><strong>With tools:</strong> Same expert with database access, email, HR portal. Now she can DO things, not just recite policy. One instruction &rarr; three real actions.</p>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; Defining Tools</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.tools <span class="kw">import</span> Tool
+
+<span class="cm"># Regular Python function</span>
+<span class="kw">def</span> <span class="fn">check_leave_balance</span>(employee_id: <span class="cls">str</span>) -> <span class="cls">str</span>:
+    <span class="kw">try</span>:
+        balance = db.query(<span class="str">f"SELECT leaves FROM employees WHERE id={employee_id}"</span>)
+        <span class="kw">return</span> <span class="str">f"Employee {employee_id} has {balance} days remaining."</span>
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">return</span> <span class="str">f"Error: {str(e)}"</span>  <span class="cm"># NEVER raise inside a tool</span>
+
+<span class="cm"># Wrap as LangChain Tool — description is CRITICAL</span>
+<span class="cm"># AI reads description to decide WHEN to call this tool</span>
+leave_tool = <span class="cls">Tool</span>(
+    name=<span class="str">"CheckLeaveBalance"</span>,
+    description=<span class="str">"""Check an employee's leave balance.
+    Input: employee_id as string.
+    Use this when asked about leave days or balance.
+    DO NOT use for policy questions."""</span>,
+    func=check_leave_balance
+)</pre>
+  </div>
+
+  <div class="callout warn">
+    <div class="ci">&#9888;&#65039;</div>
+    <p><strong>Golden rule:</strong> Always wrap tool functions in try/except and return an error <em>string</em>. Never raise an exception inside a tool &mdash; it will crash the agent.</p>
+  </div>
+
+  <div class="callout good">
+    <div class="ci">&#9989;</div>
+    <p><strong>Real companies:</strong> Razorpay &mdash; AI calls payment gateway. Swiggy &mdash; AI calls restaurant availability. MakeMyTrip &mdash; AI calls flight booking API. Paytm &mdash; AI calls transaction history. Tools give AI the ability to ACT on real systems.</p>
+  </div>
+</section>
+
+<!-- AGENTS -->
+<section class="section" id="agents">
+  <div class="ey">08 &mdash; Autonomous AI</div>
+  <h2>Agents &mdash; AI That Decides</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; New Employee vs Experienced Employee</div>
+    <p><strong>Chain = New employee Day 1.</strong> Manager writes steps 1-2-3. Employee follows exactly. Cannot adapt.</p>
+    <p><strong>Agent = Experienced employee after 2 years.</strong> You say: "Handle Arjun's leave issue." She figures out every step: check balance &rarr; check policy &rarr; apply &rarr; notify manager. You set the goal. She decides the steps.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title purple">ReAct Pattern &mdash; How an Agent Thinks</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Goal: "What is Arjun's leave balance and how do I apply?"</p>
+    <div class="flow">
+      <div class="fs"><div class="fn2">T</div><span><strong>Thought:</strong> I need Arjun's actual balance from the database.</span></div>
+      <div class="fa">&#8595;</div>
+      <div class="fs"><div class="fn2">A</div><span><strong>Action:</strong> CheckLeaveBalance &mdash; Input: "101"</span></div>
+      <div class="fa">&#8595;</div>
+      <div class="fs"><div class="fn2">O</div><span><strong>Observation:</strong> "Employee 101 has 8 annual leave days remaining."</span></div>
+      <div class="fa">&#8595;</div>
+      <div class="fs"><div class="fn2">T</div><span><strong>Thought:</strong> Now I need the application process. Use policy search.</span></div>
+      <div class="fa">&#8595;</div>
+      <div class="fs"><div class="fn2">A</div><span><strong>Action:</strong> SearchHRPolicy &mdash; Input: "leave application process"</span></div>
+      <div class="fa">&#8595;</div>
+      <div class="fs" style="border-color:var(--green);"><div class="fn2" style="color:var(--green);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.1);">&#10003;</div><span><strong style="color:var(--green);">Final Answer:</strong> "Arjun has 8 leave days. To apply: login to HR portal, select Leave &rarr; New Request, submit for manager approval."</span></div>
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; Create Agent</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+
+agent = <span class="fn">initialize_agent</span>(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="kw">True</span>,            <span class="cm"># shows Thought/Action/Observation</span>
+    max_iterations=<span class="num">7</span>,         <span class="cm"># prevents infinite loops</span>
+    handle_parsing_errors=<span class="kw">True</span>
+)
+
+result = agent.invoke({
+    <span class="str">"input"</span>: <span class="str">"Check leave balance for employee 101 and explain how to apply"</span>
+})
+<span class="fn">print</span>(result[<span class="str">"output"</span>])</pre>
+  </div>
+</section>
+
+<!-- CHAIN vs AGENT vs LANGGRAPH -->
+<section class="section" id="compare">
+  <div class="ey">09 &mdash; Choosing</div>
+  <h2>Chain vs Agent vs LangGraph</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Customer Complaint at a Bank</div>
+    <p><strong>Chain:</strong> Fixed steps &mdash; Read &rarr; Classify &rarr; Respond. Always. Cannot call fraud team if fraud detected.</p>
+    <p><strong>Agent:</strong> Reads complaint, thinks "This is fraud," calls fraud team, freezes account, escalates &mdash; steps not pre-defined. Sometimes unpredictable.</p>
+    <p><strong>LangGraph:</strong> Developer defines ALL paths. Normal &rarr; 3-step. Fraud &rarr; alert+freeze+escalate. You control every branch. Predictable. Safe for production.</p>
+  </div>
+
+  <div class="g3">
+    <div class="gc c1">
+      <div class="gch c1">Chain</div>
+      <ul>
+        <li>Fixed sequence A&rarr;B&rarr;C</li>
+        <li>No decisions at runtime</li>
+        <li>No loops</li>
+        <li>Very predictable</li>
+        <li>Easy to debug</li>
+        <li>Best: known pipelines</li>
+      </ul>
+    </div>
+    <div class="gc c2">
+      <div class="gch c2">Agent</div>
+      <ul>
+        <li>AI decides each step</li>
+        <li>Dynamic path</li>
+        <li>Can loop itself</li>
+        <li>Flexible</li>
+        <li>Harder to debug</li>
+        <li>Best: open questions</li>
+      </ul>
+    </div>
+    <div class="gc c3">
+      <div class="gch c3">LangGraph</div>
+      <ul>
+        <li>Developer defines all paths</li>
+        <li>Explicit if/else decisions</li>
+        <li>Explicit loops</li>
+        <li>Controlled + flexible</li>
+        <li>Fully auditable</li>
+        <li>Best: complex workflows</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>Feature</th><th style="color:var(--c1);">Chain</th><th style="color:var(--c2);">Agent</th><th style="color:var(--c3);">LangGraph</th></tr>
+    <tr><td>Steps</td><td>Pre-defined</td><td>Dynamic</td><td>Pre-defined paths</td></tr>
+    <tr><td>Decisions</td><td>None</td><td>AI decides</td><td>Developer defines</td></tr>
+    <tr><td>Loops</td><td>No</td><td>Yes (AI)</td><td>Yes (explicit)</td></tr>
+    <tr><td>Predictability</td><td>Very high</td><td>Medium</td><td>High</td></tr>
+    <tr><td>Safe for production</td><td>Yes</td><td>Be careful</td><td>Yes</td></tr>
+  </table></div>
+</section>
+
+<!-- LANGGRAPH -->
+<section class="section" id="langgraph">
+  <div class="ey">10 &mdash; Workflow Graphs</div>
+  <h2>LangGraph &mdash; Controlled AI Workflows</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; HR Flowchart on the Office Wall</div>
+    <p>Every HR office has a physical flowchart: "Receive Request &rarr; Check Budget &rarr; YES: Create JD | NO: Notify CFO &rarr; Post Job &rarr; Screen Resumes..."</p>
+    <p><strong>LangGraph builds that exact flowchart in Python &mdash; with AI doing the actual work at each box.</strong></p>
+  </div>
+
+  <div class="card">
+    <div class="card-title green">Three Core Concepts</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;">
+      <div style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.15);border-radius:8px;padding:14px;">
+        <div style="color:var(--green);font-weight:700;margin-bottom:6px;font-size:13px;">STATE</div>
+        <p style="font-size:12px;color:var(--muted);margin:0;">Shared dictionary passed between ALL nodes. Like a job file folder travelling desk to desk. Every node reads it and adds to it. Never loses previous data.</p>
+      </div>
+      <div style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.15);border-radius:8px;padding:14px;">
+        <div style="color:var(--green);font-weight:700;margin-bottom:6px;font-size:13px;">NODES</div>
+        <p style="font-size:12px;color:var(--muted);margin:0;">Individual Python functions. Each is one step. Receives state, does work (LLM call or tool), returns updates to state.</p>
+      </div>
+      <div style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.15);border-radius:8px;padding:14px;">
+        <div style="color:var(--green);font-weight:700;margin-bottom:6px;font-size:13px;">EDGES</div>
+        <p style="font-size:12px;color:var(--muted);margin:0;">Connections between nodes. Normal: always go to next. Conditional: call a function at runtime to decide which path.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; Complete Hiring Workflow Graph</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> typing <span class="kw">import</span> TypedDict, Optional
+<span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, END
+
+<span class="cm"># 1. STATE — shared file folder for the entire workflow</span>
+<span class="kw">class</span> <span class="cls">HiringState</span>(TypedDict):
+    job_request:     <span class="cls">str</span>
+    job_title:       Optional[<span class="cls">str</span>]
+    department:      Optional[<span class="cls">str</span>]
+    budget_approved: Optional[<span class="cls">bool</span>]
+    jd_content:      Optional[<span class="cls">str</span>]
+
+<span class="cm"># 2. NODES — each step in the workflow</span>
+<span class="kw">def</span> <span class="fn">extract_requirements</span>(state) -> <span class="cls">dict</span>:
+    response = llm.invoke(<span class="str">f"Extract job title from: {state['job_request']}"</span>)
+    <span class="kw">return</span> {<span class="str">"job_title"</span>: <span class="str">"Senior Java Developer"</span>, <span class="str">"department"</span>: <span class="str">"IT"</span>}
+
+<span class="kw">def</span> <span class="fn">check_budget</span>(state) -> <span class="cls">dict</span>:
+    budget = db.query(<span class="str">f"SELECT budget FROM depts WHERE name='{state['department']}'"</span>)
+    <span class="kw">return</span> {<span class="str">"budget_approved"</span>: budget > <span class="num">0</span>}
+
+<span class="kw">def</span> <span class="fn">generate_jd</span>(state) -> <span class="cls">dict</span>:
+    jd = llm.invoke(<span class="str">f"Write JD for {state['job_title']} at LTIMindtree"</span>)
+    <span class="kw">return</span> {<span class="str">"jd_content"</span>: jd.content}
+
+<span class="kw">def</span> <span class="fn">notify_no_budget</span>(state) -> <span class="cls">dict</span>:
+    send_email(<span class="str">"cfo@ltimindtree.com"</span>, <span class="str">f"Budget needed for {state['job_title']}"</span>)
+    <span class="kw">return</span> {}
+
+<span class="cm"># 3. DECISION FUNCTION — which path to take?</span>
+<span class="kw">def</span> <span class="fn">route_budget</span>(state) -> <span class="cls">str</span>:
+    <span class="kw">return</span> <span class="str">"generate_jd"</span> <span class="kw">if</span> state[<span class="str">"budget_approved"</span>] <span class="kw">else</span> <span class="str">"notify_no_budget"</span>
+
+<span class="cm"># 4. BUILD THE GRAPH</span>
+graph = <span class="cls">StateGraph</span>(HiringState)
+graph.add_node(<span class="str">"extract"</span>,           extract_requirements)
+graph.add_node(<span class="str">"check_budget"</span>,      check_budget)
+graph.add_node(<span class="str">"generate_jd"</span>,       generate_jd)
+graph.add_node(<span class="str">"notify_no_budget"</span>,  notify_no_budget)
+
+graph.set_entry_point(<span class="str">"extract"</span>)
+graph.add_edge(<span class="str">"extract"</span>,           <span class="str">"check_budget"</span>)
+graph.add_edge(<span class="str">"generate_jd"</span>,       END)
+graph.add_edge(<span class="str">"notify_no_budget"</span>,  END)
+graph.add_conditional_edges(<span class="str">"check_budget"</span>, route_budget,
+    {<span class="str">"generate_jd"</span>: <span class="str">"generate_jd"</span>, <span class="str">"notify_no_budget"</span>: <span class="str">"notify_no_budget"</span>})
+
+workflow = graph.compile()
+result   = workflow.invoke({<span class="str">"job_request"</span>: <span class="str">"Hire Senior Java Developer for IT"</span>})
+<span class="fn">print</span>(result[<span class="str">"jd_content"</span>])</pre>
+  </div>
+</section>
+
+<!-- SEMANTIC KERNEL -->
+<section class="section" id="sk">
+  <div class="ey">11 &mdash; Microsoft Framework</div>
+  <h2>Semantic Kernel</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; WhatsApp vs Microsoft Teams</div>
+    <p><strong>LangChain = WhatsApp.</strong> Community product. Born open source. Everyone uses it. Great for Python teams on OCI/AWS/GCP.</p>
+    <p><strong>Semantic Kernel = Microsoft Teams.</strong> Official Microsoft product. C#, Java, Python. Deep Azure integration. Enterprise support contract available. Same concepts, different company.</p>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th></th><th>LangChain</th><th>Semantic Kernel</th></tr>
+    <tr><td>Creator</td><td>Open source community</td><td>Microsoft (official)</td></tr>
+    <tr><td>Languages</td><td>Python, JavaScript</td><td>Python, C#, Java</td></tr>
+    <tr><td>Best for</td><td>Python, OCI / AWS / GCP</td><td>Azure, Microsoft 365, C# teams</td></tr>
+    <tr><td>Prompt Template &rarr;</td><td>PromptTemplate</td><td>Semantic Function</td></tr>
+    <tr><td>Tool &rarr;</td><td>Tool</td><td>Plugin / Native Function</td></tr>
+    <tr><td>Agent &rarr;</td><td>Agent</td><td>Planner</td></tr>
+    <tr><td>Memory &rarr;</td><td>Memory</td><td>Conversation History</td></tr>
+  </table></div>
+
+  <div class="callout info">
+    <div class="ci">&#8505;&#65039;</div>
+    <p><strong>For this programme:</strong> LangChain is the right choice &mdash; Python-first, native OCI integrations, larger ecosystem. Learn Semantic Kernel if your company runs C# on Azure.</p>
+  </div>
+</section>
+
+<!-- TOKENS -->
+<section class="section" id="tokens">
+  <div class="ey">12 &mdash; Settings That Matter</div>
+  <h2>Tokens, Temperature &amp; Cost</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Airtel SMS Charges</div>
+    <p>Old days: each SMS = 1 credit (under 160 chars), long = 2 credits. AI works the same way. The unit is called a <strong>TOKEN</strong>. 1 token &asymp; 0.75 words.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title blue">Tokens &mdash; Input + Output = Cost</div>
+    <div class="tw" style="margin:12px 0 0;">
+      <table>
+        <tr><th>Token Type</th><th>What It Is</th><th>Example Cost</th></tr>
+        <tr><td>Input tokens</td><td>What you send (prompt + question)</td><td>~150 tokens per HR question</td></tr>
+        <tr><td>Output tokens</td><td>What AI generates (answer)</td><td>~300 tokens for one answer</td></tr>
+        <tr><td>Total cost</td><td>Input + Output &times; $2/million</td><td>450 tokens = &#8377;0.07</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:12px;font-size:13px;color:var(--muted);"><strong style="color:var(--text);">max_tokens guide:</strong> 200 &mdash; short answers &nbsp;|&nbsp; 500 &mdash; chatbot &nbsp;|&nbsp; 1000 &mdash; JD generation &nbsp;|&nbsp; 2000 &mdash; detailed reports</p>
+    <p style="font-size:13px;color:var(--muted);margin:0;"><strong style="color:var(--green);">Kavitha's monthly AI cost:</strong> 100 hires + 500 chatbot questions = &#8377;95/month. ROI: saves 47 hours/month.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title purple">Temperature &mdash; Factual vs Creative</div>
+    <div class="tw" style="margin-top:10px;">
+      <table>
+        <tr><th>Value</th><th>Behaviour</th><th>Use Case for LTIMindtree</th></tr>
+        <tr><td>0.2</td><td>Same answer every time</td><td>Resume scoring, classification</td></tr>
+        <tr><td>0.3</td><td>Factual and consistent</td><td>HR policy Q&amp;A</td></tr>
+        <tr><td>0.5</td><td>Balanced, natural language</td><td>General HR chatbot</td></tr>
+        <tr><td>0.7</td><td>Creative and varied</td><td>JD writing, email drafting</td></tr>
+        <tr><td>1.0</td><td>Very creative, unpredictable</td><td>Brainstorming only</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- RAG PREVIEW -->
+<section class="section" id="rag">
+  <div class="ey">13 &mdash; Preview of Day 37</div>
+  <h2>RAG &mdash; AI That Reads Your Documents</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Two Types of Doctors</div>
+    <p><strong>Without RAG (current chatbot):</strong> Doctor answers from 5-year-old memory. Doesn't look at your actual reports. May be right. May be wrong.</p>
+    <p><strong>With RAG:</strong> Doctor reads your actual blood tests, X-ray, history &mdash; then answers from YOUR specific data. Cannot give generic wrong answers.</p>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>Feature</th><th>Without RAG (preamble)</th><th>With RAG</th></tr>
+    <tr><td>Data source</td><td>AI training data (guesses)</td><td>Your actual documents</td></tr>
+    <tr><td>Accuracy</td><td>Medium &mdash; generic answers</td><td>High &mdash; reads real doc</td></tr>
+    <tr><td>Policy updates</td><td>Manual update code</td><td>Just re-upload PDF</td></tr>
+    <tr><td>Unknown questions</td><td>Invents answer</td><td>Says "not found in docs"</td></tr>
+    <tr><td>Company-specific</td><td>Generic IT company answers</td><td>Exact LTI policy text</td></tr>
+  </table></div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; RAG Quick Preview (Full on Day 37)</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> FAISS
+<span class="kw">from</span> langchain_community.embeddings <span class="kw">import</span> CohereEmbeddings
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> RetrievalQA
+<span class="kw">from</span> langchain.document_loaders <span class="kw">import</span> PyPDFLoader
+
+<span class="cm"># Load actual LTI policy PDF</span>
+loader = <span class="cls">PyPDFLoader</span>(<span class="str">"ltimindtree_hr_policy_2026.pdf"</span>)
+documents = loader.load()
+
+<span class="cm"># Convert chunks to vectors and store</span>
+embeddings = <span class="cls">CohereEmbeddings</span>(model=<span class="str">"embed-multilingual-v3.0"</span>)
+vectorstore = <span class="cls">FAISS</span>.from_documents(documents, embeddings)
+
+<span class="cm"># QA chain that retrieves before answering</span>
+qa_chain = <span class="cls">RetrievalQA</span>.from_chain_type(
+    llm=llm,
+    retriever=vectorstore.as_retriever(search_kwargs={<span class="str">"k"</span>: <span class="num">3</span>})
+)
+
+result = qa_chain.invoke(<span class="str">"What is the exact maternity leave policy?"</span>)
+<span class="cm"># Finds page 89, Section 12.4 of PDF</span>
+<span class="cm"># Answers from actual document text — cannot hallucinate</span></pre>
+  </div>
+</section>
+
+<!-- LABS -->
+<section class="section" id="labs">
+  <div class="ey">14 &mdash; Hands-On</div>
+  <h2>Mini Labs</h2>
+
+  <div class="callout warn">
+    <div class="ci">&#128230;</div>
+    <p><strong>Setup first:</strong> <code>pip install langchain langchain-community cohere langchain-core</code></p>
+  </div>
+
+  <h3>Lab 1 &mdash; Single Chain (5 min)</h3>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain_community.chat_models <span class="kw">import</span> <span class="cls">ChatCohere</span>
+<span class="kw">from</span> langchain.prompts <span class="kw">import</span> <span class="cls">PromptTemplate</span>
+
+llm = <span class="cls">ChatCohere</span>(model=<span class="str">"command-a-03-2025"</span>, temperature=<span class="num">0.5</span>,
+                  max_tokens=<span class="num">300</span>, cohere_api_key=<span class="str">"YOUR_KEY"</span>)
+
+template = <span class="cls">PromptTemplate</span>(
+    input_variables=[<span class="str">"question"</span>],
+    template=<span class="str">"You are HR assistant for LTIMindtree. Answer: {question}"</span>
+)
+
+chain  = template <span class="op">|</span> llm
+result = chain.invoke({<span class="str">"question"</span>: <span class="str">"How many annual leaves do we get?"</span>})
+<span class="fn">print</span>(result.content)
+<span class="cm"># OBSERVE: Template formatted the question. LLM responded professionally.</span></pre>
+  </div>
+
+  <h3>Lab 2 &mdash; Sequential Chain (10 min)</h3>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.chains <span class="kw">import</span> LLMChain, SimpleSequentialChain
+
+extract_t = <span class="cls">PromptTemplate</span>(input_variables=[<span class="str">"request"</span>],
+    template=<span class="str">"""Extract from: "{request}"\nReturn:\nTitle: [x]\nDept: [x]\nExp: [x]"""</span>)
+
+jd_t = <span class="cls">PromptTemplate</span>(input_variables=[<span class="str">"requirements"</span>],
+    template=<span class="str">"""Based on:\n{requirements}\nWrite 200-word JD for LTIMindtree Hyderabad."""</span>)
+
+pipeline = <span class="cls">SimpleSequentialChain</span>(
+    chains=[<span class="cls">LLMChain</span>(llm=llm, prompt=extract_t),
+            <span class="cls">LLMChain</span>(llm=llm, prompt=jd_t)],
+    verbose=<span class="kw">True</span>
+)
+result = pipeline.invoke(<span class="str">"We need a Python Data Engineer for Analytics team"</span>)
+<span class="fn">print</span>(result[<span class="str">"output"</span>])
+<span class="cm"># OBSERVE: Step 1 prints requirements. Step 2 uses them automatically. No manual passing.</span></pre>
+  </div>
+
+  <h3>Lab 3 &mdash; Memory (10 min)</h3>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.memory <span class="kw">import</span> ConversationBufferMemory
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> ConversationChain
+
+memory = <span class="cls">ConversationBufferMemory</span>()
+convo  = <span class="cls">ConversationChain</span>(llm=llm, memory=memory)
+
+questions = [
+    <span class="str">"What is the notice period at LTIMindtree?"</span>,
+    <span class="str">"And for probation employees?"</span>,
+    <span class="str">"What happens if someone doesn't serve it?"</span>
+]
+
+<span class="kw">for</span> q <span class="kw">in</span> questions:
+    <span class="fn">print</span>(<span class="str">f"You: {q}"</span>)
+    <span class="fn">print</span>(<span class="str">f"AI:  {convo.predict(input=q)}\n"</span>)
+
+<span class="cm"># OBSERVE: Q2 "And for probation?" — AI knows you mean notice period</span>
+<span class="cm"># Q3 "doesn't serve it" — AI knows "it" = notice period from Q1</span></pre>
+  </div>
+
+  <h3>Lab 4 &mdash; Output Parser &mdash; Complaint Extraction (10 min)</h3>
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; Assessment 1 Connection</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">from</span> langchain.output_parsers <span class="kw">import</span> StructuredOutputParser, ResponseSchema
+
+schemas = [
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"issue_type"</span>,  description=<span class="str">"LEAVE/SALARY/POLICY/OTHER"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"urgency"</span>,     description=<span class="str">"HIGH/MEDIUM/LOW"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"summary"</span>,     description=<span class="str">"One sentence summary"</span>),
+    <span class="cls">ResponseSchema</span>(name=<span class="str">"action"</span>,      description=<span class="str">"Recommended HR action"</span>),
+]
+parser = <span class="cls">StructuredOutputParser</span>.from_response_schemas(schemas)
+tmpl   = <span class="cls">PromptTemplate</span>(
+    template=<span class="str">"Analyze complaint: {complaint}\n\n{format_instructions}"</span>,
+    input_variables=[<span class="str">"complaint"</span>],
+    partial_variables={<span class="str">"format_instructions"</span>: parser.get_format_instructions()}
+)
+chain = tmpl <span class="op">|</span> llm <span class="op">|</span> parser
+
+complaints = [
+    <span class="str">"Salary not credited for 2 months. EMI due. Very urgent."</span>,
+    <span class="str">"Manager rejected casual leave without any reason."</span>,
+    <span class="str">"Company laptop slow for 3 months. IT team not helping."</span>
+]
+<span class="kw">for</span> c <span class="kw">in</span> complaints:
+    r = chain.invoke({<span class="str">"complaint"</span>: c})
+    <span class="fn">print</span>(<span class="str">f"{r['issue_type']} | {r['urgency']} | {r['summary']}"</span>)
+
+<span class="cm"># OBSERVE: Every complaint → same 5 structured fields.</span>
+<span class="cm"># Complaint 1 → SALARY, HIGH | Complaint 2 → LEAVE, MEDIUM</span>
+<span class="cm"># This is your Complaint Extraction Assessment solution!</span></pre>
+  </div>
+</section>
+
+<!-- ERRORS -->
+<section class="section" id="errors">
+  <div class="ey">15 &mdash; Production</div>
+  <h2>Error Handling</h2>
+
+  <div class="analogy">
+    <div class="at">Analogy &mdash; Calling Airtel Customer Care</div>
+    <p>200 = Connected, answered. &nbsp; 401 = "Please verify your account" (API key wrong). &nbsp; 404 = "Number does not exist" (wrong model name). &nbsp; 429 = "All agents busy" (rate limit). &nbsp; Parsing Error = Agent spoke but garbled (AI didn't return JSON).</p>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+    <tr><td>401 Auth Error</td><td>Wrong API key / Web Credential</td><td>Check credentials</td></tr>
+    <tr><td>404 Not Found</td><td>Wrong model name</td><td>Use <code>cohere.command-a-03-2025</code></td></tr>
+    <tr><td>429 Rate Limit</td><td>Too many calls per minute</td><td><code>time.sleep(60)</code> then retry</td></tr>
+    <tr><td>OutputParserException</td><td>AI didn't follow JSON format</td><td>Use <code>OutputFixingParser</code></td></tr>
+    <tr><td>Agent loops forever</td><td>Tool returns wrong data</td><td>Set <code>max_iterations=7</code></td></tr>
+  </table></div>
+
+  <div class="cw">
+    <div class="ch"><span class="cl">Python &mdash; Always Wrap Calls</span><div class="cd"><span></span><span></span><span></span></div></div>
+    <pre><span class="kw">import</span> time
+
+<span class="kw">try</span>:
+    result = chain.invoke({<span class="str">"input"</span>: user_question})
+    <span class="fn">print</span>(result)
+<span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+    <span class="kw">if</span> <span class="str">"401"</span> <span class="kw">in</span> <span class="fn">str</span>(e):
+        <span class="fn">print</span>(<span class="str">"Authentication failed — check API key"</span>)
+    <span class="kw">elif</span> <span class="str">"429"</span> <span class="kw">in</span> <span class="fn">str</span>(e):
+        time.sleep(<span class="num">60</span>)
+        result = chain.invoke({<span class="str">"input"</span>: user_question})
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">f"Error: {str(e)}"</span>)
+
+<span class="cm"># Inside tools — NEVER raise, always return string</span>
+<span class="kw">def</span> <span class="fn">my_tool</span>(input_str: <span class="cls">str</span>) -> <span class="cls">str</span>:
+    <span class="kw">try</span>:
+        <span class="kw">return</span> do_the_work(input_str)
+    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">return</span> <span class="str">f"Tool error: {str(e)}"</span>  <span class="cm"># Agent reads this and handles gracefully</span></pre>
+  </div>
+</section>
+
+<!-- PROGRESSION -->
+<section class="section">
+  <div class="ey">16 &mdash; Learning Path</div>
+  <h2>The Progression &mdash; Day 33 to Day 37</h2>
+
+  <div class="prog-grid">
+    <div class="prog-card">
+      <div class="prog-step">Day 33-34</div>
+      <div class="prog-title">Traditional AI Call</div>
+      <p class="prog-desc">Direct REST call to OCI. Manual JSON, auth, parsing. One question, one answer. Works but 500+ lines for complex workflows.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 35 &mdash; Part 1</div>
+      <div class="prog-title">LangChain Basics</div>
+      <p class="prog-desc">Prompt Template + LLM + Output Parser. Clean code. Model agnostic. 50 lines instead of 500. Switch models in one line.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 35 &mdash; Part 2</div>
+      <div class="prog-title">+ Memory</div>
+      <p class="prog-desc">Multi-turn conversation. AI remembers context. "And for probation?" works. Follow-ups understood. Real chatbot experience.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 35 &mdash; Part 3</div>
+      <div class="prog-title">+ Tools</div>
+      <p class="prog-desc">AI queries real database. Sends real emails. Updates real systems. AI can ACT, not just talk.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 35 &mdash; Part 4</div>
+      <div class="prog-title">+ Agents</div>
+      <p class="prog-desc">One instruction. AI decides all steps. "Handle Arjun's issue" &rarr; agent checks balance, policy, applies leave, notifies manager.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 35 &mdash; Part 5</div>
+      <div class="prog-title">LangGraph</div>
+      <p class="prog-desc">Complex workflows. IF budget &rarr; JD. ELSE &rarr; notify CFO. Full control. Predictable. Production-grade. Auditable.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Day 37 &mdash; Next</div>
+      <div class="prog-title">RAG</div>
+      <p class="prog-desc">AI answers from YOUR actual documents. Reads real HR policy PDF. Cannot hallucinate. Always accurate. Always current.</p>
+    </div>
+    <div class="prog-card">
+      <div class="prog-step">Result</div>
+      <div class="prog-title">Kavitha's Outcome</div>
+      <p class="prog-desc">47 emails in 47 minutes instead of 8 hours. AI handles. She reviews. Same quality. 10x speed. Cost: &#8377;95/month.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INTERVIEW Q&A -->
+<section class="section" id="interview">
+  <div class="ey">17 &mdash; Assessment Prep</div>
+  <h2>Interview Questions</h2>
+
+  <div class="qa">
+    <div class="qq">What is LangChain? Where does it fit in the AI stack?</div>
+    <div class="qa-a">LangChain is a Python framework for building LLM-powered applications. It sits between your app and the AI model: App &rarr; LangChain &rarr; OCI SDK &rarr; OCI Gen AI. It is NOT an AI model &mdash; it organises how your application uses AI.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">Why use LangChain instead of direct OCI REST API?</div>
+    <div class="qa-a">Direct API = manual JSON, authentication, parsing for every call. 500+ lines for complex workflows. Breaks when model changes. LangChain = 50 lines, model-agnostic, built-in memory/parsers/tools/chains. Switch AI provider with one line.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is LCEL and why is the pipe | operator used?</div>
+    <div class="qa-a">LangChain Expression Language. The pipe connects components so output of left becomes input of right automatically. <code>prompt | llm | parser</code> creates a pipeline. All components support invoke/batch/stream consistently. Replaces old chain.run().</div>
+  </div>
+  <div class="qa">
+    <div class="qq">Difference between Chain, Agent, and LangGraph?</div>
+    <div class="qa-a">Chain = fixed sequence A&rarr;B&rarr;C, no decisions. Agent = AI decides each step dynamically. LangGraph = developer defines all nodes, edges, and conditional paths, AI follows the controlled flowchart. Chain for pipelines, Agent for open Q&A, LangGraph for production workflows.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is State in LangGraph?</div>
+    <div class="qa-a">A shared TypedDict passed between all nodes. Like a job file folder travelling desk to desk. Every node reads it and returns updates. Holds all information accumulated as the workflow runs. Never loses previous nodes' results.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is an Output Parser and why use it?</div>
+    <div class="qa-a">Converts AI free text to structured Python dict or typed object. You define schema (fields and descriptions). Parser tells LLM what JSON to return and validates it. Makes AI output reliably machine-readable &mdash; no regex, no manual parsing.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What are the three Runnable methods?</div>
+    <div class="qa-a"><strong>invoke()</strong> = single call, complete response (most common). <strong>batch()</strong> = multiple parallel calls, faster for bulk operations like screening 50 resumes. <strong>stream()</strong> = progressive word-by-word output for UI typing effect.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is model agnostic and why does it matter?</div>
+    <div class="qa-a">Same LangChain code works with any AI model. Change OCI Cohere to OpenAI to Gemini &mdash; one line change. Chains, memory, tools, parsers all stay unchanged. Avoids vendor lock-in. Future-proofs your codebase.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is Memory and what are the types?</div>
+    <div class="qa-a">Stores conversation history so AI remembers context. BufferMemory = stores everything (short conversations under 10 turns). WindowMemory = last N messages (medium, controls cost). SummaryMemory = summarises old messages (long conversations). Without memory every question is a fresh start.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">When to use Semantic Kernel instead of LangChain?</div>
+    <div class="qa-a">When team codes in C# or Java, when company runs on Microsoft Azure, when Microsoft enterprise support contract is needed, or when building on Microsoft 365. For Python + OCI/AWS/GCP environments &mdash; LangChain is the better choice.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">Why is Tool description so important for agents?</div>
+    <div class="qa-a">The agent reads the description to decide WHEN to call the tool. Poor description = wrong tool chosen = wrong answer. Good description includes: what it does, when to use it, what NOT to use it for, and exact input format with examples.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is RAG and why is it better than preambleOverride?</div>
+    <div class="qa-a">RAG = Retrieval Augmented Generation. AI answers from YOUR actual documents. preambleOverride = you manually type policies &mdash; can be wrong, incomplete, outdated. RAG reads the actual PDF &mdash; cannot hallucinate, handles 200 pages, always current. Full implementation in Day 37.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">Temperature 0.3 vs 0.7 &mdash; when to use each?</div>
+    <div class="qa-a">0.3 = factual and consistent (HR policy Q&A, complaint scoring &mdash; same answer every time). 0.7 = creative and varied (JD writing, email drafting &mdash; engaging, different phrasing each call). Lower = deterministic. Higher = creative.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">What is the ReAct pattern?</div>
+    <div class="qa-a">Reasoning + Acting. Agent loop: Thought (what do I need?) &rarr; Action (which tool?) &rarr; Observation (what did tool return?) &rarr; repeat until question fully answered. Used in ZERO_SHOT_REACT_DESCRIPTION agent type.</div>
+  </div>
+  <div class="qa">
+    <div class="qq">Input tokens vs Output tokens vs max_tokens?</div>
+    <div class="qa-a">Input tokens = what you SEND to AI (prompt + question). Output tokens = what AI GENERATES back (answer). Total cost = input + output. max_tokens = limit you set on output length. Set based on use case: 200 short, 500 chatbot, 1000 JD, 2000 report.</div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="section">
+  <div class="ey">Summary</div>
+  <h2>Day 35 &mdash; Complete Picture</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+    <div class="callout good" style="margin:0;"><div class="ci">&#128279;</div><div><p><strong>LangChain</strong></p><p>Framework between app and AI. 8 components. Model agnostic. invoke/batch/stream. 50 lines instead of 500.</p></div></div>
+    <div class="callout purple" style="margin:0;"><div class="ci">&#128256;</div><div><p><strong>LangGraph</strong></p><p>Controlled workflows. State + Nodes + Edges + Conditional Edges. Full control. Production-grade. Auditable.</p></div></div>
+    <div class="callout info" style="margin:0;"><div class="ci">&#127970;</div><div><p><strong>Semantic Kernel</strong></p><p>Microsoft's LangChain. Python + C# + Java. Same concepts. Choose when your company runs Azure or C#.</p></div></div>
+    <div class="callout warn" style="margin:0;"><div class="ci">&#128196;</div><div><p><strong>RAG &mdash; Day 37 Preview</strong></p><p>AI answers from YOUR actual documents. Accurate, grounded. Cannot hallucinate. Embeddings + Vector Store + Retriever + LLM.</p></div></div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">The transformation LangChain enables</div>
+    <div style="font-size:20px;font-weight:700;color:#fff;">47 emails &rarr; 47 minutes</div>
+    <div style="color:var(--muted);margin:4px 0 16px;">instead of 8 hours &mdash; AI handles, Kavitha reviews</div>
+    <div style="display:flex;justify-content:center;gap:28px;flex-wrap:wrap;">
+      <div><div style="color:var(--green);font-weight:700;font-size:15px;">&#8377;95/month</div><div style="font-size:11px;color:var(--faint);">AI cost</div></div>
+      <div><div style="color:var(--green);font-weight:700;font-size:15px;">60&times; faster</div><div style="font-size:11px;color:var(--faint);">per hire</div></div>
+      <div><div style="color:var(--green);font-weight:700;font-size:15px;">One instruction</div><div style="font-size:11px;color:var(--faint);">agent handles rest</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <div class="card-title blue">Coming Next</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+      <span style="background:rgba(91,138,240,.10);border:1px solid rgba(91,138,240,.2);border-radius:6px;padding:6px 14px;font-size:13px;color:var(--accent);">Day 36 &rarr; AI Agents deep dive</span>
+      <span style="background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.2);border-radius:6px;padding:6px 14px;font-size:13px;color:var(--accent2);">Day 37 &rarr; RAG from real PDF</span>
+      <span style="background:rgba(52,211,153,.10);border:1px solid rgba(52,211,153,.2);border-radius:6px;padding:6px 14px;font-size:13px;color:var(--green);">Day 38 &rarr; OCI Object Storage</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>LTIMindtree OCI GenAI Foundation Programme</span>
+  <span>Day 35 &middot; LangChain &middot; LangGraph &middot; Semantic Kernel</span>
+</footer>
+
+</body>
+</html>

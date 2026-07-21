@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Assignment 1 — Student Management Application</title>
+<style>
+:root{--bg:#F7F8FA;--surface:#FFF;--border:#E4E7ED;--accent:#1A5276;--accent-light:#EAF0F8;--accent-mid:#C5D9EF;--gold:#B7860B;--gold-light:#FDF8EC;--green:#1D6A3E;--green-light:#EAF5EE;--red:#8B1A1A;--red-light:#FDF0F0;--teal:#0E6655;--teal-light:#E8F8F5;--purple:#4A235A;--purple-light:#F5EEF8;--text:#1C1C2E;--muted:#5D6D7E;--radius:10px;--shadow:0 2px 10px rgba(0,0,0,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
+.header{background:linear-gradient(135deg,#1A3A5C,#1A5276);color:#fff;padding:40px 44px 32px;position:relative;overflow:hidden}
+.header::after{content:'';position:absolute;right:-60px;bottom:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.04)}
+.asgn-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.header h1{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px}
+.header-sub{font-size:14px;opacity:.75;margin-bottom:22px}
+.header-pills{display:flex;flex-wrap:wrap;gap:10px}
+.header-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600}
+.container{max-width:900px;margin:0 auto;padding:36px 20px 80px}
+.section-label{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:36px 0 14px;padding-left:2px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--accent-light)}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:var(--accent);flex:1}
+.step-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#fff;padding:3px 10px;border-radius:20px}
+.step-body{padding:20px}
+.card{border-radius:8px;padding:14px 16px;margin-bottom:14px;border-left:4px solid}
+.card:last-child{margin-bottom:0}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.card-content{font-size:14px;line-height:1.75}
+.card.what{background:var(--accent-light);border-color:var(--accent)}.card.what .card-label{color:var(--accent)}
+.card.how{background:var(--green-light);border-color:var(--green)}.card.how .card-label{color:var(--green)}
+.card.note{background:#FFF8E1;border-color:#F9A825}.card.note .card-label{color:#7A5800}
+.card.warn{background:var(--red-light);border-color:var(--red)}.card.warn .card-label{color:var(--red)}
+.card.tip{background:var(--teal-light);border-color:var(--teal)}.card.tip .card-label{color:var(--teal)}
+.card.submit{background:var(--purple-light);border-color:var(--purple)}.card.submit .card-label{color:var(--purple)}
+.steps{list-style:none;margin-top:10px}
+.steps li{position:relative;padding:7px 0 7px 32px;font-size:14px;border-left:2px solid var(--border);margin-left:12px;line-height:1.6}
+.steps li::before{content:attr(data-n);position:absolute;left:-12px;top:7px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps li+li{margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px}
+th{background:var(--accent-light);color:var(--accent);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--accent-mid)}
+td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--accent-light)}
+pre{background:#1C1C2E;color:#E0E0F0;border-radius:8px;padding:16px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code','Courier New',monospace;font-size:13px;line-height:1.65;margin-top:10px}
+.kw{color:#79B8FF}.str{color:#9ECBFF}.cm{color:#6A9955;font-style:italic}.num{color:#F97583}.fn{color:#DCDCAA}
+hr{border:none;border-top:1px dashed var(--border);margin:16px 0}
+.checklist{list-style:none;margin-top:10px}
+.checklist li{padding:6px 0 6px 28px;position:relative;font-size:14px;border-bottom:1px dashed var(--border)}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:'☐';position:absolute;left:0;color:var(--accent);font-size:15px}
+.submit-grid{display:grid;grid-template-columns:auto 1fr;gap:0}
+.submit-num{background:var(--accent);color:#fff;width:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.submit-text{padding:10px 14px;font-size:14px;border-bottom:1px solid var(--border);background:var(--surface)}
+.submit-grid > *:nth-last-child(-n+2){border-bottom:none}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.badge{background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-mid);border-radius:6px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.footer{text-align:center;padding:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:48px}
+@media(max-width:700px){.header{padding:28px 20px 22px}.header h1{font-size:22px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="asgn-pill">&#128203; Assignment 1 &middot; Day 31</div>
+  <h1>Student Management Application</h1>
+  <p class="header-sub">Oracle APEX &middot; Table Creation &middot; Interactive Report &middot; Form &middot; Dynamic Action &middot; Validations</p>
+  <div class="header-pills">
+    <span class="header-pill">&#128197; Day 31 &middot; July 13, 2026</span>
+    <span class="header-pill">&#127919; Individual Assessment</span>
+    <span class="header-pill">&#128196; Submit: PDF or Word</span>
+    <span class="header-pill">&#128190; File: RollNumber_StudentManagementApp.pdf</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- BEFORE YOU START -->
+<div class="section-label">Before You Start</div>
+<div class="card note" style="margin-bottom:20px;">
+  <div class="card-label">&#9888; Read First</div>
+  <div class="card-content">
+    &bull; This is an <strong>individual assignment</strong> &mdash; do not share your workspace credentials or copy another student's work.<br>
+    &bull; Use exact names given for tables, columns, pages, items, and buttons &mdash; evaluation depends on it.<br>
+    &bull; Take a screenshot at every stage listed under &ldquo;What You Must Submit&rdquo;.<br>
+    &bull; Your screenshot must show the <strong>browser URL and workspace name</strong> so the evaluator can confirm it is your own account.<br>
+    &bull; File name format: <code>RollNumber_StudentManagementApp.pdf</code> &nbsp;(e.g. <code>21CS045_StudentManagementApp.pdf</code>)
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="section-label">Step 1 &middot; Create and Populate the STUDENTS Table</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-title">Create the STUDENTS Table</div>
+    <div class="step-tag">SQL Workshop</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card what">
+      <div class="card-label">Table Structure Required</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>Column</th><th>Data Type</th><th>Rule</th></tr>
+          <tr><td><strong>STUDENT_ID</strong></td><td>NUMBER</td><td>Primary Key &middot; Auto-generated &middot; Use GENERATED ALWAYS AS IDENTITY</td></tr>
+          <tr><td><strong>STUDENT_NAME</strong></td><td>VARCHAR2(100)</td><td>Mandatory &middot; NOT NULL</td></tr>
+          <tr><td><strong>EMAIL</strong></td><td>VARCHAR2(150)</td><td>Optional &middot; Can be NULL</td></tr>
+          <tr><td><strong>DEPARTMENT</strong></td><td>VARCHAR2(50)</td><td>Mandatory &middot; Must be one of: CSE, ECE, MECH, CIVIL</td></tr>
+          <tr><td><strong>CREATED_DATE</strong></td><td>DATE</td><td>Defaults to SYSDATE &middot; No user input needed</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card how">
+      <div class="card-label">&#128187; SQL Workshop &rarr; SQL Commands &mdash; Run This</div>
+      <div class="card-content">
+<pre><span class="cm">-- Step 1A: Drop if exists (only if you need to restart)</span>
+<span class="cm">-- WARNING: This permanently deletes all data</span>
+<span class="cm">-- Only run this if you made a mistake in the table structure</span>
+<span class="kw">DROP TABLE</span> students PURGE;
+
+<span class="cm">-- Step 1B: Create the STUDENTS table</span>
+<span class="kw">CREATE TABLE</span> students (
+  student_id    NUMBER         <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+  student_name  VARCHAR2(<span class="num">100</span>)  <span class="kw">NOT NULL</span>,
+  email         VARCHAR2(<span class="num">150</span>),
+  department    VARCHAR2(<span class="num">50</span>)   <span class="kw">NOT NULL</span>,
+  created_date  DATE           <span class="kw">DEFAULT</span> SYSDATE <span class="kw">NOT NULL</span>
+);</pre>
+      </div>
+    </div>
+
+    <div class="card note">
+      <div class="card-label">&#128161; Why GENERATED ALWAYS AS IDENTITY</div>
+      <div class="card-content">
+        The assignment specifically says: <em>"use an Identity column (the modern, currently recommended approach) rather than a separate sequence-and-trigger."</em><br><br>
+        <code>GENERATED ALWAYS AS IDENTITY</code> means Oracle automatically assigns the next unique number to STUDENT_ID every time you insert a row. You never supply this value yourself &mdash; Oracle handles it. This is the modern Oracle 12c+ approach.
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Step 1C &mdash; Populate with 5 Records Using a PL/SQL Block</div>
+      <div class="card-content">
+        The assignment says: <strong>use a PL/SQL anonymous block &mdash; not five separate INSERT statements.</strong>
+<pre><span class="cm">-- PL/SQL Anonymous Block to insert 5 students</span>
+<span class="cm">-- Mix of at least 2 different departments required</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">INSERT INTO</span> students (student_name, email, department, created_date)
+  <span class="kw">VALUES</span> (<span class="str">'Arjun Kumar'</span>,   <span class="str">'arjun@college.in'</span>,   <span class="str">'CSE'</span>,  SYSDATE);
+
+  <span class="kw">INSERT INTO</span> students (student_name, email, department, created_date)
+  <span class="kw">VALUES</span> (<span class="str">'Priya Sharma'</span>,  <span class="str">'priya@college.in'</span>,   <span class="str">'ECE'</span>,  SYSDATE);
+
+  <span class="kw">INSERT INTO</span> students (student_name, email, department, created_date)
+  <span class="kw">VALUES</span> (<span class="str">'Rahul Verma'</span>,   <span class="str">'rahul@college.in'</span>,   <span class="str">'CSE'</span>,  SYSDATE);
+
+  <span class="kw">INSERT INTO</span> students (student_name, email, department, created_date)
+  <span class="kw">VALUES</span> (<span class="str">'Sneha Nair'</span>,    <span class="str">'sneha@college.in'</span>,   <span class="str">'MECH'</span>, SYSDATE);
+
+  <span class="kw">INSERT INTO</span> students (student_name, email, department, created_date)
+  <span class="kw">VALUES</span> (<span class="str">'Vikram Das'</span>,    <span class="str">'vikram@college.in'</span>,  <span class="str">'CIVIL'</span>,SYSDATE);
+
+  <span class="kw">COMMIT</span>;
+<span class="kw">END</span>;
+/
+
+<span class="cm">-- Verify: Should show 5 rows with auto-generated STUDENT_ID</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> students;</pre>
+        <br>
+        &#9989; You should see 5 rows. STUDENT_ID will be 1, 2, 3, 4, 5 (auto-generated). Departments mix: CSE, ECE, MECH, CIVIL.
+      </div>
+    </div>
+
+    <div class="card warn">
+      <div class="card-label">&#9888; Common Mistakes in Step 1</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>Mistake</th><th>Fix</th></tr>
+          <tr><td>Including STUDENT_ID in INSERT columns</td><td>Remove it &mdash; Identity column fills it automatically. If you include it you get an error.</td></tr>
+          <tr><td>Using SEQUENCE + TRIGGER instead of IDENTITY</td><td>Assignment specifically requires IDENTITY column &mdash; marks deducted otherwise</td></tr>
+          <tr><td>Writing 5 separate INSERT statements</td><td>Assignment requires a PL/SQL block with BEGIN...END &mdash; wrap all inserts inside it</td></tr>
+          <tr><td>All 5 rows in same department</td><td>Must have at least 2 different departments</td></tr>
+          <tr><td>Forgetting COMMIT inside the block</td><td>Data will not be saved permanently without COMMIT</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card submit">
+      <div class="card-label">&#128247; Screenshot Required Here</div>
+      <div class="card-content"><strong>Screenshot 1:</strong> SQL Workshop showing the STUDENTS table structure (Object Browser &rarr; STUDENTS &rarr; Columns tab) AND the SELECT * FROM students result showing 5 rows.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="section-label">Step 2 &middot; Create the Application</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-title">Create the Student Management App</div>
+    <div class="step-tag">App Builder</div>
+  </div>
+  <div class="step-body">
+    <div class="card how">
+      <div class="card-label">Steps</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Go to <strong>App Builder &rarr; Create &rarr; New Application</strong>.</li>
+          <li data-n="2">Name: <strong>Student Management App</strong> &mdash; use this exact name.</li>
+          <li data-n="3">Under Features: make sure <strong>Navigation Menu</strong> is enabled (it is on by default).</li>
+          <li data-n="4">Do NOT add any pages here yet &mdash; you will add them in Steps 3 and 4.</li>
+          <li data-n="5">Click <strong>Create Application</strong>. APEX creates the app with a blank home page.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="section-label">Step 3 &middot; Student Report Page</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-title">Build the Interactive Report Page</div>
+    <div class="step-tag">Page Designer</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card how">
+      <div class="card-label">3A &mdash; Create the Report Page</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Inside your app &rarr; click <strong>Create Page</strong>.</li>
+          <li data-n="2">Choose: <strong>Report &rarr; Interactive Report</strong>.</li>
+          <li data-n="3">Page Name: <strong>Student Report</strong>.</li>
+          <li data-n="4">Data Source: Table &rarr; select <strong>STUDENTS</strong>.</li>
+          <li data-n="5">Click <strong>Create Page</strong>. APEX auto-generates the report with all columns.</li>
+        </ol>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">3B &mdash; Add the "Create Student" Button</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Open the Student Report page in <strong>Page Designer</strong>.</li>
+          <li data-n="2">In the Left Panel (Rendering tab) &rarr; right-click <strong>Breadcrumb Bar</strong> region &rarr; <strong>Create Button</strong>. (Alternatively right-click the region where the page title sits.)</li>
+          <li data-n="3">Button settings in Right Panel:
+            <br>&nbsp;&nbsp;&bull; Label: <strong>Create Student</strong>
+            <br>&nbsp;&nbsp;&bull; Static ID: <strong>CREATE_STUDENT</strong> &mdash; exact, case-sensitive
+            <br>&nbsp;&nbsp;&bull; Position: <strong>Right of Title</strong>
+            <br>&nbsp;&nbsp;&bull; Action: <strong>Redirect to Page in this Application</strong>
+            <br>&nbsp;&nbsp;&bull; Target Page: select the Student Form page (built in Step 4)
+          </li>
+          <li data-n="4">Save (Ctrl+S).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card note">
+      <div class="card-label">&#128161; Tip &mdash; Button Before Form Page Exists</div>
+      <div class="card-content">If the Student Form page does not exist yet when you create this button, set the target page number manually after you build Step 4. Come back to this button and update the redirect target.</div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">3C &mdash; Make Student Name a Clickable Link</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">In Page Designer, click on the <strong>STUDENT_NAME</strong> column inside the Interactive Report region.</li>
+          <li data-n="2">In Right Panel &rarr; Column &rarr; <strong>Type: Link</strong>.</li>
+          <li data-n="3">Click the <strong>Link</strong> property &rarr; Target: Page in this Application.</li>
+          <li data-n="4">Page: select the Student Form page number.</li>
+          <li data-n="5">Set Item: <strong>P[FormPageNo]_STUDENT_ID</strong> &rarr; Value: <strong>#STUDENT_ID#</strong><br>
+          This passes the clicked student's ID to the form so it loads that record.</li>
+          <li data-n="6">Save (Ctrl+S) and Run to verify clicking a name opens the form pre-filled.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card submit">
+      <div class="card-label">&#128247; Screenshot Required Here</div>
+      <div class="card-content"><strong>Screenshot 2:</strong> The Student Report page running in the browser, showing the 5 seeded students, the Create Student button, and clickable student names.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="section-label">Step 4 &middot; Student Form Page</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-title">Build the Student Form</div>
+    <div class="step-tag">Page Designer</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card how">
+      <div class="card-label">4A &mdash; Create the Form Page</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Inside your app &rarr; <strong>Create Page &rarr; Form</strong>.</li>
+          <li data-n="2">Page Name: <strong>Student Form</strong>.</li>
+          <li data-n="3">Data Source: Table &rarr; <strong>STUDENTS</strong>.</li>
+          <li data-n="4">Primary Key Column: <strong>STUDENT_ID</strong>.</li>
+          <li data-n="5">Click <strong>Create Page</strong>. APEX generates a form with all columns as items.</li>
+        </ol>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">4B &mdash; Configure the Department as a Select List</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">In Page Designer, click on the <strong>P[N]_DEPARTMENT</strong> item.</li>
+          <li data-n="2">Right Panel &rarr; Identification &rarr; Type: change to <strong>Select List</strong>.</li>
+          <li data-n="3">List of Values &rarr; Type: <strong>Static Values</strong>.</li>
+          <li data-n="4">Click <strong>Edit</strong> next to Static Values. Add exactly four entries:
+<pre>Display Value  |  Return Value
+CSE            |  CSE
+ECE            |  ECE
+MECH           |  MECH
+CIVIL          |  CIVIL</pre>
+          </li>
+          <li data-n="5">Null Display Value: set to <strong>-- Select Department --</strong> (so blank option shows first).</li>
+          <li data-n="6">Save (Ctrl+S).</li>
+        </ol>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">4C &mdash; Hide Fields Not Needed from User</div>
+      <div class="card-content">
+        <table style="margin-top:0;">
+          <tr><th>Item</th><th>Action</th><th>Reason</th></tr>
+          <tr><td>P[N]_STUDENT_ID</td><td>Keep as Hidden (already is by default)</td><td>Auto-generated &mdash; user should not see or edit it</td></tr>
+          <tr><td>P[N]_CREATED_DATE</td><td>Set to Hidden or Display Only</td><td>Defaults to SYSDATE &mdash; no user input needed</td></tr>
+          <tr><td>P[N]_STUDENT_NAME</td><td>Keep as Text Field</td><td>User enters this</td></tr>
+          <tr><td>P[N]_EMAIL</td><td>Keep as Text Field</td><td>Optional &mdash; user may leave blank</td></tr>
+          <tr><td>P[N]_DEPARTMENT</td><td>Changed to Select List in 4B</td><td>User picks from 4 options</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="section-label">Step 5 &middot; Validation Rules</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-title">Add Two Validation Rules</div>
+    <div class="step-tag">Validations</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card what">
+      <div class="card-label">Key Requirement &mdash; Read Carefully</div>
+      <div class="card-content">
+        <strong>Rule A</strong> &mdash; Client-side: Error must appear <strong>in the browser instantly</strong> when submit is attempted &mdash; NO round trip to the server.<br><br>
+        <strong>Rule B</strong> &mdash; Server-side: Error must only appear <strong>after</strong> the form is submitted to the server &mdash; cannot fire before that.<br><br>
+        These are two completely different APEX mechanisms.
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Rule A &mdash; Client-Side: Student Name Cannot Be Empty</div>
+      <div class="card-content">
+        <strong>Mechanism to use: Item &rarr; Value Required = Yes (HTML5 required attribute)</strong><br><br>
+        <ol class="steps">
+          <li data-n="1">In Page Designer, click on <strong>P[N]_STUDENT_NAME</strong> item.</li>
+          <li data-n="2">Right Panel &rarr; Validation section &rarr; <strong>Value Required: Yes</strong>.</li>
+          <li data-n="3">This adds the HTML5 <code>required</code> attribute to the input field.</li>
+          <li data-n="4">Save (Ctrl+S).</li>
+        </ol>
+        <br>
+        <strong>Why this is client-side:</strong> The browser itself checks the <code>required</code> attribute before the form is even submitted. The page never sends a request to the server &mdash; the browser blocks the submit and shows an error instantly.
+      </div>
+    </div>
+
+    <div class="card note">
+      <div class="card-label">&#128161; Alternative Client-Side Method</div>
+      <div class="card-content">
+        Another valid approach: Add a <strong>Dynamic Action</strong> on the Save button click event that uses JavaScript to check if the field is empty and show an alert &mdash; before page submit. Either approach satisfies Rule A as long as it prevents the server round trip.
+      </div>
+    </div>
+
+    <div class="card submit" style="margin-top:14px;">
+      <div class="card-label">&#128247; Screenshot Required Here</div>
+      <div class="card-content"><strong>Screenshot 3:</strong> Page Designer showing Rule A configured on P[N]_STUDENT_NAME &mdash; show the Value Required = Yes setting in the Right Panel.</div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Rule B &mdash; Server-Side: Letters and Spaces Only</div>
+      <div class="card-content">
+        <strong>Mechanism to use: APEX Validation &rarr; PL/SQL Expression</strong><br><br>
+        <ol class="steps">
+          <li data-n="1">In Page Designer &rarr; Left Panel &rarr; Processing tab &rarr; right-click <strong>Validating</strong> &rarr; <strong>Create Validation</strong>.</li>
+          <li data-n="2">Right Panel settings:
+            <br>&nbsp;&nbsp;&bull; Name: <strong>Student Name Letters Only</strong>
+            <br>&nbsp;&nbsp;&bull; Type: <strong>Function Body Returning Boolean</strong> (or PL/SQL Expression)
+            <br>&nbsp;&nbsp;&bull; Item: <strong>P[N]_STUDENT_NAME</strong>
+          </li>
+          <li data-n="3">PL/SQL Expression (use this):
+<pre><span class="fn">REGEXP_LIKE</span>(:P<span class="num">N</span>_STUDENT_NAME, <span class="str">'^[A-Za-z ]+$'</span>)</pre>
+          Replace N with your actual page number.
+          </li>
+          <li data-n="4">Error Message: <strong>Student Name must contain only letters and spaces.</strong> &mdash; exact text required.</li>
+          <li data-n="5">Always Execute: <strong>No</strong> &mdash; only fire when student name is not null (Rule A handles the empty case).</li>
+          <li data-n="6">Save (Ctrl+S).</li>
+        </ol>
+        <br>
+        <strong>Why this is server-side:</strong> APEX Validations run during the Processing phase &mdash; only after the form has been submitted and the request has reached the server. The browser has no knowledge of this rule.
+      </div>
+    </div>
+
+    <div class="card what">
+      <div class="card-label">What REGEXP_LIKE Does Here</div>
+      <div class="card-content">
+        <code>^[A-Za-z ]+$</code> means:<br><br>
+        <code>^</code> &mdash; Start of string<br>
+        <code>[A-Za-z ]</code> &mdash; Only uppercase letters, lowercase letters, or a space<br>
+        <code>+</code> &mdash; One or more characters<br>
+        <code>$</code> &mdash; End of string<br><br>
+        So <code>Arjun Kumar</code> &rarr; passes (only letters and space)<br>
+        So <code>John123</code> &rarr; fails (contains digits) &rarr; error shown
+      </div>
+    </div>
+
+    <div class="card submit">
+      <div class="card-label">&#128247; Screenshot Required Here</div>
+      <div class="card-content"><strong>Screenshot 4:</strong> Page Designer showing Rule B &mdash; the server-side validation on STUDENT_NAME with the REGEXP_LIKE expression and the exact error message visible in the Right Panel.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="section-label">Step 6 &middot; Dynamic Action &mdash; CSE Reminder Message</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-title">Show CSE Elective Reminder Instantly</div>
+    <div class="step-tag">Dynamic Action</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card what">
+      <div class="card-label">What to Build</div>
+      <div class="card-content">
+        When Department = CSE &rarr; show message: <strong>"CSE students must register their elective by Friday."</strong><br>
+        When Department = anything else &rarr; hide the message.<br>
+        Must happen instantly &mdash; no page reload.
+      </div>
+    </div>
+
+    <div class="card how">
+      <div class="card-label">6A &mdash; Add a Display Item for the Message</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">In Page Designer, add a new item below the Department field.</li>
+          <li data-n="2">Type: <strong>Display Only</strong> (or Static Content / HTML region).</li>
+          <li data-n="3">Name: <strong>P[N]_CSE_MESSAGE</strong>.</li>
+          <li data-n="4">Default Value: <strong>CSE students must register their elective by Friday.</strong></li>
+          <li data-n="5">Under Layout &rarr; set it as <strong>Hidden</strong> by default (so it starts invisible).</li>
+          <li data-n="6">Save (Ctrl+S).</li>
+        </ol>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">6B &mdash; Create the Dynamic Action</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">In Page Designer, right-click <strong>P[N]_DEPARTMENT</strong> item &rarr; <strong>Create Dynamic Action</strong>.</li>
+          <li data-n="2">Name: <strong>Show CSE Message</strong>.</li>
+          <li data-n="3"><strong>WHEN</strong> settings:
+            <br>&nbsp;&nbsp;&bull; Event: <strong>Change</strong>
+            <br>&nbsp;&nbsp;&bull; Selection Type: <strong>Item</strong>
+            <br>&nbsp;&nbsp;&bull; Item: <strong>P[N]_DEPARTMENT</strong>
+          </li>
+          <li data-n="4"><strong>Condition</strong> settings:
+            <br>&nbsp;&nbsp;&bull; Condition Type: <strong>Equal to</strong>
+            <br>&nbsp;&nbsp;&bull; Value: <strong>CSE</strong>
+          </li>
+          <li data-n="5"><strong>True Action</strong>:
+            <br>&nbsp;&nbsp;&bull; Action: <strong>Show</strong>
+            <br>&nbsp;&nbsp;&bull; Affected Elements &rarr; Item: <strong>P[N]_CSE_MESSAGE</strong>
+          </li>
+          <li data-n="6">Click <strong>+ Add False Action</strong>:
+            <br>&nbsp;&nbsp;&bull; Action: <strong>Hide</strong>
+            <br>&nbsp;&nbsp;&bull; Affected Elements &rarr; Item: <strong>P[N]_CSE_MESSAGE</strong>
+          </li>
+          <li data-n="7">Save (Ctrl+S).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card note">
+      <div class="card-label">&#128161; Also Hide on Page Load</div>
+      <div class="card-content">
+        Add a second Dynamic Action:<br>
+        WHEN: <strong>Page Load</strong> &rarr; Action: <strong>Hide</strong> &rarr; Item: P[N]_CSE_MESSAGE<br><br>
+        This ensures the message is hidden when the form first opens &mdash; before the user picks any department.
+      </div>
+    </div>
+
+    <div class="card submit">
+      <div class="card-label">&#128247; Screenshot Required Here</div>
+      <div class="card-content"><strong>Screenshot 5:</strong> Page Designer showing the complete Dynamic Action &mdash; the WHEN (Change on DEPARTMENT), Condition (Equal to CSE), True Action (Show CSE_MESSAGE), and False Action (Hide CSE_MESSAGE) all visible.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 7: TESTING -->
+<div class="section-label">Step 7 &middot; Testing &mdash; All Required Screenshots</div>
+<div class="step">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-title">Test Every Requirement and Capture Screenshots</div>
+    <div class="step-tag">Testing</div>
+  </div>
+  <div class="step-body">
+
+    <div class="card how">
+      <div class="card-label">Test 1 &mdash; Rule A: Blank Name Blocked Before Submit</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Run the app &rarr; click Create Student button.</li>
+          <li data-n="2">Leave Student Name <strong>completely empty</strong>.</li>
+          <li data-n="3">Click the Save/Submit button.</li>
+          <li data-n="4">The browser must block the submit and show an error <strong>instantly</strong> &mdash; no page flicker, no server round trip.</li>
+        </ol>
+        <br>&#128247; <strong>Screenshot 6:</strong> Browser showing the blank name error appearing immediately &mdash; the URL should NOT have changed (no round trip happened).
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Test 2 &mdash; Rule B: "John123" Rejected After Submit</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Open Create Student form.</li>
+          <li data-n="2">Enter Student Name: <strong>John123</strong>.</li>
+          <li data-n="3">Fill other required fields (Department: select any).</li>
+          <li data-n="4">Click Save/Submit.</li>
+          <li data-n="5">The page must submit to the server first (you will see a brief page reload) and then show the error: <strong>"Student Name must contain only letters and spaces."</strong></li>
+        </ol>
+        <br>&#128247; <strong>Screenshot 7:</strong> Error message visible after submit &mdash; "Student Name must contain only letters and spaces."
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Test 3 &mdash; Dynamic Action: CSE Message Appears/Disappears</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Open Create Student form.</li>
+          <li data-n="2">Change Department dropdown to <strong>CSE</strong>.</li>
+          <li data-n="3">Message must appear instantly: "CSE students must register their elective by Friday."</li>
+          <li data-n="4">Change Department to <strong>ECE</strong> (or any other).</li>
+          <li data-n="5">Message must disappear instantly. No page reload either way.</li>
+        </ol>
+        <br>&#128247; <strong>Screenshot 8a:</strong> CSE selected &mdash; message visible.<br>
+        &#128247; <strong>Screenshot 8b:</strong> Different department selected &mdash; message hidden.
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Test 4 &mdash; Click Student Name Link Opens Pre-filled Form</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Go to Student Report page.</li>
+          <li data-n="2">Click any student name (e.g. Arjun Kumar).</li>
+          <li data-n="3">Student Form must open with <strong>that student's data pre-filled</strong> in all fields.</li>
+        </ol>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="card how">
+      <div class="card-label">Test 5 &mdash; Create 2 New Students Through the Form</div>
+      <div class="card-content">
+        <ol class="steps">
+          <li data-n="1">Click Create Student button.</li>
+          <li data-n="2">Fill all fields correctly for a new student. Click Save.</li>
+          <li data-n="3">Repeat for a second new student.</li>
+          <li data-n="4">Go back to Student Report. Both new students must appear.</li>
+        </ol>
+        <br>&#128247; <strong>Screenshot 9:</strong> Student Report showing at least 7 rows total (5 seeded + 2 new).
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- WHAT TO SUBMIT -->
+<div class="section-label">What You Must Submit &mdash; Complete Checklist</div>
+<div class="step" style="box-shadow:none;">
+  <div class="step-body" style="padding:16px 20px;">
+    <ul class="checklist">
+      <li><strong>Screenshot 1</strong> &mdash; STUDENTS table structure + 5 seeded rows in SQL Workshop</li>
+      <li><strong>Screenshot 2</strong> &mdash; Student Report page showing seeded students with Create button and clickable names</li>
+      <li><strong>Screenshot 3</strong> &mdash; Page Designer showing Rule A (client-side &mdash; Value Required = Yes on STUDENT_NAME)</li>
+      <li><strong>Screenshot 4</strong> &mdash; Page Designer showing Rule B (server-side &mdash; REGEXP_LIKE validation with exact error message)</li>
+      <li><strong>Screenshot 5</strong> &mdash; Page Designer showing complete Dynamic Action (WHEN, Condition, True Action, False Action)</li>
+      <li><strong>Screenshot 6</strong> &mdash; Live test: blank Student Name blocked before submission (browser error, no page reload)</li>
+      <li><strong>Screenshot 7</strong> &mdash; Live test: "John123" rejected after Submit with correct error message visible</li>
+      <li><strong>Screenshot 8a</strong> &mdash; Live test: CSE selected &mdash; reminder message visible</li>
+      <li><strong>Screenshot 8b</strong> &mdash; Live test: different department selected &mdash; reminder message hidden</li>
+      <li><strong>Screenshot 9</strong> &mdash; Final Student Report showing at least 2 newly created students</li>
+    </ul>
+    <div class="card warn" style="margin-top:16px;">
+      <div class="card-label">&#9888; Every Screenshot Must Show</div>
+      <div class="card-content">The <strong>browser URL bar</strong> and your <strong>workspace name</strong> in the APEX header. Screenshots without these cannot be verified as your own work and will not be evaluated.</div>
+    </div>
+    <div class="card note" style="margin-top:0;">
+      <div class="card-label">File Submission</div>
+      <div class="card-content">Compile all screenshots in order into one PDF or Word document.<br>
+      File name: <code>RollNumber_StudentManagementApp.pdf</code><br>
+      Example: <code>21CS045_StudentManagementApp.pdf</code><br>
+      Submit through the LMS assignment link before the deadline.</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK REFERENCE -->
+<div class="section-label">Quick Reference &mdash; Key Concepts Used</div>
+<div class="step" style="box-shadow:none;border:1px solid var(--border);">
+  <div class="step-body" style="padding:16px 20px;">
+    <table style="margin-top:0;">
+      <tr><th>Requirement</th><th>APEX Mechanism</th><th>Where to Configure</th></tr>
+      <tr><td>Auto-generate STUDENT_ID</td><td>GENERATED ALWAYS AS IDENTITY</td><td>CREATE TABLE statement</td></tr>
+      <tr><td>Insert 5 rows as a block</td><td>PL/SQL Anonymous Block (BEGIN...END)</td><td>SQL Workshop &rarr; SQL Commands</td></tr>
+      <tr><td>Department as dropdown</td><td>Select List item with Static LOV</td><td>Page Designer &rarr; Item type</td></tr>
+      <tr><td>Rule A: client-side empty check</td><td>Value Required = Yes (HTML5 required)</td><td>Item &rarr; Validation &rarr; Value Required</td></tr>
+      <tr><td>Rule B: server-side format check</td><td>APEX Validation &rarr; PL/SQL Expression (REGEXP_LIKE)</td><td>Processing tab &rarr; Validating</td></tr>
+      <tr><td>CSE instant message</td><td>Dynamic Action: Change &rarr; Equal to CSE &rarr; Show/Hide</td><td>Right-click item &rarr; Create Dynamic Action</td></tr>
+      <tr><td>Clickable name link to form</td><td>IR Column Type: Link with STUDENT_ID passed</td><td>Column &rarr; Type: Link</td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+<div class="footer">Assignment 1 &middot; Student Management Application &middot; OCI GenAI Foundation Programme &middot; Day 31</div>
+</body>
+</html>
